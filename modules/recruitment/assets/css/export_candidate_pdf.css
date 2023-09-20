@@ -1,0 +1,123 @@
+.align_left{
+	text-align: left;
+}
+.align_right{
+	text-align: right;
+}
+.avartar_w_h{
+	width: 200px;
+	height: 280px;
+}
+.text_align_center{
+	text-align: center;
+}
+.text_align_justify{
+	text-align: justify;
+}
+.av_margin_left{
+	padding-left: 100px;
+}
+
+
+.border_table{
+	border: 1px solid #000000!important;
+	
+}
+
+.experience_boder{
+	margin: 50px!important; 
+}
+.candidate_name_color{
+	color: black; 
+}
+.position_color{
+	color: black; 
+}
+.candidate_code_color{
+	color: black; 
+}
+
+.summary_title{
+	color: black; 
+	font-size: 19px;
+
+}
+
+.introduce_yourself{
+	color: black; 
+	font-size: 15px;
+
+}
+
+.employment_record_title{
+	color: black; 
+	font-size: 19px;
+
+}
+.record_title{
+	color: black; 
+	font-size: 17px;
+	font-weight: bold;
+
+}
+.record_content{
+	color: black; 
+	font-size: 15px;
+
+}
+
+.employment_literacy_title{
+	color: black; 
+	font-size: 19px;
+
+}
+.literacy_title{
+	color: black; 
+	font-size: 17px;
+	font-weight: bold;
+
+}
+.literacy_content{
+	color: black; 
+	font-size: 15px;
+
+}
+.skill_name{
+	border: 1px solid black;
+	padding: 10px
+}
+
+.logo_width{
+	width: 150px;
+}
+
+.candidate_name_widt_27{
+	width: 27%;
+}
+.logo_with{
+	width: 73%;
+}
+.avatar_width_30{
+	width: 27%;
+}
+.qualifications_width_70{
+	width: 70%;
+}
+.td_width_100{
+	width: 100%;
+}
+.td_width_2{
+	width: 2%;
+}
+.td_width_15{
+	width: 15%;
+}
+.td_width_38{
+	width: 38%;
+}
+.td_width_27{
+	width: 27%;
+}
+.td_width_96{
+	width: 96%;
+}

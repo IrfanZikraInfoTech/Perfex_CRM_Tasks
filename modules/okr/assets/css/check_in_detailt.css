@@ -1,0 +1,66 @@
+
+
+th, td {
+  padding: 15px;
+}
+th {
+  text-align: left;
+  background-color: #4D5F76;
+  color: white;
+  border-color: white;
+}
+.main_results{
+  /*font-size: 1em;*/
+  text-align: center;
+}
+.main_results > .main_results_title{
+  font-size: 1.1em;
+  font-weight: 500;
+  text-align: center !important;
+}
+.plan-detailt, .result-detailt {
+    height: 30px;
+    padding: 10px;
+    border-radius: 5px;
+}
+.plan-detailt {
+  padding-left: 1px !important;    
+}
+.result-detailt {
+  padding-right: 1px !important;
+}
+.plan-detailt > div, .result-detailt > div {
+    position: relative;
+    background-color: #c0c0c0;
+    top: 0;
+    left: 1px;
+    right: 1px;
+    margin: -7px 0px 0px 0px;
+    padding: 9px;
+    bottom: 0;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.plan-detailt > div {
+  background-color: #1ABC9C;
+
+}
+.result-detailt > div {
+  background-color: #7CB5EC;
+}
+
+/*.plan-detailt > div > span, .result-detailt > div > span{
+  margin: 12px 0px 0px -20px;
+  position: absolute;
+}*/
+
+.task_add, .task_list_view_rs{
+  cursor: pointer;
+}
+
+.task-hanld {
+  position: absolute;
+  transform: translate(2px, 63px);
+}

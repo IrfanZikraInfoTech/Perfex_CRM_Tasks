@@ -1,0 +1,100 @@
+.treegrid-expander {
+	display: inline-block;
+	margin-left: -24px;
+	position: relative;
+	width: 24px;
+
+}
+.treegrid-expander {
+	vertical-align: middle;
+}
+.treegrid-expander::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -54%;
+  width: 15px;
+  height: 1px;
+  background: dodgerblue;
+  border: 1px solid gray;
+  transform: translate(0px, 3px);
+  top: 20px;
+    left: 9px;
+
+}
+.treegrid-expander::after {
+	content: "\f0da";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    color: #991FFC;
+	display: block;
+	text-align: center;
+    font-size: 27px;
+	left: 50%;
+	margin-left: -14px;
+	margin-top: -22px;
+	position: absolute;
+	top: 55%;
+	width: 1em;
+    height: 1em;
+    text-align: center;
+    line-height: 1em;
+    border-radius: 50%;
+    border: 1px solid gray;
+    background: white;
+    margin: -11px 0 0 -52px;
+    left: 34px;
+    top: 18px;
+}
+.treegrid-expander-expanded,
+.treegrid-expander-collapsed {
+	cursor: pointer;
+}
+.treegrid-expander-expanded::after {
+	content: "\f0da";
+    font-family: FontAwesome;
+    font-size: 27px;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    margin: -9px 0 0 -52px;
+    left: 34px;
+    top: 18px;
+}
+.treegrid-expander-collapsed::after {
+	content: "\f0d7";
+    font-family: FontAwesome;
+    font-size: 27px;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    margin: -9px 0 0 -52px;
+    left: 34px;
+    top: 18px;
+}
+
+tr.loading>td>.treegrid-container>.treegrid-expander::after {
+	background: url('../images/loader.gif') center center no-repeat;
+	border: 0;
+	height: 16px;
+	margin-left: -8px;
+	margin-top: -8px;
+	width: 16px;
+}
+.treegrid-move-indicator {
+	border: 5px solid transparent;
+	border-left-color: #000;
+	display: none;
+	width: 0;
+	height: 0;
+	position: absolute;
+	margin-top: -5px;
+	margin-left: -6px;
+}
+.treegrid-container.dragging {
+	margin-left: 0 !important;
+
+	position: absolute;
+}

@@ -1,0 +1,36 @@
+.padding-5{
+	padding: 5px 5px 5px 5px;
+}
+.campaign-planning-style{
+	color:#c53da9 ;
+	border:1px solid #c53da9;
+}
+.campaign-progress-style{
+	color:#28B8DA ;
+	border:1px solid #28B8DA;
+}
+.campaign-finish-style{
+	color:#84C529 ;
+	border:1px solid #84C529;
+}
+.campaign-cancel-style{
+	color:#fb3b3b ;
+	border:1px solid #fb3b3b;
+}
+.campaign-overdue-style{
+	color:#fb8c00 ;
+	border:1px solid #fb8c00;
+}
+.ribbon.warnings span {
+    background: #c53da9;
+}
+.padding-left-10{
+	padding-left: 10px;
+}
+.candidate_request-color{
+	color: #fb8c00;
+}
+.candidate_request-hr{
+	border: 0.5px solid; 
+	color: #fb8c00
+}

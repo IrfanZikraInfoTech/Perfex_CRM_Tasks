@@ -1,0 +1,12 @@
+.insurance_type_frame{
+	overflow-x: scroll;
+}
+.ui-datepicker-calendar {
+	display: none;
+}
+.ui-datepicker-month{
+	color: #323a45;
+}
+.ui-datepicker-year{
+	color: #323a45;
+}

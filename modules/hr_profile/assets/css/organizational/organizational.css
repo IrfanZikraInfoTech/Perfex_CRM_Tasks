@@ -1,0 +1,106 @@
+#department_chart .orgchart>table>tr:first-child .node .chart_company_name img.img_logo_1 {
+    background-color: transparent;
+    width: 50px;
+    height: 50px;
+    padding: 10px;
+    
+    margin-top: 0px;
+
+    }
+#department_chart .orgchart>table>tr:first-child .node .chart_company_name p.title_company_1{
+    width: 185px !important;
+    word-break: break-word;
+    height: 89px !important;
+    white-space: pre-wrap;
+    font-size: 15px;
+    padding: 0px 0px 0px 19px;
+    font-weight: bold;
+    background-color: white;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    margin-top: 16px;
+  }
+#department_chart .orgchart>table>tr:first-child .node .chart_company_name{
+    
+    padding: 5px;
+    min-height: 0px;
+    max-height: 100px;
+    flex-direction: row;
+    justify-content: center;
+    word-wrap: break-word;
+}
+
+#department_chart .orgchart>table>tr .node .chart_company_name{
+    background-color: #fab017ba  !important;
+    border: 1px solid #fab017ba ;
+    display: flex;
+    align-items: center;
+}
+
+.department-chart-modal{
+    width: 100%;
+    height: 100%;
+    /*background-color: orange;*/
+}
+#department_chart{
+    overflow: hidden;
+    bottom: 0;
+    top: 0;
+    position: fixed;
+    left: 0;
+    right: 0;
+    margin-top: 4%;
+
+}
+
+.unit-chart-modal{
+    width: 100%;
+    height: 100%;
+    /*background-color: orange;*/
+}
+#unit_chart{
+    overflow: hidden;
+    bottom: 0;
+    top: 0;
+    position: fixed;
+    left: 0;
+    right: 0;
+    margin-top: 4%;
+
+}
+
+#un_chart{
+    background-color: #f0f0f0;
+    bottom: 0;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+}
+#department_chart_view .modal-body{
+    height: 700px;
+}
+
+.organizational_chart_dialog{
+    width: 100%;
+}
+
+.modal-dialog {
+    margin: auto !important;
+}
+
+#department_chart_view #dp_chart {
+    bottom: 0;
+    background-color: #f0f0f0;
+    position: fixed;
+    top: 64px;
+    left: 0px;
+    right: 0;
+}
+
+div#department_chart_view {
+    padding-right: 0px !important;
+}

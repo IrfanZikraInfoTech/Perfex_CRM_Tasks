@@ -1,0 +1,208 @@
+.picture-container {
+    position: relative;
+    cursor: pointer;
+    text-align: center;
+}
+.picture {
+    width: 170px;
+    height: 170px;
+    background-color: #999999;
+    border: 4px solid #CCCCCC;
+    color: #FFFFFF;
+    border-radius: 50%;
+    margin: 0px auto;
+    overflow: hidden;
+    transition: all 0.2s;
+    -webkit-transition: all 0.2s;
+}
+.picture-src {
+    width: 100%;
+    height: 100%;
+}
+.picture input[type="file"] {
+    cursor: pointer;
+    display: block;
+    height: 100%;
+    left: 0;
+    opacity: 0 !important;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+.hr_profile_profile_edit .container{
+    text-align: center;
+    display: flex;
+    justify-content: center;	
+}
+.text-info {
+    color: #0ca7ec !important;
+}
+.ribbon-top-right {
+    top: -10px;
+    right: -10px;
+}
+.ribbon {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    position: absolute;
+    z-index: 10;
+    text-align: right;
+}
+.ribbon-top-right::before, .ribbon-top-right::after {
+    border-top-color: transparent;
+    border-right-color: transparent;
+}
+.ribbon::before, .ribbon::after {
+    position: absolute;
+    z-index: -1;
+    content: '';
+    display: block;
+    border: 5px solid;
+}
+.ribbon-top-right span {
+    left: -8px;
+    top: 30px;
+    transform: rotate(45deg);
+}
+.ribbon-top-right::before {
+    top: 0;
+    left: 36px;
+}
+.ribbon span {
+    position: absolute;
+    display: block;
+    width: 225px;
+    padding: 8px 0;
+    box-shadow: 0 5px 10px rgba(0,0,0,.1);
+    text-shadow: 0 1px 1px rgba(0,0,0,.2);
+    text-transform: capitalize;
+    text-align: center;
+    font-size: 10px;
+}
+.ribbon span {
+    font-weight: 500;
+    color: #03c;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 20px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    display: block;
+    position: absolute;
+    right: -45px;
+}
+.card {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    border-radius: 3px;
+    word-wrap: break-word;
+    border: 1px solid #e2ebf7 !important;
+    box-shadow: 0 0 3px rgba(31,30,47,.05);
+}
+.card {
+    position: relative;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+.bg_inactivity {
+    color: #f72222 !important;
+    font-size: 12px !important;
+    background-color: #c0c0c0b8 !important;
+}
+.ribbon span::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 100%;
+    z-index: -1;
+    border-left: 3px solid #1C841B;
+    border-right: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+    border-top: 3px solid #1C841B;
+}
+.ribbon span::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: -1;
+    border-left: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+}
+.list-group-item{
+    border-radius: unset;
+    border-left: 0;
+    border-right: 0;
+}
+.box-shadow-0 {
+    box-shadow: none !important;
+}
+.overflow-hidden {
+    overflow: hidden;
+}
+.card {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    border-radius: 3px;
+    word-wrap: break-word;
+    border: 1px solid #e2ebf7 !important;
+    box-shadow: 0 0 3px rgba(31,30,47,.05);
+}
+
+.table-margin-none{
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+/*
+.picture{   
+    background-color: #999999;
+    border: 4px solid #CCCCCC;
+    color: #FFFFFF;
+    border-radius: 10%;
+    margin: 0px auto;
+    overflow: hidden;
+    transition: all 0.2s;
+    -webkit-transition: all 0.2s;
+    width: 200px;
+    height: 200px;
+   border-radius: 50%;
+}
+.picture:hover{
+    border-color: #2ca8ff;
+}
+.content.ct-wizard-green .picture:hover{
+    border-color: #05ae0e;
+}
+.content.ct-wizard-blue .picture:hover{
+    border-color: #3472f7;
+}
+.content.ct-wizard-orange .picture:hover{
+    border-color: #ff9500;
+}
+.content.ct-wizard-red .picture:hover{
+    border-color: #ff3b30;
+}
+.picture input[type="file"] {
+    cursor: pointer;
+    display: block;
+    height: 100%;
+    left: 0;
+    opacity: 0 !important;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.picture-src{
+    width: 100%;
+    */
+/*}*/

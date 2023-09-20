@@ -1,0 +1,59 @@
+.kan-ban-overflow{
+	overflow:auto;
+}
+.panel-heading-bg.application-style {
+    color: #28B8DA;
+    border: 1px solid #28B8DA;
+    background: #28B8DA;
+}
+.panel-heading-bg.potential-style {
+    color: #CD853F;
+    border: 1px solid #CD853F;
+    background: #CD853F;
+}
+.panel-heading-bg.interview-style {
+    color: #00FF33;
+    border: 1px solid #00FF33;
+    background: #00FF33;
+}
+.panel-heading-bg.won_interview-style {
+    color: #CCCC00;
+    border: 1px solid #CCCC00;
+    background: #CCCC00;
+}
+.panel-heading-bg.send_offer-style {
+    color: #FF9999;
+    border: 1px solid #FF9999;
+    background: #FF9999;
+}
+.panel-heading-bg.elect-style {
+    color: #84c529;
+    border: 1px solid #84c529;
+    background: #84c529;
+}
+.panel-heading-bg.non_elect-style {
+    color: #FF6666;
+    border: 1px solid #FF6666;
+    background: #FF6666;
+}
+.panel-heading-bg.unanswer-style {
+    color: #FF3333;
+    border: 1px solid #FF3333;
+    background: #FF3333;
+}
+.panel-heading-bg.transferred-style {
+    color: #8B4726;
+    border: 1px solid #8B4726;
+    background: #8B4726;
+}
+.panel-heading-bg.freedom-style {
+    color: #FF34B3;
+    border: 1px solid #FF34B3;
+    background: #FF34B3;
+}
+.span_heading_color {
+    color: white;
+}
+.kan-ban-wrapper-min-height{
+	min-height: 30vh;
+}

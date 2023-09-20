@@ -1,0 +1,159 @@
+.dt-table-loading.table, .table-loading .dataTables_filter, .table-loading .dataTables_length, .table-loading .dt-buttons, .table-loading table tbody tr, .table-loading table thead th {
+	opacity: 1!important;
+}
+.mt-0{	margin-top: 0; }
+.mb-0{	margin-bottom: 0; }
+.pt-1{	padding-top: 1px; }
+.pt-2{	padding-top: 2px; }
+.pt-3{	padding-top: 3px; }
+.pt-4{	padding-top: 4px; }
+.pt-5{	padding-top: 5px; }
+.pt-6{	padding-top: 6px; }
+.pt-7{	padding-top: 7px; }
+.pt-8{	padding-top: 8px; }
+.pt-9{	padding-top: 9px; }
+.pt-10{	padding-top: 10px; }
+.hover{	display: none; }
+.item_hover:hover .hover{ display: block; }
+.w-100{
+	width: 100%;
+} 
+.h-100{
+	height: 100%;
+} 
+.border-none{
+	border: none;
+}
+.cursor-pointer{
+	cursor: pointer;
+}
+.mr-7{
+	margin-right: 7px;
+}
+.bg-fab017{
+	background-color: #fab017;
+}
+.p-5{
+	padding: 5px;
+}
+.organizational{
+	border-radius: 4px 4px 0px 0px;
+	color: white;
+	padding: 5px;
+	min-width: 195px;
+}
+.zen_unit_chart{
+	height: 35px;
+}
+.h5-color {
+    color: #d8341b;
+}
+.hr-color {
+    margin-top: 10px;
+    border-bottom: 0.5px solid;
+    color: #d8341b;
+}
+
+body.dependent_persons .label-success:hover,
+body.dependent_persons .label-success:active {
+    background: rgb(110, 160, 41);
+    border: rgb(132, 197, 41);
+    color: #ffffff !important;
+}
+
+body.dependent_persons .label-success, body.resignation_procedures .label-success, body.knowledge_base_q_a .label-success, body.contracts .label-success, body.hr_profile .label-success,  body.hr_profile .contract-ribbonc-success  {
+    background: rgb(132, 197, 41);
+    border: rgb(132, 197, 41);
+    color: #ffffff !important;
+}
+
+body.dependent_persons .label-danger, body.contracts .label-danger, body.hr_profile .label-danger,  body.hr_profile .contract-ribbonc-danger {
+    background: rgba(244, 3, 47, 0.59);
+    border: 1px solid rgb(248, 106, 132);
+    color: #ffffff !important;
+}
+body.dependent_persons .label-primary, body.resignation_procedures .label-primary, body.hr_profile .label-primary, body.hr_profile .contract-ribbonc-primary {
+    background: rgba(40, 184, 218, 0.93);
+    border: 1px solid rgb(40, 184, 218);
+    color: #ffffff !important;
+}
+body.dependent_persons .label-warning, body.hr_profile .label-warning, body.hr_profile .contract-ribbonc-warning {
+    background: rgba(255, 152, 0, 1);
+    border: 1px solid rgb(255, 152, 0);
+    color: #ffffff !important;
+}
+
+
+.resignation-procedures-modal{
+    padding: 10px 10px;
+}
+
+input#kb_article_files {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    opacity: 0;
+    outline: 0;
+    background: #fff;
+    cursor: pointer;
+    display: block;
+}
+
+.publisher-tools-tab.attach {
+    position: relative;
+    overflow: hidden;
+}
+
+.publisher-tools-tab {
+    display: block;
+    background: #f7f7f7;
+    padding: 7px 14px;
+    color: #7f838a;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 25px;
+    margin-bottom: 15px;
+}
+
+th.th-color{
+    color: #fff !important;
+    background-color: #2d2d2d;
+}
+.att-background-color{
+    background-color: #f1f5fa;
+}
+
+.staff-chart-background-color{
+    background-color: #fab017;
+    border-radius: 4px 4px 0px 0px;
+    color: white;
+    padding: 5px;min-width: 195px;
+}
+
+.staff-chart-margin{
+    margin-right:7px
+}
+
+.articles-width{
+    width:300px;
+}
+.table-margintop{
+    margin-top: 0px !important;
+}
+.signature-pad--body {
+    border-radius: 4px;
+    position: relative;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    border: 1px solid #c0cbda;
+}
+
+.hr-img-responsive {
+    width: 300px;
+    height: auto;
+}

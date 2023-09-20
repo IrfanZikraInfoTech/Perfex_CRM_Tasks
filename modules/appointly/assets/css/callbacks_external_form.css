@@ -1,0 +1,191 @@
+body {
+    overflow-x: hidden !important;
+}
+
+.cb-form-wrapper {
+    font-family: inherit;
+    position: absolute;
+    background: #fff;
+    z-index: 9999999;
+    top: calc(100% - 98.5%);
+    width: 540px;
+    right: 0;
+    box-sizing: border-box;
+    padding: 25px 30px 20px 30px;
+    min-height: 218px;
+    border-bottom-left-radius: 2px;
+    -webkit-transform: translateX(100%);
+    transform: translateX(100%);
+    transition: all 0.4s ease;
+}
+
+.pfx-cb-show {
+    right: 540px !important;
+}
+
+.pfx-cb-hide {
+    right: 0 !important;
+}
+
+.text-dark {
+    color: #333;
+}
+
+
+/* 
+This adds request a callback label in the request callbacks form
+If this below is uncommented 
+You should gho in modules\appointly\views\forms\callbacks_form.php and uncomment    <!-- <span>Request a Callback</span> --> at line 6
+/* .cb-form-color {
+    background-color: rgb(51, 170, 255)
+} */
+
+#perfex-callbacks-form .vertical {
+    cursor: pointer;
+    position: absolute;
+    transform-origin: 0 0;
+    font-size: 16px;
+    line-height: 34px;
+    z-index: 1;
+    padding: 10px 10px;
+    padding-right: 10px;
+    color: #ffffff;
+    /* Uncomment left -2 and comment left -34 if you uncomennted above lines  and want to have request label text in form */
+    /* left: -2px; */
+    left: -34px;
+    top: -1px;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    -webkit-transform: rotate(-90deg) translate(-100%, -100%);
+    transform: rotate(-90deg) translate(-100%, -100%);
+    padding-right: 64px;
+    border-radius: 5px;
+}
+
+.callback-icon {
+    display: block;
+    z-index: 1;
+    position: absolute;
+    top: -2px;
+    right: 0;
+    transform: rotate(90deg);
+    width: 54px;
+    height: 54px;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #e3e3e3;
+    border-radius: 2px;
+}
+
+.callback-icon span {
+    font-weight: normal;
+}
+
+.callback-icon img {
+    width: 47px;
+    position: absolute;
+    top: 47%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#perfex-callbacks-form .alert_active_success {
+    background: #c55c3b;
+    color: #f1f1f1;
+    font-style: italic;
+    border: none;
+    display: none;
+    text-align: center;
+}
+
+.pfxcbmodal-header {
+    text-align: center;
+}
+
+.pfxcbmodal-header .modal-title {
+    font-size: 2em;
+    text-transform: uppercase;
+}
+
+.pfxcbwidget-header {
+    text-align: center;
+}
+
+.pfxcbwidget-header .widget-title {
+    font-size: 1.5em;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.pfxcbcontent {
+    padding: 30px;
+    background-color: #fff;
+    color: #fff;
+    border: 1px solid #e3e3e3;
+}
+
+#perfex-callbacks-form .alert_status {
+    background: #c55c3b !important;
+    color: #f1f1f1 !important;
+    font-style: italic !important;
+    border: none;
+    display: none;
+}
+
+.callback_date_from {
+    width: 45%;
+    float: left;
+}
+
+.callback_date_to {
+    width: 45%;
+    float: right;
+}
+
+.callbacks_image.selected_option {
+    border: 2px dashed #03a9f4;
+    border-radius: 50%;
+    padding: 1px;
+}
+
+.callbacks_image {
+    width: 30px;
+    margin-left: 4px;
+}
+
+@media only screen and (max-width: 667px) {
+    .pfx-cb-show {
+        right: 303px !important;
+    }
+
+    .cb-form-wrapper {
+        position: absolute;
+        width: 319px !important;
+        top: 0;
+    }
+}
+
+.blurry {
+    transition: all ease 0.5s;
+    -moz-filter: blur(4px);
+    -o-filter: blur(4px);
+    -ms-filter: blur(4px);
+    filter: blur(4px);
+}
+
+@media screen and (max-width: 600px) {
+    body .cb-form-wrapper.pfxcbcontent .pfx-cb-show {
+        right: calc(100% - 15.5%);
+    }
+
+    .cb-form-wrapper .dropdown-menu.open .inner.open {
+        overflow-x: hidden;
+    }
+
+    .cb-form-wrapper .dropdown-menu.open {
+        max-width: 240px;
+    }
+
+    .xdsoft_datetimepicker {
+        left: 5px !important;
+    }
+}

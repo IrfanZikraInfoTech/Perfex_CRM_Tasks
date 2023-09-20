@@ -1,0 +1,22 @@
+.thumbnail {
+   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5);
+   transition: 0.3s;
+   min-width: 40%;
+   border-radius: 5px;
+   border: 1px solid #28a745;
+ }
+
+ .thumbnail-description {
+   min-height: 40px;
+ }
+
+ .thumbnail:hover {
+   cursor: pointer;
+   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 1);
+ }
+ .isp-general-infor{
+	color: #d81b60;
+ }
+ .isp-general-infor-hr{
+	color: #d81b60;
+ }

@@ -1,0 +1,85 @@
+.customers{
+	font-family: Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    color: #314e73;
+    background: #f9fafb;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+.panel_s {
+    border: none;
+    -webkit-box-shadow: 0 1px 15px 1px rgba(90,90,90,.08);
+    box-shadow: 0 1px 15px 1px rgba(90,90,90,.08);
+}
+.panel-body {
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #e4e5e7;
+    border-radius: 4px;
+    padding: 20px;
+    position: relative;
+}
+.tagsinput, input#tags {
+    width: 100%;
+    opacity: 1;
+    height: 31.56px;
+}
+ul.tagit {
+    border: 0 !important;
+    background: transparent;
+}
+ul.tagit {
+    padding: 1px 5px;
+    overflow: auto;
+    margin-left: inherit;
+    margin-right: inherit;
+}
+.ui-widget {
+    font-size: 1.1em;
+}
+ul.tagit li.tagit-new {
+    padding-top: 2px;
+}
+
+ul.tagit li.tagit-new {
+    padding: .25em 4px .25em 0;
+}
+ul.tagit li {
+    display: block;
+    float: left;
+    margin: 2px 5px 2px 0;
+}
+ul.tagit input[type="text"] {
+    background: transparent;
+    border-left: 1px dashed #b3b3b3;
+    height: 20px;
+    padding-left: 5px;
+}
+ul.tagit input[type=text] {
+    color: #333;
+    background: 0 0;
+}
+ul.tagit input[type=text] {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    width: inherit;
+    background-color: inherit;
+    outline: 0;
+}
+input.tagit-hidden-field {
+    display: none;
+}
+ul.tagit input[type="text"] {
+    background: transparent;
+    border-left: 1px dashed #b3b3b3;
+    height: 20px;
+    padding-left: 5px;
+}

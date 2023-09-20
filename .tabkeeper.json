@@ -1,0 +1,16 @@
+[
+	{
+		"name": "Tickets",
+		"paths": [
+			"c:\\xampp\\htdocs\\crm-2.0\\application\\views\\themes\\perfex\\views\\single_ticket.php"
+		]
+	},
+	{
+		"name": "Test 2",
+		"paths": [
+			"c:\\xampp\\htdocs\\crm-2.0\\application\\views\\themes\\perfex\\views\\single_ticket.php",
+			"c:\\xampp\\htdocs\\crm-2.0\\application\\views\\themes\\perfex\\views\\announcements.php",
+			"c:\\xampp\\htdocs\\crm-2.0\\application\\views\\themes\\perfex\\views\\calendar.php"
+		]
+	}
+]

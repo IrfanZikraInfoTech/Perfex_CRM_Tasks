@@ -1,0 +1,24 @@
+.minheight85{
+	min-height: 85px;
+}
+.minheight35{
+	min-height: 35px;
+}
+.fontsize24{
+	font-size: 24px;
+}
+.minwidth310{
+	min-width: 310px; margin: 0 auto;
+}
+.width100{
+	width: 100%;
+}
+.margintop15-color{
+	margin-top: 15px; color: #d81b60;
+}
+.margintop10-color{
+	margin-top: 10px; border: 0.5px solid; color: #d81b60
+}
+.margintop0{
+	margin-top: 0px;
+}

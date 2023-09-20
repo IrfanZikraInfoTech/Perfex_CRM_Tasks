@@ -1,0 +1,133 @@
+body {
+    background: #e2e7ed !important;
+}
+
+body .label {
+    font-size: 13px;
+}
+
+body .busy_time_info {
+    margin-left: 10px;
+    background: #fb4862;
+}
+
+body .available_time_info {
+    background: #3af;
+}
+
+body .go_back_button {
+    font-weight: 500;
+    font-size: 16px;
+}
+
+body .busy_time_info_google {
+    background: #ffb100;
+}
+
+body .busy_time {
+    background: #fb4862 !important;
+    color: #fff !important;
+    pointer-events: none;
+}
+
+body .has-error .form-control:focus {
+    border-color: #ff0300 !important;
+    box-shadow: none !important;
+}
+
+body .busy_google_time {
+    background: #ffb100 !important;
+    color: #fff !important;
+    font-weight: 300 !important;
+    pointer-events: none;
+}
+
+.appointment-header {
+    display: flex;
+    justify-content: center;
+}
+
+.appointment_logo img {
+    max-width: 150px;
+    height: auto;
+    float: left;
+}
+
+.logo.img-responsive.navbar-brand.logo {
+    margin-bottom: 0;
+    margin-left: -20px;
+}
+
+.logo.img-responsive.navbar-brand.logo {
+    margin-bottom: 0;
+    margin-left: -20px;
+}
+
+.datetimepicker {
+    background: #fff !important;
+}
+
+.mtop6 {
+    margin-top: 6px !important;
+}
+
+.mtop35 {
+    margin-top: 35px;
+}
+
+.appointment_type_holder .appointment_color_type {
+    height: 30px;
+    width: 30px;
+    margin-top: 3px;
+}
+
+.appointment_type_holder .dropdown-menu li a:hover,
+.appointment_type_holder .dropdown-menu li a {
+    border: none !important;
+    border-radius: 0px !important;
+    padding: 8px 20px;
+}
+
+.appointment_type_holder .bootstrap-select {
+    float: left;
+}
+
+.main_wrapper {
+    padding: 25px;
+    box-shadow: 0px 0px 0px 1px rgb(1 1 1 / 8%);
+    border-radius: 4px;
+    background: #fff;
+}
+
+.hwp {
+    border-radius: 4px;
+    padding: 4px 10px;
+    color: #fff;
+}
+
+body input {
+    height: 38px !important;
+}
+
+body textarea,
+body input {
+    border: 1px solid #ececec !important;
+}
+
+.hours_wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+@media only screen and (max-device-width: 360px) and (-webkit-device-pixel-ratio: 3) {
+    .xdsoft_datetimepicker {
+        left: 2px !important;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
+
+
+/* Callbacks Popup */

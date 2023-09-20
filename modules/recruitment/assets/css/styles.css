@@ -1,0 +1,159 @@
+.zindex10001{
+	z-index: 10001;
+}
+.width65{
+	width: 65%;
+}
+.marginauto{
+	margin: auto;
+}
+.general-infor-color{
+	color: #d81b60;
+}
+.general-infor-hr{
+	border: 0.5px solid; 
+	color: #d81b60
+}
+.padding-left-right-0{
+	padding-right: 0px; 
+	padding-left: 0px;
+}
+.margin-top-0{
+	margin-top: 0px;
+}
+.proposal-style{
+	color:#28B8DA ;
+	border:1px solid #28B8DA; 
+}
+.approved-style{
+	color:#84C529 ;
+	border:1px solid #84C529;
+}
+.made_finish-style{
+	color:#c53da9 ;
+	border:1px solid #c53da9; 
+}
+.reject-style{
+	color:#fb3b3b ;
+	border:1px solid #fb3b3b;
+}
+.candidate_request-color{
+	color: #fb8c00;
+}
+.candidate_request-hr{
+	border: 0.5px solid; 
+	color: #fb8c00
+}
+.margin-right-5{
+	margin-right: 5px
+}
+.ribbon.warning span {
+    background: #c53da9;
+}
+.width-125{
+	width: 125%;
+}
+.text-aligh-right{
+	text-align: right;
+}
+.border-top-0{
+	border-top:0px;
+}
+.margin-top-10{
+	margin-top: 10px;
+}
+.margin-top-15{
+	margin-top: 15px;
+}
+.width-100{
+	width: 100%;
+}
+.margin-top-8{
+	margin-top: 8px;
+}
+.font-size-125{
+	font-size: 1.25em;
+}
+.padding-left-0{
+	padding-left: 0px;
+}
+.width-135{
+	width: 135%;
+}
+.lightheight-34-nowrap{
+	line-height: 34px;
+	white-space: nowrap;
+}
+.lightheight-84-nowrap{
+	line-height: 84px;
+	white-space: nowrap;
+}
+.border-radius-4{
+	border-radius: 4px;
+}
+.save-template{
+	display: none !important;
+}
+.application-style{
+	color:#28B8DA;
+	border:1px solid #28B8DA;
+}
+.potential-style{
+	color:#CD853F ;
+	border:1px solid #CD853F; 
+}
+.interview-style{
+	color:#00FF33 ;
+	border:1px solid #00FF33; 
+}
+.won_interview-style{
+	color:#CCCC00 ;
+	border:1px solid #CCCC00;
+}
+.send_offer-style{
+	color:#FF9999 ;
+	border:1px solid #FF9999;
+}
+.elect-style{
+	color:#999966 ;
+	order:1px solid #999966;
+}
+.non_elect-style{
+	color:#FF6666 ;
+	border:1px solid #FF6666;
+}
+.unanswer-style{
+	color:#FF3333 ;
+	border:1px solid #FF3333;
+}
+.transferred-style{
+	color:#8B4726 ;
+	border:1px solid #8B4726;
+}
+.freedom-style{
+	color:#FF34B3 ;
+	border:1px solid #FF34B3;
+}
+.padding-bottom-5{
+	padding-bottom: 5px;
+}
+.padding-right-0{
+	padding-right: 0px;
+}
+.border-radius-20{
+	border-radius: 20px;
+}
+.margin-left-right-20-0{
+	margin-left: 20px; 
+	padding-right: 0px;
+}
+.padding-left-10{
+	padding-left: 10px;
+}
+.margin-left-12{
+	margin-left: 12px;
+}
+.width-height-738-66{
+	width: 738px;
+	height: 66px !important;
+}

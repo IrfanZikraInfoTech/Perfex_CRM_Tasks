@@ -1,0 +1,46 @@
+ #trees {
+    width: 100%;
+    height: 100%;
+  }
+  #staff_chart {
+    font-family: Arial;
+    height: 620px;
+
+
+    overflow: auto;
+    text-align: center;
+  }
+
+  #tree {
+    width: 100%;
+    height: 100%;
+    font-family: Helvetica;
+    overflow: hidden;
+  }
+  img.img_logo1 {
+    width: 188px;
+    padding: 7px;
+    z-index: 1000000;
+  }
+  #st_chart{
+    background-color: #f0f0f0;
+    bottom: 0;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+  }
+  .sfatt-chart-modal{
+    width: 100%;
+    height: 100%;
+  }
+  #staff_chart{
+    height: 100% !important;
+  }
+  .sfatt-chart-modal .tab-menu-heading a{
+    margin-top: -28px;
+  }
+
+  #staff_chart_view .modal-body {
+    background-color: #9e9e9e21 !important;
+}

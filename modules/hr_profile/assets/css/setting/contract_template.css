@@ -1,0 +1,24 @@
+.brround {
+	border-radius: 50%;
+}
+
+.avatar {
+    width: 3rem;
+    height: 3rem;
+    line-height: 26px;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    color: #fff;
+    font-weight: 600;
+    vertical-align: bottom;
+    font-size: 14px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.bg-secondary {
+    background-color: #ef6430!important;
+    color: #fff;
+}

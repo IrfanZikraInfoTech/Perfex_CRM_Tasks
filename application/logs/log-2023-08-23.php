@@ -1,0 +1,16 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+
+ERROR - 2023-08-23 00:10:24 --> Could not find the language line "Project Data"
+ERROR - 2023-08-23 00:10:24 --> Could not find the language line "AI Text"
+ERROR - 2023-08-23 00:10:30 --> Could not find the language line "Project Data"
+ERROR - 2023-08-23 00:10:30 --> Could not find the language line "AI Text"
+ERROR - 2023-08-23 00:10:31 --> Could not find the language line "Project Data"
+ERROR - 2023-08-23 00:10:31 --> Could not find the language line "AI Text"
+ERROR - 2023-08-23 00:10:31 --> Could not find the language line "Project Data"
+ERROR - 2023-08-23 00:10:31 --> Could not find the language line "AI Text"
+ERROR - 2023-08-23 00:10:31 --> Could not find the language line "Project Data"
+ERROR - 2023-08-23 00:10:31 --> Could not find the language line "AI Text"
+ERROR - 2023-08-23 00:10:31 --> Could not find the language line "Project Data"
+ERROR - 2023-08-23 00:10:31 --> Could not find the language line "AI Text"
+ERROR - 2023-08-23 00:10:31 --> Could not find the language line "Project Data"
+ERROR - 2023-08-23 00:10:31 --> Could not find the language line "AI Text"

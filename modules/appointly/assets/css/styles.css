@@ -1,0 +1,858 @@
+body {
+    overflow-x: hidden;
+}
+
+body .fixBtnsLine {
+    float: right;
+    width: initial;
+    padding-right: 0;
+}
+
+body .w-max-content {
+    width: max-content;
+    width: -moz-max-content;
+}
+
+body.appointly.appointments #google_not_set {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    position: relative;
+    top: 14px;
+}
+
+body .appointment_recurring_back {
+    display: flex;
+    justify-content: space-between;
+}
+
+body li[class^="sub-menu-item-appointly-"].active a {
+    margin-left: 15px !important;
+    padding-left: 30px !important;
+}
+
+body li[class^="sub-menu-item-appointly-"].active a i.menu-icon {
+    margin-left: -15px !important;
+}
+
+body li[class^="sub-menu-item-appointly-"] a {
+    padding-left: 30px !important;
+}
+
+body li[class^="menu-item-appointly-"] a {
+    padding-left: 5px !important;
+}
+
+body #addedToOutlook {
+    margin-top: 1px !important;
+}
+
+body .btn_send_mails {
+    background: #109083 !important;
+}
+
+body .google_meet_spinner {
+    font-size: 22px;
+}
+
+body.appointly.appointments_history a.calendar_list,
+body.appointly.appointments a.calendar_list {
+    background: #c7c6c6;
+    padding: 5px 10px 5px 10px;
+    border-radius: 4px;
+    color: #4a4a4a;
+}
+
+body .table.table-appointments .btn.btn-xs {
+    padding: 4px 8px;
+    font-size: 12px;
+    text-transform: unset;
+}
+
+body .datetimepicker {
+    cursor: pointer !important;
+    color: #333 !important;
+}
+
+body .appointment_summary_parent .appoinment_summary:last-child {
+    border-right: none;
+}
+
+body .approve_appointment_spacing {
+    padding-left: 29px !important;
+    padding-right: 27px !important;
+}
+
+body .busy_time_info {
+    border-radius: 4px;
+    background: #fb4862;
+}
+
+body .available_time_info {
+    border-radius: 4px;
+    background: #3af;
+}
+
+body .busy_time_info_google {
+    border-radius: 4px;
+    background: #ffb100;
+}
+
+body .busy_time {
+    background: #fb4862 !important;
+    color: #fff !important;
+    pointer-events: none;
+}
+
+body .busy_google_time {
+    background: #ffb100 !important;
+    color: #fff !important;
+    font-weight: 300 !important;
+    pointer-events: none;
+}
+
+boldit {
+    font-weight: 500;
+    margin-right: 10px;
+}
+
+body .spmodified.appointment_notes {
+    overflow: auto;
+    max-height: 500px;
+    display: block;
+    overflow-wrap: break-word;
+}
+
+body .available_times_labels {
+    width: calc(100% - 59%);
+    padding-top: 25px;
+}
+
+body .available_times_labels_edit {
+    width: calc(100% - 59%);
+    padding-top: 34px;
+}
+
+.text-white:hover,
+.text-white:active,
+.text-white:focus,
+.text-white {
+    color: #fff;
+}
+
+body .spmodified.attendees {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+body .spmodified.client_phone a {
+    align-self: baseline;
+}
+
+body .spmodified.client_phone {
+    /* justify-content: flex-start; */
+    flex-wrap: wrap;
+}
+
+body .approve_appointment_single:active,
+body .approve_appointment_single:focus,
+body .approve_appointment_single:hover {
+    background: rgb(75, 95, 197) !important;
+}
+
+.spmodified_attendees {
+    font-size: 15px;
+    line-height: 4.0;
+    background: #fbfbfb;
+    border-radius: 3px;
+    padding: 12px;
+    border: 1px #d6d6d6;
+    border-style: solid;
+    display: flex;
+    justify-content: space-between;
+}
+
+.a-justify-content-center {
+    justify-content: center;
+}
+
+.spmodified {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    line-height: 2.0;
+    background: #fbfbfb;
+    border-radius: 3px;
+    padding: 12px;
+    box-shadow: 0 0 0 1px rgb(1 1 1 / 8%);
+}
+
+.spmodified_fit_center {
+    display: flex;
+    align-self: baseline;
+    font-size: 15px;
+    line-height: 2.0;
+    width: fit-content;
+    width: max-content;
+    background: #f1f1f1;
+    border-radius: 3px;
+    margin: auto;
+    padding: 10px 25px;
+    box-shadow: 0 0 0 1px rgb(1 1 1 / 8%);
+    margin-bottom: 20px;
+}
+
+body .modal-content {
+    border-radius: 8px;
+}
+
+body .table-appointments .btn-info:not(.view_meeting) {
+    min-width: 69px;
+}
+
+body .text-muted.mtop1 a {
+    font-size: 18px;
+}
+
+body .text-muted.mtop1 {
+    width: 183px;
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+body .panel-body .todays_appointment {
+    margin-left: 0 !important;
+    margin-right: 10px;
+}
+
+body .appointly-secondary {
+    background: rgba(148, 148, 148, 0.08);
+    padding: 10px;
+    border-radius: 6px;
+    width: 200px;
+}
+
+body .mbot0 {
+    display: block;
+    margin-bottom: 0;
+}
+
+body .appointment_status_info {
+    margin: -1px 0 0;
+}
+
+body .appointly-default {
+    color: #252525 !important;
+    background-color: #ffffff !important;
+    text-align: center;
+    border-color: transparent;
+    padding: 9px;
+    font-size: 18px;
+    margin: 5px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+body ._filter_data .dropdown-menu.height500 {
+    overflow: hidden;
+}
+
+body .appointment-date {
+    background: #fff !important;
+}
+
+body .span_limited {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-bottom: 3px;
+    width: 183px;
+}
+
+body .w-50 {
+    width: 50%;
+}
+
+body .w-100 {
+    width: 100%;
+}
+
+.appointment h3 {
+    margin-top: 8px;
+}
+
+.appointment {
+    padding: 10px 55px;
+}
+
+body .meeting_approved {
+    pointer-events: none !important;
+}
+
+body.appointments .btn-warning {
+    background-color: #ffb100;
+}
+
+body.appointments .label-primary {
+    background: rgba(3, 169, 244, 0.59);
+    border: 1px solid rgb(136, 214, 250);
+    text-transform: uppercase !important;
+    color: #ffffff !important;
+}
+
+body.appointments .label-warning {
+    background: #f7af3d;
+    border: 1px solid #f7af3d;
+    color: #fff;
+}
+
+body #wrapper .info-header h3 {
+    margin-top: 12px !important;
+    margin-left: 18px;
+}
+
+body .label_canceL_notes_parent {
+    max-width: 650px;
+    margin-top: 10px;
+}
+
+body .meeting_cancel_notes_client {
+    max-width: 650px;
+    white-space: pre-wrap;
+    padding-bottom: 16px;
+}
+
+body #wrapper .info-header {
+    margin: 0 auto;
+    background: #f1f1f1;
+    display: flex;
+    padding: 0 40px;
+    width: fit-content;
+    width: max-content;
+    margin-top: 15px;
+    margin-bottom: 25px;
+    text-align: center;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px rgb(1 1 1 / 8%);
+}
+
+.appointly_initiated_by_placeholder {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 138px;
+    top: 22px;
+}
+
+.appointly_logo_placeholder {
+    width: 150px;
+    margin: 18px 0 0 15px;
+    float: left;
+    z-index: 999999;
+    position: absolute;
+}
+
+body .appointment_logo img {
+    max-width: 150px;
+    height: auto;
+    float: left;
+    margin-right: 10px;
+}
+
+body .label {
+    font-size: 13px;
+}
+
+body.appointments .label-info {
+    background: rgb(86, 111, 236);
+    border: 1px solid rgb(86, 111, 236);
+    text-transform: uppercase !important;
+    color: #ffffff !important;
+}
+
+body.appointments .label-success:hover,
+body.appointments .label-success:active {
+    background: rgb(110, 160, 41);
+    border: rgb(132, 197, 41);
+    color: #ffffff !important;
+    text-transform: uppercase !important;
+}
+
+body.admin_light_theme_initiated.appointments .label-warning {
+    color: #fff !important;
+}
+
+body.appointments_history .label-success,
+body.appointments .label-success {
+    background: rgb(132, 197, 41);
+    border: rgb(132, 197, 41);
+    color: #ffffff !important;
+    text-transform: uppercase !important;
+}
+
+body.appointments .label-danger {
+    background: rgba(244, 3, 47, 0.59);
+    border: 1px solid rgb(248, 106, 132);
+    color: #ffffff !important;
+}
+
+body .appointly_single_view_form {
+    display: none;
+}
+
+body table.table-appointments th.sorting_disabled.not-export {
+    width: 220px;
+}
+
+body .appointment .fit-content {
+    text-align: center;
+    margin: 15px;
+}
+
+.align-items-center {
+    margin: 0 auto;
+    width: 80%;
+}
+
+body .appointment_icon_single {
+    padding-top: 0;
+    padding-right: 15px;
+    padding-left: 7px;
+    float: left;
+    font-size: 36px;
+}
+
+.spmodified.col-md-12.mright15 {
+    width: 100%;
+}
+
+body.perfex_office_theme_initiated.appointments ._buttons a {
+    cursor: pointer !important;
+}
+
+body.perfex_office_theme_initiated.appointments .label-warning {
+    background: #f7af3d !important;
+    font-size: 14px !important;
+    border: 1px solid #f7af3d !important;
+    color: #fff !important;
+}
+
+body .google_meet_send {
+    width: 21px;
+    height: 23px;
+    margin-bottom: -7px;
+    margin-top: -2px;
+}
+
+@media (max-width: 735px) {
+    body .appointment_recurring_back {
+        justify-content: flex-end;
+        margin-top: 5px;
+    }
+
+    body.appointly .appointmentWrapper {
+        padding: 0;
+    }
+
+    body.appointly .fixBtnsLine {
+        margin-bottom: 25px;
+    }
+
+    body.appointly .panel_s .panel-body {
+        padding: 0;
+    }
+
+    body .available_times_labels {
+        font-size: 11px;
+        margin: 0 auto;
+        display: grid;
+        padding: 0 11px;
+    }
+
+    body .col-md-12.d-flex.mtop15 {
+        display: unset;
+    }
+
+    body #wrapper .spmodified_fit_center {
+        display: block;
+        align-self: baseline;
+        width: fit-content;
+        width: max-content;
+        margin: auto;
+    }
+
+    body #wrapper .appointment_status_info {
+        float: right;
+    }
+
+    body #wrapper .info-header {
+        margin-left: auto;
+        /* padding: 0px 5px; */
+    }
+
+    body #wrapper .info-header h3 {
+        margin-left: 14px;
+        font-size: 21px;
+    }
+
+    body .appointment_go_back {
+        display: none;
+    }
+
+    body #wrapper .content {
+        padding-top: 0;
+    }
+
+    body .col-xs-12 {
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+    }
+
+    body .appointment_public_url {
+        word-break: break-word;
+    }
+
+    body .appointment_group_buttons,
+    body .early_reminders_parent {
+        display: inline-grid;
+        grid-gap: 8px;
+        grid-template-columns: 1fr;
+        width: 100%;
+        padding-left: 0;
+    }
+
+    body .text-muted.mtop1 {
+        width: 128px;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 13px;
+        text-overflow: ellipsis;
+    }
+
+    body .todays_appointment h5 span {
+        font-size: 11px;
+    }
+
+    body .span_limited {
+        width: 128px;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 11px;
+        text-overflow: ellipsis;
+    }
+
+    body .panel-body .todays_appointment {
+        width: 144px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        margin-right: 0 !important;
+        margin-left: 7px !important;
+    }
+}
+
+body .col-md-4.ui-sortable .appointly-secondary {
+    width: 242px;
+}
+
+body .col-md-4.ui-sortable .todays_appointment {
+    margin-left: 6px !important;
+    margin-right: 4px;
+}
+
+.appointment_type_holder .appointment_color_type {
+    height: 30px;
+    width: 30px;
+    border-radius: 4px;
+    margin-top: 3px;
+}
+
+.btn-primary-google:active,
+.btn-primary-google:focus,
+.btn-primary-google:hover {
+    color: rgb(231, 229, 229);
+}
+
+.btn-primary-options {
+    background-color: #404ad8;
+    color: #fff;
+}
+
+.btn-primary-options:active,
+.btn-primary-options:focus,
+.btn-primary-options:hover {
+    color: rgb(231, 229, 229);
+    border-color: #404ad8;
+}
+
+.btn-primary-google {
+    background-color: #408bd8;
+    color: #fff;
+}
+
+.btn-primary-outlook:active,
+.btn-primary-outlook:focus,
+.btn-primary-outlook:hover {
+    color: rgb(231, 229, 229);
+}
+
+.btn-primary-outlook {
+    background-color: #226cb9;
+    color: #fff;
+}
+
+body .google_meet_main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    margin-left: -12px;
+    font-size: 1.8em;
+    cursor: pointer;
+}
+
+.appointment_type_holder .dropdown-menu li a:hover,
+.appointment_type_holder .dropdown-menu li a {
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 8px 20px;
+}
+
+body .open .appointly_dropdown_options {
+    border: 1px solid #1e95b1 !important;
+}
+
+.appointment_type_holder .bootstrap-select {
+    width: calc(100% - 39px) !important;
+    float: left;
+}
+
+#feedback_comment_area h6 {
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid #dedddd;
+    padding: 20px;
+    font-size: 14px;
+}
+
+.feedback_star i:before {
+    font-size: 28px;
+    margin-left: 6px;
+}
+
+.star_rated i:before {
+    color: #f37502;
+}
+
+.hover_star i:before {
+    color: #ffcc36;
+}
+
+body .btn {
+    font-size: 14px;
+}
+
+body.appointly .initiated_by {
+    font-size: 0 !important;
+}
+
+body .delete_apppointment_type {
+    margin-top: 28px;
+    margin-left: 7px;
+}
+
+body .d-flex {
+    display: flex;
+}
+
+body .flex-wrap {
+    flex-wrap: wrap;
+    padding-left: 0;
+}
+
+body .sub-menu-item-appointly_sidemenu i {
+    margin-right: 8px !important;
+}
+
+body .appointment_public_link::before {
+    font-size: 28px;
+}
+
+body .appointment_public_link {
+    padding-top: 10px;
+    padding-left: 17px;
+    padding-right: 17px;
+}
+
+/* samsung s10E, s8, s8+  */
+
+@media only screen and (max-device-width: 360px) and (-webkit-device-pixel-ratio: 3) {
+    .xdsoft_datetimepicker {
+        left: 2px !important;
+    }
+
+    body #wrapper .info-header {
+        padding: 0 8px !important;
+    }
+}
+
+/* Firefox */
+
+@-moz-document url-prefix() {
+    boldit {
+        font-weight: normal;
+        margin-right: 10px;
+    }
+}
+
+/* Callbacks */
+
+body.appointly #wrapper .client_options {
+    padding: 0 5px;
+}
+
+body.callbacks #wrapper .table-callbacks .staff-profile-image-small {
+    height: 23px;
+    width: 23px;
+    border-radius: 50%;
+}
+
+body.callbacks .callbacks_image {
+    width: 24px;
+    margin-left: 4px;
+}
+
+table.dataTable.table-callbacks th:last-child {
+    width: 84px;
+}
+
+table.dataTable.table-callbacks tbody tr td:nth-child(4) {
+    display: flex;
+    justify-content: center;
+}
+
+table.dataTable.table-callbacks tbody tr td:first-child {
+    border-top: 0;
+    width: 200px;
+}
+
+body #callbackView .callbacks-textarea-message {
+    min-height: 100px;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+body .label-callback-status-1 {
+    color: #fdfdfd;
+    border: 1px solid #2c59d4;
+    background: #2c59d4;
+}
+
+body .label-callback-status-2 {
+    color: #fdfdfd;
+    border: 1px solid #f44444;
+    background: #f44444;
+}
+
+body .label-callback-status-3 {
+    color: #fdfdfd;
+    border: 1px solid #f44444;
+    background: #f44444;
+}
+
+body .label-callback-status-4 {
+    color: #fdfdfd;
+    border: 1px solid #2cd464;
+    background: #2cd464;
+}
+
+body i.fa-globe.timezone {
+    font-size: 21px;
+    color: #1f8ea8;
+}
+
+body.callbacks .callback-user:hover,
+body.callbacks .callback-user:active {
+    border: 1px dashed #03a9f4;
+}
+
+body.callbacks .remove-callback-user {
+    position: absolute;
+    top: 35px;
+    left: 12px;
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transition: visibility 0s, opacity .5s linear;
+    transition: visibility 0s, opacity .5s linear;
+}
+
+body.callbacks .callback-user:hover > a + .remove-callback-user {
+    visibility: visible;
+    opacity: 1;
+}
+
+body.callbacks .callbacks-select-staff {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    padding: 0 6px;
+    margin-bottom: 5px;
+}
+
+/* Envelope icon for outlook style */
+
+.fixLine {
+    padding-right: 9px;
+}
+
+.table-appointments::before {
+    content: "";
+}
+
+body.callbacks #callbackView hr {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+body .line-trough-grayish {
+    text-decoration: line-through;
+    color: #9a9a9a;
+}
+
+body .filterBlur {
+    filter: blur(2px);
+    -webkit-filter: blur(2px);
+}
+
+body.callbacks .callback-user {
+    border: 1px solid #f0f0f0;
+    padding: 2px;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-bottom: 5px;
+    display: inline-block;
+    position: relative;
+}
+
+body.appointly .label,
+body.callbacks .label {
+    line-height: normal;
+}
+
+body.appointly .mrtopmin5 {
+    margin-top: -5px;
+}
+
+@media (max-width: 735px) {
+    body .google_meet_main {
+        display: inline-block;
+    }
+
+    body.callbacks .horizontal-scrollable-tabs .horizontal-tabs .nav-tabs-horizontal > li {
+        max-width: max-content;
+        max-width: fit-content;
+    }
+}

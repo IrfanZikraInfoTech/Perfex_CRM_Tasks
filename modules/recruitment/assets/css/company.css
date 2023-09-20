@@ -1,0 +1,187 @@
+.form-group.text-small-margin {
+    margin-top: -19px;
+}
+#communication_modal{
+	overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+.dropzone, .dropzone * {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.dropzone-previews {
+    box-sizing: border-box;
+}
+
+#images_old_preview {
+    box-sizing: border-box;
+}
+
+/*.dz-image-preview {
+    border-radius: 20px;
+    overflow: hidden;
+    width: 120px;
+    height: 120px;
+    position: relative;
+    display: block;
+    z-index: 10;
+}*/
+.dz-details {
+    z-index: 20;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    font-size: 13px;
+    min-width: 100%;
+    max-width: 100%;
+    padding: 2em 1em;
+    text-align: center;
+    color: rgba(0,0,0,.9);
+    line-height: 150%;
+}
+
+.dz-progress {
+    opacity: 1;
+    z-index: 1000;
+    pointer-events: none;
+    position: absolute;
+    height: 16px;
+    left: 50%;
+    top: 50%;
+    margin-top: -8px;
+    width: 80px;
+    margin-left: -40px;
+    background: rgba(255,255,255,.9);
+    -webkit-transform: scale(1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.dz-upload {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: green;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transition: width .3s ease-in-out;
+}
+
+.dz-error-message {
+    pointer-events: none;
+    z-index: 1000;
+    position: absolute;
+    display: block;
+    display: none;
+    opacity: 0;
+    -webkit-transition: opacity .3s ease;
+    -moz-transition: opacity .3s ease;
+    -ms-transition: opacity .3s ease;
+    -o-transition: opacity .3s ease;
+    transition: opacity .3s ease;
+    border-radius: 8px;
+    font-size: 13px;
+    top: 130px;
+    left: -10px;
+    width: 140px;
+    background: #be2626;
+    background: linear-gradient(to bottom,#be2626,#a92222);
+    padding: .5em 1.2em;
+    color: #fff;
+}
+
+.dz-success-mark {
+    position: absolute;
+    display: none;
+    top: 30px;
+    width: 54px;
+    height: 58px;
+    left: 50%;
+    margin-left: -27px;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 500;
+    margin-top: -27px;
+}
+
+.dz-error-mark {
+    position: absolute;
+    display: none;
+    top: 30px;
+    width: 54px;
+    height: 58px;
+    left: 50%;
+    margin-left: -27px;
+    pointer-events: none;
+    opacity: 0;
+    margin-top: -27px;
+    z-index: 500;
+}
+
+.dz-remove {
+    font-size: 14px;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+    border: none;
+}
+
+.dz-preview {
+    position: relative;
+    display: inline-block;
+    width: 120px;
+    margin: 0.5em;
+    vertical-align: top;
+    min-height: 100px;
+}
+
+img.image-w-h {
+    width: 120px;
+    height: 120px;
+}
+
+.remove_file {
+    position: absolute;
+    top: -12px;
+    right: -10px;
+    border: 1px solid red;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    border-radius: 50%;
+}
+
+img.images_w_table {
+    width: 116px;
+    height: 73px;
+}
+
+.dz-preview .dz-details .dz-filename {
+    white-space: nowrap;
+}
+
+.dz-preview .dz-details, .dz-preview .dz-details:hover {
+    background: #03a9f4;
+    color: #fff;
+    height: 120px;
+}
+.dz-preview.dz-file-preview .dz-details {
+    opacity: 1;
+}
+.dz-preview .dz-image {
+    border-radius: 20px;
+    overflow: hidden;
+    width: 120px;
+    height: 120px;
+    position: relative;
+    display: block;
+    z-index: 10;
+}
+.dz-preview .dz-details .dz-filename {
+    white-space: nowrap;
+}
