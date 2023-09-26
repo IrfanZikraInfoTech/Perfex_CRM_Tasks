@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Staff Shifts Report</title>
+    <style>
+      body {
+        background-color: #f3f4f6;
+        padding: 30px;
+        font-family: 'Courier New', Courier, monospace;
+      }
+
+      h1, h2 {
+        margin: 0px;
+      }
+
+
+      .container {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+      }
+
+      .bg-white {
+        background-color: #ffffff;
+      }
+
+      .p-8 {
+        padding: 1rem;
+      }
+
+      .rounded-lg {
+        border-radius: 0.5rem;
+      }
+
+      .shadow-md {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .flex {
+        display: flex;
+      }
+
+      .items-center {
+        align-items: center;
+      }
+
+      .justify-between {
+        justify-content: space-between;
+      }
+
+      .h-40 {
+        height: 7rem;
+      }
+
+      .text-2xl {
+        font-size: 1.5rem;
+      }
+
+      .font-bold {
+        font-weight: bold;
+      }
+
+      .text-lg {
+        font-size: 1.125rem;
+      }
+
+      .font-semibold {
+        font-weight: 600;
+      }
+
+
+      .w-full {
+        width: 100%;
+      }
+
+      .border-collapse {
+        border-collapse: collapse;
+      }
+
+      .bg-gray-200 {
+        background-color: #e2e8f0;
+      }
+
+      .border {
+        border-width: 1px;
+        border-style: solid;
+      }
+
+      .myTd{
+        border-width: 1px;
+        border-style: solid;
+        font-size: 0.9rem;
+        padding-left: 0.15rem;
+        padding-right: 0.15rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        text-align: center;
+      }
+      td{
+        font-size: 0.8rem !important;
+      }
+      .text-center{
+        text-align: center;
+      }
+      tr.myRow{
+        background-color: #e2e8f0;
+      }
+      
+
+    </style>
+</head>
+<body class="py-6">
+    <div class="container mx-auto">
+        <div class="bg-white p-8 rounded-lg shadow-md">
+
+            <table style="width: 100%;">
+              <tr>
+                <td><img src="https://i.ibb.co/tDXrMkg/company-logo.png" alt="Company Logo" class="h-40"></td>
+                <td style="text-align:right;"><h1 class="text-2xl font-bold">{staff_name}'s Shifts Report</h1><h3 class="text-2xl font-semibold">Month: {month_name}</h3></td>
+              </tr>
+            </table>   
+
+            {shift_rows}
+
+            
+        </div>
+    </div>
+</body>
+</html>

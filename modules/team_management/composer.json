@@ -1,0 +1,6 @@
+{
+    "require": {
+        "mpdf/mpdf": "^8.1",
+        "orhanerday/open-ai": "^4.7"
+    }
+}
