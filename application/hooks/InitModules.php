@@ -9,9 +9,9 @@ class InitModules
      */
     public function handle()
     {
-        include_once(__DIR__ . './../libraries/App_modules.php');
+        include_once(__DIR__ . '../../libraries/App_modules.php');
         // Load the directory helper so the directory_map function can be used
-        include_once(__DIR__ . './../../system/helpers/directory_helper.php');
+        include_once(__DIR__ . '../../../system/helpers/directory_helper.php');
 
         foreach (\App_modules::get_valid_modules() as $module) {
             $excludeUrisPath = $module['path'] . 'config' . DIRECTORY_SEPARATOR . 'csrf_exclude_uris.php';

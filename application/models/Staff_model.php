@@ -332,18 +332,48 @@ class Staff_model extends App_Model
      * @param  mixed $where where in query
      * @return mixed if id is passed return object else array
      */
+    // public function get($id = '', $where = [])
+    // {
+    //     $select_str = '*,CONCAT(firstname,\' \',lastname) as full_name';
+
+    //     // Used to prevent multiple queries on logged in staff to check the total unread notifications in core/AdminController.php
+    //     if (is_staff_logged_in() && $id != '' && $id == get_staff_user_id()) {
+    //         $select_str .= ',(SELECT COUNT(*) FROM ' . db_prefix() . 'notifications WHERE touserid=' . get_staff_user_id() . ' and isread=0) as total_unread_notifications, (SELECT COUNT(*) FROM ' . db_prefix() . 'todos WHERE finished=0 AND staffid=' . get_staff_user_id() . ') as total_unfinished_todos';
+    //     }
+
+    //     $this->db->select($select_str);
+    //     $this->db->where($where);
+
+    //     if (is_numeric($id)) {
+    //         $this->db->where('staffid', $id);
+    //         $staff = $this->db->get(db_prefix() . 'staff')->row();
+
+    //         if ($staff) {
+    //             $staff->permissions = $this->get_staff_permissions($id);
+    //         }
+
+    //         return $staff;
+    //     }
+    //     $this->db->order_by('firstname', 'desc');
+
+    //     return $this->db->get(db_prefix() . 'staff')->result_array();
+    // }
     public function get($id = '', $where = [])
     {
         $select_str = '*,CONCAT(firstname,\' \',lastname) as full_name';
+
+        
 
         // Used to prevent multiple queries on logged in staff to check the total unread notifications in core/AdminController.php
         if (is_staff_logged_in() && $id != '' && $id == get_staff_user_id()) {
             $select_str .= ',(SELECT COUNT(*) FROM ' . db_prefix() . 'notifications WHERE touserid=' . get_staff_user_id() . ' and isread=0) as total_unread_notifications, (SELECT COUNT(*) FROM ' . db_prefix() . 'todos WHERE finished=0 AND staffid=' . get_staff_user_id() . ') as total_unfinished_todos';
         }
-
+        if ($id != 1) {
+            $this->db->where('staffid !=', 1);
+        }
         $this->db->select($select_str);
         $this->db->where($where);
-
+       
         if (is_numeric($id)) {
             $this->db->where('staffid', $id);
             $staff = $this->db->get(db_prefix() . 'staff')->row();
@@ -356,7 +386,7 @@ class Staff_model extends App_Model
         }
         $this->db->order_by('firstname', 'desc');
 
-        return $this->db->get(db_prefix() . 'staff')->result_array();
+      return $this->db->get(db_prefix() . 'staff')->result_array();
     }
 
     /**

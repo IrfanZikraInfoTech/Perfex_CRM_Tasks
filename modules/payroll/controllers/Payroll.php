@@ -9,6 +9,10 @@ class Payroll extends AdminController
         $this->load->model('payroll_model');
     }
 
+    public function testing(){
+        echo 'hello world';
+    }
+
     // Role_salary
     public function Role_salary(){   
         if (!has_permission('payroll', '', 'admin')) {
@@ -18,6 +22,7 @@ class Payroll extends AdminController
         $this->load->view('role_salary', $data);
         // $this->load->view('payroll_manage');
     }
+    
     public function add_payment() {
         $staff_id = $this->input->post('staffId');
         $bonus = $this->input->post('bonus');
@@ -27,7 +32,8 @@ class Payroll extends AdminController
         $created_date = date('Y-m-d');
         $update_date = null;
         $month = $this->input->post('month');
-
+        $currency = $this->input->post('currency');  // Retrieve currency from POST data
+    
         $data = array(
             'staff_id' => $staff_id,
             'bonus' => $bonus,
@@ -37,16 +43,18 @@ class Payroll extends AdminController
             'created_date' => $created_date,
             'update_date' => $update_date,
             'month' => $month,
+            'currency' => $currency  // Add currency to the data array
         );
-
+    
         $result = $this->payroll_model->add_payment($data);
-
+    
         if ($result) {
             echo json_encode(array('status' => 'success'));
         } else {
             echo json_encode(array('status' => 'fail'));
         }
     }
+    
     // Finish Role_salary
 
     //Setting controllers
@@ -59,9 +67,6 @@ class Payroll extends AdminController
         // redirect or load view here
     } 
     public function Setting(){
-        if (!has_permission('payroll', '', 'admin')) {
-            access_denied('Access Denied!');
-        }
         $data['staffs'] = $this->payroll_model->get_employee_details();
         $this->load->view('payroll_setting', $data);    
     }
@@ -69,11 +74,6 @@ class Payroll extends AdminController
 
     //monthly payroll
     public function monthly_section() {    
-
-        if (!has_permission('payroll', '', 'admin')) {
-            access_denied('Access Denied!');
-        }
-
         // Get the month and year from the GET parameters, set a default if they're not set
         $month = $this->input->get('month', TRUE) ? $this->input->get('month', TRUE) : date('Y-m-d');
     
@@ -89,23 +89,28 @@ class Payroll extends AdminController
         $status = $this->input->post('status');
         $id = $this->input->post('id');
         $changedby = $this->input->post('changedby');
+        $approver_status = $this->input->post('approver_status');  // Get the approver_status value
+
         
         // Use the model to update the status in the database
-        if($this->payroll_model->update_approval_status($id, $status,$changedby)){
+        if($this->payroll_model->update_approval_status($id, $status,$changedby,$approver_status)){
             echo ("seccessfull");
         }else{
             echo("unsuccessfull");
         }
     }
+    public function delete_record() {
+        $id = $this->input->post('id_to_delete');
+        
+        $this->payroll_model->delete_staff($id);
+        
+        redirect('payroll/monthly_section');
+    }
+    
     //finished monthly 
 
     //payslip
     public function pay_slip(){
-
-        if (!has_permission('payroll', '', 'admin')) {
-            access_denied('Access Denied!');
-        }
-
         // Get the month and year from the GET parameters, set a default if they're not set
         $month = $this->input->get('month', TRUE) ? $this->input->get('month', TRUE) : date('Y-m-d');
    
@@ -115,50 +120,49 @@ class Payroll extends AdminController
         // Load the view and pass the data
         $this->load->view('pay_slip', $data);
    }
-    public function view_payslip($type, $id) {
-        if (!has_permission('payroll', '', 'admin')) {
-            access_denied('Access Denied!');
-        }
-        // Load the employee data
-        $data = $this->payroll_model->getPaymentDetails($id);
-        if (!$data) {
-            show_404();
-            return;
-        }
-
-        $mpdf = new \Mpdf\Mpdf();
-
-        // Define some HTML content with style
-        $salary = $data->salary;
-        $bonus = $data->bonus;
-        $deduction = $data->deduction;
-        $total = $salary + $bonus - $deduction;
-
-        $html = file_get_contents(base_url('modules/payroll/views/pay_salary_slip_model.html'));
-
-        $html = str_replace('{firstname}', (!empty($data->firstname) ? $data->firstname : "Unspecified"), $html);
-        $html = str_replace('{email}', (!empty($data->email) ? $data->email : "Unspecified"), $html);
-        $html = str_replace('{phonenumber}', (!empty($data->phonenumber) ? $data->phonenumber : "Unspecified"), $html);
-        $html = str_replace('{payment_mode}', (!empty($data->payment_mode) ? $data->payment_mode : "Unspecified"), $html);
-        $html = str_replace('{salary}', (!empty($salary) ? $salary : "Unspecified"), $html);
-        $html = str_replace('{bonus}', (!empty($bonus) ? $bonus : "Unspecified"), $html);
-        $html = str_replace('{deduction}', (!empty($deduction) ? $deduction : "Unspecified"), $html);
-        $html = str_replace('{total}', (!empty($total) ? $total : "Unspecified"), $html);
-        $html = str_replace('{Refrence_number}', (!empty($data->Refrence_number) ? $data->Refrence_number : "Unspecified"), $html);
-        $html = str_replace('{approver_name}', (!empty($data->approver_name) ? $data->approver_name : "Unspecified"), $html);
-
-
-        // Output the HTML content
-        $mpdf->WriteHTML($html);
-
-        // Close and output PDF document
-        if($type==1){
-            $mpdf->Output('Salaryslip.pdf', 'I');
-        }else{
-            $mpdf->Output('Salaryslip.pdf' . '.pdf', 'D');
-        }
-
+   public function view_payslip($type, $id) {
+    // Load the employee data
+    $data = $this->payroll_model->getPaymentDetails($id);
+    if (!$data) {
+        show_404();
+        return;
     }
+
+    // Create a new mPDF object.
+    $mpdf = new \Mpdf\Mpdf();
+
+    // Add a page
+    $mpdf->AddPage();
+
+    // Set the image that will be used as a background.
+    $img_file = "https://i.ibb.co/qFYCS3K/Letter-haed-empty-01.jpg";
+    $mpdf->Image($img_file, 1, 9.5, 285, 360, '', '', '', false, 300, '', false, false, 0);
+
+    // Define some HTML content with style
+    $salary = $data->salary;
+    $bonus = $data->bonus;
+    $deduction = $data->deduction;
+    $total = $salary + $bonus - $deduction;
+
+    $html = file_get_contents(base_url('modules/payroll/views/pay_salary_slip_model.html'));
+
+    $html = str_replace(
+        ['{firstname}','{lastname}','{email}', '{phonenumber}', '{payment_mode}', '{salary}', '{bonus}', '{deduction}', '{total}','{remark}','{Refrence_number}','{approver_name}'],
+        [$data->firstname, $data->lastname, $data->email, $data->phonenumber, $data->payment_mode, $salary, $bonus, $deduction, $total,$data->remark, $data->Refrence_number, $data->approver_name,],
+        $html
+    );
+
+    // Output the HTML content
+    $mpdf->WriteHTML($html);
+
+    // Close and output PDF document
+    if($type==1){
+        $mpdf->Output('Salaryslip.pdf', 'I');
+    }else{
+        $mpdf->Output('Salaryslip.pdf', 'D');
+    }
+}
+
    public function save_payment_mode() {
     $id = $this->input->post('id');
     $paymentMode = $this->input->post('payment_mode');
@@ -175,9 +179,10 @@ class Payroll extends AdminController
     public function save_reference_number() {
     $id = $this->input->post('id');
     $referenceNumber = $this->input->post('reference_number');
+    $remark = $this->input->post('remark');
     $paymentMode = $this->input->post('payment_mode');
 
-    echo $this->payroll_model->saveReferenceNumber($id, $referenceNumber,$paymentMode);
+    echo $this->payroll_model->saveReferenceNumber($id, $referenceNumber,$paymentMode,$remark);
     }
 }
     // public function make_payment() {

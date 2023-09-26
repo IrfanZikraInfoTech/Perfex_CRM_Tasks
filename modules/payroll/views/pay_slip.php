@@ -44,7 +44,8 @@
                     <th scope="col">Issue Name</th>
                     <th scope="col">Payment Mode</th>
                     <th scope="col">Reference Number</th>
-                    <?php if(has_permission('payroll', '', 'admin')){?>
+                    <th scope="col">Remark</th>
+                    <?php if(is_admin()){?>
                     <th scope="col">Save</th>
                     <?php } ?>
                     <th scope="col">Generate Slip</th>
@@ -52,18 +53,18 @@
                 </tr>
             </thead>
             <tbody>
-            <?php 
-                $selectedMonth = isset($_GET['month']) ? $_GET['month'] : null;
-                if(is_array($staffs)){
-                foreach ($staffs as $staff) :
-                    if($staff['staff_id'] == $this->session->userdata('staff_user_id') || has_permission('payroll', '', 'admin')) :
-                    $rowMonth = ($staff['month']);
-                    // Only display the row if the selected month matches the row's month
-                    if ($selectedMonth === null || $selectedMonth == $rowMonth) :
-            ?>
+                <?php 
+                    $selectedMonth = isset($_GET['month']) ? $_GET['month'] : null;
+                    if (is_array($staffs)) {
+                        foreach ($staffs as $staff) :
+                            if (($staff['staff_id'] == $this->session->userdata('staff_user_id') || is_admin()) && $staff['approver_status'] == 1) :
+                                $rowMonth = $staff['month'];
+                                // Only display the row if the selected month matches the row's month
+                                if ($selectedMonth === null || $selectedMonth == $rowMonth) :
+                ?>
                 <tr data-month="<?php echo $rowMonth; ?>">
                     <td><?php echo $staff['firstname']; ?></td>
-                    <td><?php echo $staff['salary'] + $staff['bonus'] - $staff['deduction']; ?></td>
+                    <td><?php echo $staff['currency'] . ' ' . $staff['salary'] + $staff['bonus'] - $staff['deduction']; ?></td>
                     <td><?php echo $staff['approver_name']; ?></td>
                     <td>
                         <select class="form-control payment-mode" data-id="<?php echo $staff['id']; ?>" disabled>
@@ -72,9 +73,10 @@
                             <option value="UPI" <?php if($staff['payment_mode'] == 'UPI') echo 'selected'; ?>>UPI</option>
                         </select>
                     </td>
-                    <td><input type="text" class="form-control reference-number" data-id="<?php echo $staff['id']; ?>" value="<?php echo $staff['Refrence_number']; ?>" disabled /></td>
-                    
-                    <?php if(has_permission('payroll', '', 'admin')){?>
+                    <td><input type="text" class="form-control reference-number" data-id="<?php echo $staff['id']; ?>" value="<?php echo $staff['refrence_number']; ?>" disabled /></td>
+                    <td><input type="text" class="form-control remark" data-id="<?php echo $staff['id']; ?>" value="<?php echo $staff['remark']; ?>" disabled /></td>
+                
+                    <?php if(is_admin()){?>
                     <td><button class="btn btn-secondary edit-save-btn" data-id="<?php echo $staff['id']; ?>" data-editing="false">Edit</button></td>
                     <?php } ?>
 
@@ -120,6 +122,7 @@
                 // 'Save' was clicked
                 var selectedPayment_mode = $('.payment-mode[data-id="'+ id +'"]').val();
                 var referenceNumber = $('.reference-number[data-id="' + id + '"]').val();
+                var remark = $('.remark[data-id="' + id + '"]').val();
 
                 // Send AJAX request to save the data
                 $.ajax({
@@ -128,11 +131,12 @@
                     data: {
                         'id': id,
                         'reference_number': referenceNumber,
+                        'remark': remark,
                         'payment_mode': selectedPayment_mode
                     },
                     success: function(response) {
                         // Data was saved, now disable the fields
-                        $('.payment-mode[data-id="'+ id +'"], .reference-number[data-id="'+ id +'"]').prop('disabled', true);
+                        $('.payment-mode[data-id="'+ id +'"], .reference-number[data-id="'+ id +'"],.remark[data-id="' + id + '"]').prop('disabled', true);
                         $('.edit-save-btn[data-id="'+ id +'"]').data('editing', false).text('Edit');
                     },
                     error: function(response) {
@@ -141,7 +145,7 @@
                 });
             } else {
                 // 'Edit' was clicked, enable the fields and change button text
-                $('.payment-mode[data-id="'+ id +'"], .reference-number[data-id="'+ id +'"]').prop('disabled', false);
+                $('.payment-mode[data-id="'+ id +'"], .reference-number[data-id="'+ id +'"],.remark[data-id="' + id + '"]').prop('disabled', false);
                 $(this).data('editing', true).text('Save');
             }
         });        

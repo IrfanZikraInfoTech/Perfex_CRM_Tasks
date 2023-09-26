@@ -22,7 +22,7 @@
                 <tr id="row-<?php echo $staff['staffid']; ?>">
                     <td><?php echo $staff['firstname']; ?></td>
                     <td><?php echo $staff['email']; ?></td>
-                    <td id="salary-<?php echo $staff['staffid']; ?>"><?php echo $staff['employee_salary']; ?></td>
+                    <td id="salary-<?php echo $staff['staffid']; ?>"><?php echo $staff['currency'] . ' ' . $staff['employee_salary']; ?></td>
                     <td>
                         <button type="button" class="rounded transition-all bg-blue-500 text-white hover:bg-white hover:text-blue-500 hover:border-blue-500 border border-solid px-4 py-2" data-toggle="modal" data-target="#addSalaryModal" onclick="open_salary_model(<?php echo $staff['staffid'] ?>)">Edit Salary</button>
                     </td>
