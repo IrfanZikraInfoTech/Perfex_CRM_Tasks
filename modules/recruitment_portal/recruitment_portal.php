@@ -19,6 +19,7 @@ if(has_permission('recruitment_portal', '', 'admin') || (array_key_exists('staff
     hooks()->add_action('admin_init', 'recruitment_portal_init_menu_items');
 }
 
+
 if (!$CI->db->table_exists(db_prefix() . '_rec_campaigns')) {
     $CI->db->query('CREATE TABLE `' . db_prefix() . "_rec_campaigns` (
         `id` INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -138,32 +139,32 @@ if (!$CI->db->table_exists(db_prefix() . '_rec_color_scheme')) {
 
 
 
-// function addCustomRoutes() {
-//     $routeFilePath = FCPATH . 'application/config/routes.php'; 
+function addCustomRoutes() {
+    $routeFilePath = FCPATH . 'application/config/routes.php'; 
 
-//     if (is_writable($routeFilePath)) {
+    if (is_writable($routeFilePath)) {
 
-//         $customRoutes = [
-//             "\$route['career'] = 'admin/recruitment_portal/career';",
-//             "\$route['career/apply/(:num)'] = 'admin/recruitment_portal/apply/\$1';",
-//             "\$route['career/view/(:num)'] = 'admin/recruitment_portal/view/\$1';",
-//             // "\$route['default_controller'] = 'clients';",
-//             // "\$route['404_override'] = '';",
-//             // "\$route['translate_uri_dashes'] = false;"
-//         ];
+        $customRoutes = [
+            "\$route['career'] = 'admin/recruitment_portal/career';",
+            "\$route['career/apply/(:num)'] = 'admin/recruitment_portal/apply/\$1';",
+            "\$route['career/view/(:num)'] = 'admin/recruitment_portal/view/\$1';",
+            // "\$route['default_controller'] = 'clients';",
+            // "\$route['404_override'] = '';",
+            // "\$route['translate_uri_dashes'] = false;"
+        ];
 
-//         $content = file_get_contents($routeFilePath);
-//         $content .= "\n// Custom Routes for MyModule\n" . implode("\n", $customRoutes);
+        $content = file_get_contents($routeFilePath);
+        $content .= "\n// Custom Routes for MyModule\n" . implode("\n", $customRoutes);
 
-//         if (file_put_contents($routeFilePath, $content) !== false) {
-//             return true;
-//         } else {
-//             return false;
-//         }
-//     } else {
-//         return false;
-//     }
-// }
+        if (file_put_contents($routeFilePath, $content) !== false) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
 
 
 

@@ -19,9 +19,9 @@
                 <tr>
                     <td><?php echo $staff['firstname']; ?></td>
                     <td><?php echo $staff['email']; ?></td>
-                    <td><?php echo $staff['currency'] . ' ' . $staff['employee_salary']; ?></td>
+                    <td><?php echo $staff['employee_salary']; ?></td>
                     <td>
-                        <button type="button" class="rounded transition-all bg-emerald-500 text-white hover:bg-white hover:text-emerald-500 hover:border-emerald-500 border border-solid px-4 py-2" onclick="openPayModal(<?php echo $staff['staffid']; ?>, '<?php echo $staff['employee_salary']; ?>')">Update</button>
+                        <button type="button" class="rounded transition-all bg-emerald-500 text-white hover:bg-white hover:text-emerald-500 hover:border-emerald-500 border border-solid px-4 py-2" onclick="openPayModal(<?php echo $staff['staffid']; ?>, '<?php echo $staff['employee_salary']; ?>')">Pay</button>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -57,13 +57,6 @@
                 </div>
                 <p>Salary: <span id="salary"></span></p>
                 <div class="form-group">
-                    <label for="currency">Select Currency:</label>
-                    <select name="currency" id="currency" class="form-control">
-                        <option value="INR">INR</option>
-                        <option value="PKR">PKR</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label for="bonusInput">Bonus:</label>
                     <input id="bonusInput" type="number" placeholder="Enter Bonus" oninput="calculateTotal()" class="form-control">
                 </div>
@@ -75,7 +68,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePayModal()">Close</button>
-                <button type="button" class="btn btn-primary" onclick="makePayment()">Update Payment</button>
+                <button type="button" class="btn btn-primary" onclick="makePayment()">Make Payment</button>
             </div>
         </div>
     </div>
@@ -125,25 +118,14 @@
         resetData();
     }
 
-    async function makePayment() {
-    var month = document.getElementById('month').value;
-    var bonus = Number(document.getElementById('bonusInput').value);
-    var deduction = Number(document.getElementById('deductionInput').value);
-    var total = salary + bonus - deduction;
-    var currency = document.getElementById('currency').value;
+    function makePayment() {
+        var month = (document.getElementById('month').value);
+        var bonus = Number(document.getElementById('bonusInput').value);
+        var deduction = Number(document.getElementById('deductionInput').value);
+        var total = salary + bonus - deduction;
+        console.log(staff_id);
 
-    // Show Processing alert
-    Swal.fire({
-        title: 'Processing...',
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        onOpen: () => {
-            Swal.showLoading();
-        }
-    });
-
-    try {
-        const response = await $.ajax({
+        $.ajax({
             type: 'POST',
             url: '<?php echo admin_url("payroll/add_payment"); ?>',
             data: {
@@ -151,27 +133,23 @@
                 bonus: bonus,
                 deduction: deduction,
                 total: total,
-                month: month,
-                salary: salary,
-                currency: currency
+                month:month,
+                salary:salary
+            },
+            success: function(response) {
+                var res = JSON.parse(response);
+                if (res.status === 'success') {
+                    alert('Payment done and data stored successfully');
+                } else {
+                    alert('There was a problem storing the data');
+                }
+                payModal.hide();
+                resetData();
+            },
+            error: function(xhr, status, error) {
+                console.log(error);
+                alert('There was an error with the AJAX request');
             }
         });
-
-        const res = JSON.parse(response);
-
-        if (res.status === 'success') {
-            payModal.hide();  // Close the modal
-            resetData();     // Reset the form data
-            Swal.fire('Done','data update successfully', 'success');
-        } else {
-            payModal.hide();  // Close the modal
-            resetData();     // Reset the form data
-            Swal.fire('Error', 'There was a problem storing the data', 'error');
-        }
-    } catch (error) {
-        payModal.hide();  // Close the modal
-        resetData();     // Reset the form data
-        Swal.fire('Error', 'There was an error with the AJAX request', 'error');
     }
-}
 </script>
