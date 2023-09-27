@@ -111,7 +111,7 @@ class Team_management extends AdminController {
         //if (!has_permission('team_management', '', 'admin')) {
         //    access_denied('You do not have permission to access this page.');
         //}
-        $data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
+        $data['staff_members'] = $this->staff_model->get('', ['active' => 1, 'staffid !=' => 1]);
         $this->load->view('staff_shifts', $data);
     }
 
