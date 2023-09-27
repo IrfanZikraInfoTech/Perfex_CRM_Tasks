@@ -1339,6 +1339,24 @@ class Projects extends AdminController
         echo json_encode(array('success' => $success));
     }
 
+    public function set_sprint_closing_summary() {
+        $sprint_id = $this->input->post('sprint_id');
+        $summary = $this->input->post('summary');
+
+        // Update the sprint status
+        $success = $this->projects_model->update_sprint_summary($sprint_id, $summary);
+    
+        echo json_encode(array('success' => $success));
+    }
+
+    public function get_sprint() {
+        $sprint_id = $this->input->post('sprint_id');
+
+        $sprint = $this->projects_model->get_sprint($sprint_id);
+    
+        echo json_encode($sprint);
+    }
+
     public function delete_sprint() {
         $sprint_id = $this->input->post('sprint_id');
     

@@ -443,7 +443,7 @@ class Team_management_model extends App_Model
         return $this->db->affected_rows() > 0;
     }
 
-    public function clock_out($staff_id)
+    public function clock_out($staff_id, $force)
     {
         $now = date('Y-m-d H:i:s');
         $now_timestamp = time(); // Get the current Unix timestamp
@@ -455,7 +455,7 @@ class Team_management_model extends App_Model
         $query = $this->db->get(db_prefix().'_staff_time_entries');
         $row = $query->row();
 
-        if (isset($row)) {
+        if (isset($row) && !$force) {
             $clock_in_date = date("Y-m-d", strtotime($row->clock_in));
             if (!$this->team_management_model->get_staff_summary($staff_id, $clock_in_date)) {
                 return ['success' => false, 'message' => "Please add your summary first."];

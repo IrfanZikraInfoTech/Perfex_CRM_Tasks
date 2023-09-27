@@ -2667,6 +2667,12 @@ class Projects_model extends App_Model
         $query = $this->db->get('tblsprints');
         return $query->result();
     }
+
+    public function get_sprint($sprint_id) {
+        $this->db->where('id', $sprint_id);
+        $query = $this->db->get('tblsprints');
+        return $query->row();
+    }
     
     public function get_stories($type, $type_id) {
         $this->db->select('id');
@@ -2739,6 +2745,14 @@ class Projects_model extends App_Model
         return $this->db->update('tblsprints', $data);
     }
 
+    public function update_sprint_summary($sprint_id, $summary)
+    {
+        $data = ['closing_summary' => $summary];
+
+        $this->db->where('id', $sprint_id);
+        return $this->db->update('tblsprints', $data);
+    }
+
     public function delete_sprint($sprint_id)
     {
         // Start a transaction to ensure data integrity
@@ -2784,14 +2798,12 @@ class Projects_model extends App_Model
     public function delete_epic($from_epic_id, $to_epic_id) {
         $this->db->where('epic_id', $from_epic_id);
         $this->db->update('tbltasks', ['epic_id' => $to_epic_id]);  // Assume your tasks table is named tbltasks
-        if($this->db->affected_rows() > 0){
-            $this->db->where('id', $from_epic_id);
-            $this->db->delete('tblepics');
 
-            return $this->db->affected_rows() > 0;
-        }else{
-            return false;
-        }
+
+        $this->db->where('id', $from_epic_id);
+        $this->db->delete('tblepics');
+
+        return $this->db->affected_rows() > 0;
     }
     
     

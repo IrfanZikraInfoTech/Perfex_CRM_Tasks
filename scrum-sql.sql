@@ -16,6 +16,7 @@ CREATE TABLE tblsprints (
     end_date DATE NOT NULL,
     date_started DATE NULL,
     date_ended DATE NULL,
+    closing_summary TEXT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NULL
 );
@@ -25,3 +26,6 @@ CREATE TABLE tblsprints (
 ALTER TABLE tbltasks
 ADD COLUMN epic_id INT DEFAULT NULL,
 ADD COLUMN sprint_id INT DEFAULT NULL;
+
+-- ALTER COMMAND IF closing_summary isnt added, Copy and paste
+-- alter table tblsprints add closing_summary TEXT NULL;

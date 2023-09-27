@@ -119,17 +119,20 @@ function story($story, $show_epic = false) {
                             <div class="w-5 h-5 text-xs bg-green-200 text-black rounded-full flex justify-center items-center" data-toggle="tooltip" data-placement="top" title="Done: <?= $sprint->completed_count ?>"><?= $sprint->completed_count ?></div>
                         </div>
                         
-                        <button class="px-4 py-1 rounded <?= $sprint->status == 2 ? 'bg-green-500 text-white' : 'bg-white border border-solid border-gray-200 text-gray-800' ?> transition-all hover:shadow-lg shadow-md hover:scale-105 disabled:hidden" <?= ($sprint->status == 2) ? 'disabled' : '' ?>  onclick="updateSprintStatus(this);" data-status="<?= $sprint->status ?>" data-sprint-id="<?= $sprint->id ?>">
+                        <button class="px-4 py-1 rounded <?= $sprint->status == 2 ? 'bg-green-500 text-white' : 'bg-white border border-solid border-gray-200 text-gray-800' ?> transition-all hover:shadow-lg shadow-md hover:scale-105"   onclick="updateSprintStatus(this);" data-status="<?= $sprint->status ?>" data-sprint-id="<?= $sprint->id ?>">
                             <?php 
                                 if($sprint->status == 0){
                                     echo "Start";
                                 }else if($sprint->status == 1){
                                     echo "Complete";
                                 }else {
-                                    echo "Completed";
+                                    echo "Edit Summary";
                                 }
                             ?>
                         </button>
+
+
+
                         <button class="px-4 py-1 rounded bg-white border border-solid border-gray-200 text-gray-800 transition-all hover:shadow-lg shadow-md hover:scale-105" onclick="deleteSprint(<?= $sprint->id ?>)">Delete</button>
                     </div>
                 </div>          
@@ -425,20 +428,23 @@ function createEpic() {
 
 function addEpicToUI(epicId, epicName) {
     var newEpicHTML = `
-        <div class="border-2 border-solid border-purple-100 rounded-lg transition-all hover:shadow-lg ease-in-out duration-300">
+    <div class="border-2 border-solid border-purple-100 rounded-lg transition-all hover:shadow-lg ease-in-out duration-300">
             
             <div class="flex justify-between items-center py-2 px-4 bg-purple-100/40 rounded-t-lg border-solid border-purple-200 cursor-pointer" onclick="toggleCollapse(event, 'epic-${epicId}-content')">
 
-                <div class="flex items-center text-black font-bold text-base gap-2">
+                <div class="flex items-center text-black font-bold text-base gap-2 w-1/3">
                     <div class="fas fa-angle-down transform transition-transform duration-300"></div>
-                    <span class="">${epicName}</span>
+                    <input class="w-full text-black font-bold text-base bg-transparent px-2 py-1" value="${epicName}" onchange="updateEpicName(this.value, ${epicId})" placeholder="Epic Name" />
                 </div>
 
+                <div class="flex flex-row gap-2">
                 <button class="bg-green-500 text-white rounded-lg px-4 py-2 transition-all hover:bg-green-600 ease-in-out duration-300" onclick="newStory(${epicId})">New Story</button>
+                <button class="bg-rose-500 text-white rounded-lg px-4 py-2 transition-all hover:bg-rose-600 ease-in-out duration-300" onclick="deleteEpic(${epicId})">Delete</button>
+                </div>
             </div>
 
-            <div class="collapsible-content expanded"  data-issue-type="epic" data-issue-id="${epicId}" id="epic-${epicId}-content">
-                <div class="p-4 flex flex-col gap-4 epic-list" id="epic-${epicId}-list">
+            <div class="collapsible-content expanded" id="epic-${epicId}-content">
+                <div class="p-4 flex flex-col gap-4 epic-list" data-issue-type="epic" data-issue-id="${epicId}" id="epic-${epicId}-list">
                 </div>
             </div>
         </div>
@@ -689,6 +695,8 @@ function updateSprintStatus(button) {
     var sprintStatus = button.getAttribute('data-status');
     var newStatus;
 
+    var sprint_id = button.getAttribute('data-sprint-id')
+
     var projectId = '<?= $project->id ?>';
     
     // Determine the new status based on the current status
@@ -697,10 +705,128 @@ function updateSprintStatus(button) {
     } else if (sprintStatus == '1') {
         newStatus = '2';  // Complete the sprint
     } else {
-        // Sprint is already completed, nothing to do
+
+        $.ajax({
+            url: admin_url + 'projects/get_sprint',
+            type: 'POST',
+            data: {
+                sprint_id: sprint_id
+            },
+            success: function(response) {
+                response = JSON.parse(response);
+
+                if (response.id) {
+                    Swal.fire({
+                    title: 'Sprint closing summary',
+                    html: '<div class="w-full"><textarea class="border-2 border-solid border-gray-200 h-64 w-full p-2" id="sprint_closing_summary">'+response.closing_summary+'</textarea></div>',
+                    allowOutsideClick: false,
+                    showConfirmButton: true,
+                    showCancelButton: true,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            var summary = $("#sprint_closing_summary").val();
+                            if(summary == ""){
+                                Swal.fire(
+                                    'Error!',
+                                    "Please write something!",
+                                    'error'
+                                );
+                            }else{
+                                $.ajax({
+                                    url: admin_url + 'projects/set_sprint_closing_summary',
+                                    type: 'POST',
+                                    data: {
+                                        sprint_id: sprint_id,
+                                        summary: summary
+                                    },
+                                    success: function(response) {
+                                        Swal.close();
+                                        response = JSON.parse(response);
+                                        if (response.success) {
+                                            Swal.fire(
+                                                'Success!',
+                                                "Sprint closing summary is updated!",
+                                                'success'
+                                            );
+                                        } else {
+                                            // Handle error, e.g., another sprint is already active
+                                            Swal.fire('Error!', response.error, 'error');
+                                        }
+                                    },
+                                    error: function() {
+                                        Swal.close();
+                                        Swal.fire('Error!', 'Failed to update sprint status.', 'error');
+                                    }
+                                });
+                                
+                            }
+                        }
+                    });
+                }
+                 
+            },
+            error: function() {
+                Swal.close();
+                Swal.fire('Error!', 'Failed to get sprint summary.', 'error');
+            }
+        });
         return;
     }
+    
+    if(newStatus == '2'){
+        Swal.fire({
+        title: 'Sprint closing summary',
+        html: '<div class="w-full"><textarea class="border-2 border-solid border-gray-200 h-64 w-full p-2" id="sprint_closing_summary"></textarea></div>',
+        allowOutsideClick: false,
+        showConfirmButton: true,
+        showCancelButton: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var summary = $("#sprint_closing_summary").val();
+                if(summary == ""){
+                    Swal.fire(
+                        'Error!',
+                        "Please write something!",
+                        'error'
+                    );
+                }else{
 
+                    $.ajax({
+                        url: admin_url + 'projects/set_sprint_closing_summary',
+                        type: 'POST',
+                        data: {
+                            sprint_id: sprint_id,
+                            summary: summary
+                        },
+                        success: function(response) {
+                            Swal.close();
+                            response = JSON.parse(response);
+                            if (response.success) {
+                                modifySprintStatus(projectId, newStatus, sprint_id);
+                            } else {
+                                // Handle error, e.g., another sprint is already active
+                                Swal.fire('Error!', response.error, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.close();
+                            Swal.fire('Error!', 'Failed to update sprint status.', 'error');
+                        }
+                    });
+                    
+                }
+            }
+        });
+
+        
+    }else{
+        modifySprintStatus(projectId, newStatus, button.getAttribute('data-sprint-id'));
+    }
+
+    
+}
+
+function modifySprintStatus(project_id, sprint_status, sprint_id){
     // Show a loading icon or similar while the request is being processed
     Swal.fire({
         title: 'Processing',
@@ -714,9 +840,9 @@ function updateSprintStatus(button) {
         url: admin_url + 'projects/update_sprint_status',
         type: 'POST',
         data: {
-            project_id: projectId,
-            sprint_status: newStatus,
-            sprint_id: button.getAttribute('data-sprint-id')
+            project_id: project_id,
+            sprint_status: sprint_status,
+            sprint_id: sprint_id
         },
         success: function(response) {
             Swal.close();
@@ -733,10 +859,6 @@ function updateSprintStatus(button) {
         error: function() {
             Swal.close();
             Swal.fire('Error!', 'Failed to update sprint status.', 'error');
-        },
-        complete: function() {
-            // Hide loading icon
-            button.disabled = false;
         }
     });
 }

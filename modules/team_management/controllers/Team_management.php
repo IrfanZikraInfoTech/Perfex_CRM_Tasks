@@ -1016,12 +1016,12 @@ class Team_management extends AdminController {
         $is_force = ($this->input->post('force') == null) ? false : $this->input->post('force');
     
         
-        $clock_out_result = $this->team_management_model->clock_out($staff_id);
+        $clock_out_result = $this->team_management_model->clock_out($staff_id, $is_force);
 
         // print_r($clock_out_result);
         // return;
 
-        if ($clock_out_result['success'] || $is_force) {
+        if ($clock_out_result['success']) {
 
 
             // format the date for readability
