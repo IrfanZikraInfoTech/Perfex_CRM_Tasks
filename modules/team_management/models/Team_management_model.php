@@ -1793,7 +1793,7 @@ class Team_management_model extends App_Model
         $this->db->from(db_prefix() . '_staff_shifts');
         $this->db->where('month', date('m', strtotime($date)));
         $this->db->where('day', date('d', strtotime($date)));
-$this->db->where(db_prefix() . '_staff_shifts.staff_id !=', 1);  // This line excludes staff with ID=1
+        $this->db->where(db_prefix() . '_staff_shifts.staff_id !=', 1);  // This line excludes staff with ID=1
         $query = $this->db->get();
         $daywise_shifts = $query->result_array();
         
@@ -1842,7 +1842,7 @@ $this->db->where(db_prefix() . '_staff_shifts.staff_id !=', 1);  // This line ex
         $this->db->select('staff_id, DATE(clock_in) as date, clock_in, clock_out');
         $this->db->from(db_prefix() . '_staff_time_entries');
         $this->db->where('DATE(clock_in)', $date); // Fetch records for specific date
-$this->db->where(db_prefix() . '_staff_time_entries.staff_id !=', 1);  // Exclude staff with ID=1
+        $this->db->where(db_prefix() . '_staff_time_entries.staff_id !=', 1);  // Exclude staff with ID=1
         $clock_ins = $this->db->get()->result_array();
         
         $clock_times = [];
@@ -1871,8 +1871,8 @@ $this->db->where(db_prefix() . '_staff_time_entries.staff_id !=', 1);  // Exclud
 
         // Actual Total Logged in Time
         $this->db->select('*');
-$this->db->where(db_prefix() . 'staff.staffid !=', 1);  // This line excludes staff with ID=1
-
+        $this->db->where(db_prefix() . 'staff.staffid !=', 1);  // This line excludes staff with ID=1
+        $this->db->where('tblstaff.active', 1);
         $query = $this->db->get(db_prefix() . 'staff');
         $all_staff_global = $query->result_array();
         
@@ -1951,6 +1951,8 @@ $this->db->where(db_prefix() . 'staff.staffid !=', 1);  // This line excludes st
         // Total Present Staff
         $this->db->select('COUNT(DISTINCT staff_id) as total_present_staff');
         $this->db->select('staff_id, firstname');
+        $this->db->where('tblstaff.staffid !=', 1);  // This line excludes staff with ID=1
+        $this->db->where('tblstaff.active', 1);
         $this->db->from(db_prefix() . '_staff_time_entries');
         $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . '_staff_time_entries.staff_id');
         $this->db->where('DATE(clock_in)', $date);
@@ -1964,9 +1966,11 @@ $this->db->where(db_prefix() . '_staff_time_entries.staff_id !=', 1);  // This l
         
         $this->db->select('staffid, firstname');
         $this->db->from(db_prefix() . 'staff');
-$this->db->where('staffid !=', 1);  // This line excludes staff with ID=1
-
+        $this->db->where('staffid !=', 1);  // This line excludes staff with ID=1
+        $this->db->where('active', 1);
         $all_staff = $this->db->get()->result_array();
+
+
         $present_staff = $report_data['present_staff_list'];
         $staff_on_leave = $this->get_staff_on_leave($date);
         $present_staff_ids = array_column($present_staff, 'staff_id');
@@ -2214,8 +2218,8 @@ $this->db->where('staff_id !=', 1);  // Exclude staff with staff_id = 1
         // Get all staff data
         $this->db->select('*');
         $this->db->from('tblstaff');
-$this->db->where('staffid !=', 1);
-$this->db->where('active', 1);  // Exclude staff with staff_id = 1
+        $this->db->where('staffid !=', 1);
+        $this->db->where('active', 1);  // Exclude staff with staff_id = 1
 
         $staffs = $this->db->get()->result();
 
@@ -2244,58 +2248,6 @@ $this->db->where('active', 1);  // Exclude staff with staff_id = 1
         return ['on_timers' => $on_timers, 'late_joiners' => $late_joiners];
     }
 
-    
-
-
-    public function get_late_joiners($date) {
-        $this->db->select('tbl_staff_time_entries.staff_id, tblstaff.firstname');
-        $this->db->distinct();
-        $this->db->from(db_prefix() . '_staff_time_entries');
-        $this->db->join(db_prefix() . 'staff', 'tblstaff.staffid = tbl_staff_time_entries.staff_id');
-        $this->db->join(db_prefix() . '_staff_leaves', 'tbl_staff_leaves.staff_id = tbl_staff_time_entries.staff_id', 'left');
-$this->db->where('tblstaff.staffid !=', 1); // Exclude staff with staff_id = 1
-    $this->db->where('tblstaff.active', 1);
-        $this->db->where('DATE(tbl_staff_time_entries.clock_in)', $date);
-        $this->db->where_not_in('tbl_staff_time_entries.staff_id', "SELECT staff_id FROM " . db_prefix() . "_staff_leaves WHERE start_date <= '$date' AND end_date >= '$date'", false);
-    
-        $this->db->where("(
-            tbl_staff_time_entries.clock_in > (
-                SELECT DATE_ADD(CONCAT_WS('-', YEAR('$date'), month, day, ' ', shift_start_time), INTERVAL 5 MINUTE) FROM " . db_prefix() . "_staff_shifts
-                WHERE staff_id = tbl_staff_time_entries.staff_id
-                AND month = MONTH('$date')
-                AND day = DAY('$date')
-                AND shift_number = 1
-                LIMIT 1
-            )
-            OR tbl_staff_time_entries.clock_in > (
-                SELECT DATE_ADD(CONCAT_WS('-', YEAR('$date'), month, day, ' ', shift_start_time), INTERVAL 5 MINUTE) FROM " . db_prefix() . "_staff_shifts
-                WHERE staff_id = tbl_staff_time_entries.staff_id
-                AND month = MONTH('$date')
-                AND day = DAY('$date')
-                AND shift_number = 2
-                LIMIT 1
-            )
-        )", NULL, false);
-    
-        $query = $this->db->get();
-        return $query->result_array();
-    }
-      
-    public function get_on_timers($date) {
-        $this->db->select('tbl_staff_shifts.staff_id, tblstaff.firstname, COUNT(tbl_staff_shifts.staff_id) as on_time_shifts');
-        $this->db->from(db_prefix() . '_staff_time_entries');
-        $this->db->join(db_prefix() . '_staff_shifts', 'tbl_staff_shifts.staff_id = tbl_staff_time_entries.staff_id');
-        $this->db->join(db_prefix() . 'staff', 'tblstaff.staffid = tbl_staff_time_entries.staff_id');
-$this->db->where('tblstaff.staffid !=', 1); // Exclude staff with staff_id = 1
-$this->db->where('tblstaff.active', 1);
-
-        $this->db->where('DATE(tbl_staff_time_entries.clock_in)', $date);
-        $this->db->where('tbl_staff_shifts.shift_start_time BETWEEN tbl_staff_time_entries.clock_in AND tbl_staff_time_entries.clock_out');
-        $this->db->group_by('tbl_staff_shifts.staff_id, tblstaff.firstname');
-        //$this->db->having('COUNT(tbl_staff_shifts.staff_id)', 2);
-        $query = $this->db->get();
-        return $query->result_array();
-    }    
     
     public function get_staff_on_leave($date) {
         $this->db->select('tbl_staff_leaves.staff_id, tbl_staff_leaves.shift,tblstaff.firstname');
