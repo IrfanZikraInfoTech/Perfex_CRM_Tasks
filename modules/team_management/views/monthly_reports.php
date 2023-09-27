@@ -188,6 +188,7 @@ function formatShift($shiftNumer)
         <!-- All Tasks Worked On -->
         <div class="bg-white shadow rounded p-4 col-span-2">
             <h2 class="text-xl font-semibold mb-4">All Tasks Worked On</h2>
+            <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse" id="allTasks">
                     <thead>
                         <tr class="text-sm font-medium text-gray-700">
@@ -236,6 +237,7 @@ function formatShift($shiftNumer)
                         <?php endforeach; ?>
                     </tbody>
             </table>
+            </div>
         </div>
 
 

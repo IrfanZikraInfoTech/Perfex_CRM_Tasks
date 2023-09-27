@@ -510,6 +510,8 @@ function calculate_project_progress($project_id, $date) {
                     <div class="mb-10">
                         <h3 class="text-lg font-semibold mb-2">All Tasks</h3>
                         <!-- Task timer activity table -->
+                        <div class="overflow-x-auto">
+
                         <table class="min-w-full divide-y divide-gray-200 shadow-sm">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -526,11 +528,14 @@ function calculate_project_progress($project_id, $date) {
                             <tbody class="bg-white divide-y divide-gray-200" id="tbl_all_tasks">
                             </tbody>
                         </table>
+                        </div>
                     </div>
 
                     <div class="mb-10">
                         <h3 class="text-lg font-semibold mb-2">Task Timer Activity</h3>
                         <!-- Task timer activity table -->
+                        <div class="overflow-x-auto">
+
                         <table class="min-w-full divide-y divide-gray-200 shadow-sm">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -543,6 +548,7 @@ function calculate_project_progress($project_id, $date) {
                             <tbody class="bg-white divide-y divide-gray-200" id="tbl_tasks_activity">
                             </tbody>
                         </table>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-6 mb-6">
@@ -552,7 +558,8 @@ function calculate_project_progress($project_id, $date) {
                         <h3 class="text-lg font-semibold mb-2">AFK Time</h3>
                         <p class="text-xl font-bold"><!-- Total AFK time value --></p>
                         <!-- AFK time table -->
-                        
+                        <div class="overflow-x-auto">
+
                         <table class="min-w-full divide-y divide-gray-200 shadow-sm mb-6">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -564,7 +571,7 @@ function calculate_project_progress($project_id, $date) {
                             <tbody id="afk_time_table" class="bg-white divide-y divide-gray-200">
                             </tbody>
                         </table>
-
+                        </div>
                         </div>
                         
                         <div>
@@ -573,6 +580,7 @@ function calculate_project_progress($project_id, $date) {
                         <p class="text-xl font-bold"><!-- Total offline time value --></p>
                         <!-- Offline time table -->
                         <!-- Add offline time table here -->
+                        <div class="overflow-x-auto">
                         
                         <table class="min-w-full divide-y divide-gray-200 shadow-sm mb-6">
                             <thead class="bg-gray-50">
@@ -586,6 +594,7 @@ function calculate_project_progress($project_id, $date) {
                                 <!-- Add offline time entries here -->
                             </tbody>
                         </table>
+                        </div>
                         </div>
                     </div>
                     
