@@ -194,7 +194,8 @@
                 <?php
                } ?>
 
-                <?php $this->load->view(($tab ? $tab['view'] : 'admin/projects/project_overview')); ?>
+                <?php
+                $this->load->view(($tab ? $tab['view'] : 'admin/projects/project_overview')); ?>
 
             </div>
         </div>
@@ -249,6 +250,8 @@
 <!-- For invoices table -->
 <script>
 taskid = '<?php echo $this->input->get('taskid'); ?>';
+
+
 </script>
 <script>
 var gantt_data = {};
@@ -262,6 +265,15 @@ var project_id = $('input[name="project_id"]').val();
 if (typeof(discussion_id) != 'undefined') {
     discussion_comments('#discussion-comments', discussion_id, 'regular');
 }
+
+<?php if($tab['slug'] == "project_board" && isset($active_sprint)){ ?>
+$(function() {
+    
+    init_kanban("tasks/kanban", tasks_kanban_update, ".tasks-status", 240, 360);
+
+});
+<?php } ?>
+
 $(function() {
     var project_progress_color =
         '<?php echo hooks()->apply_filters('admin_project_progress_color', '#84c529'); ?>';

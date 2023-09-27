@@ -3,6 +3,7 @@
 use app\services\projects\Gantt;
 use app\services\projects\AllProjectsGantt;
 use app\services\projects\HoursOverviewChart;
+use app\services\tasks\TasksKanban;
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -231,7 +232,7 @@ class Projects extends AdminController
 
             $this->app_scripts->add(
                 'projects-js',
-                base_url($this->app_scripts->core_file('assets/js', 'projects.js')) . '?v=10',
+                base_url($this->app_scripts->core_file('assets/js', 'projects.js')) . '?v=' . $this->app_scripts->core_version(),
                 'admin',
                 ['app-js', 'jquery-comments-js', 'frappe-gantt-js', 'circle-progress-js']
             );
@@ -294,7 +295,7 @@ class Projects extends AdminController
                 $data['invoices_sale_agents'] = $this->invoices_model->get_sale_agents();
                 $data['invoices_statuses']    = $this->invoices_model->get_statuses();
             } elseif ($group == 'project_gantt') {
-                $gantt_type         = (!$this->input->get('gantt_type') ? 'milestones' : $this->input->get('gantt_type'));
+                $gantt_type         = (!$this->input->get('gantt_type') ? 'sprints' : $this->input->get('gantt_type'));
                 $taskStatus         = (!$this->input->get('gantt_task_status') ? null : $this->input->get('gantt_task_status'));
                 $data['gantt_data'] = (new Gantt($id, $gantt_type))->forTaskStatus($taskStatus)->get();
             } elseif ($group == 'project_milestones') {
@@ -303,26 +304,9 @@ class Projects extends AdminController
 
                 $data['total_milestones'] = total_rows(db_prefix() . 'milestones', ['project_id' => $id]);
                 $data['milestones_found'] = $data['total_milestones'] > 0 || (!$data['total_milestones'] && total_rows(db_prefix() . 'tasks', ['rel_id' => $id, 'rel_type' => 'project', 'milestone' => 0]) > 0);
-            } 
-
-            
-            // tables my data get
-            
-            elseif ($group == 'project_files') {
+            } elseif ($group == 'project_files') {
                 $data['files'] = $this->projects_model->get_files($id);
-
-                $this->load->model('Projects_model');
-                $data['folders'] = $this->Projects_model->get_folders();
-            
-            
-               
-
-            } 
-
-             // tables my data get end
-
-            
-            elseif ($group == 'project_expenses') {
+            } elseif ($group == 'project_expenses') {
                 $this->load->model('taxes_model');
                 $this->load->model('expenses_model');
                 $data['taxes']              = $this->taxes_model->get();
@@ -330,15 +314,9 @@ class Projects extends AdminController
                 $data['currencies']         = $this->currencies_model->get();
             } elseif ($group == 'project_activity') {
                 $data['activity'] = $this->projects_model->get_activity($id);
-            } 
-
-
-            elseif ($group == 'project_notes') {
+            } elseif ($group == 'project_notes') {
                 $data['staff_notes'] = $this->projects_model->get_staff_notes($id);
-            } 
-     
-
-            elseif ($group == 'project_contracts') {
+            } elseif ($group == 'project_contracts') {
                 $this->load->model('contracts_model');
                 $data['contract_types'] = $this->contracts_model->get_contract_types();
                 $data['years']          = $this->contracts_model->get_contracts_years();
@@ -369,6 +347,70 @@ class Projects extends AdminController
                 // Completed tasks are excluded from this list because you can't add timesheet on completed task.
                 $data['tasks']                = $this->projects_model->get_tasks($id, 'status != ' . Tasks_model::STATUS_COMPLETE . ' AND billed=0');
                 $data['timesheets_staff_ids'] = $this->projects_model->get_distinct_tasks_timesheets_staff($id);
+            }elseif ($group == 'project_backlog'){
+
+                $this->load->model('tasks_model');
+
+                $data['epics'] = $this->projects_model->get_epics($id);
+                foreach ($data['epics'] as $epic) {
+                    $epic->stories = $this->projects_model->get_stories('epic', $epic->id);
+                    foreach($epic->stories as &$story){
+                        $story = $this->tasks_model->get($story->id);
+                    }
+                }
+
+                $data['sprints'] = $this->projects_model->get_sprints($id);
+                foreach ($data['sprints'] as $sprint) {
+                    $sprint->stories = $this->projects_model->get_stories('sprint', $sprint->id);
+                    
+                    $sprint->not_started_count = 0;
+                    $sprint->in_progress_count = 0;
+                    $sprint->completed_count = 0;
+
+                    foreach($sprint->stories as &$story){
+                        $story = $this->tasks_model->get($story->id);
+                        $story->epic = $this->projects_model->get_epic($story->epic_id);
+
+                        if ($story->status == 1) {
+                            $sprint->not_started_count++;
+                        } elseif ($story->status == 4) {
+                            $sprint->in_progress_count++;
+                        } elseif ($story->status == 5) {
+                            $sprint->completed_count++;
+                        }
+                    }
+                }
+
+            }elseif ($group == 'project_board'){
+                $sprint = $this->projects_model->is_active_sprint_exists($id)['sprint'];
+
+                if($sprint){
+                    $sprint->stories = $this->projects_model->get_stories('sprint', $sprint->id);
+                    
+                    $sprint->not_started_count = 0;
+                    $sprint->in_progress_count = 0;
+                    $sprint->completed_count = 0;
+    
+                    foreach($sprint->stories as &$story){
+                        $story = $this->tasks_model->get($story->id);
+                        $story->epic = $this->projects_model->get_epic($story->epic_id);
+    
+                        if ($story->status == 1) {
+                            $sprint->not_started_count++;
+                        } elseif ($story->status == 4) {
+                            $sprint->in_progress_count++;
+                        } elseif ($story->status == 5) {
+                            $sprint->completed_count++;
+                        }
+                    }
+
+                    $data['active_sprint'] = $sprint;
+    
+                }
+
+
+                
+
             }
 
             // Discussions
@@ -457,8 +499,6 @@ class Projects extends AdminController
         }
     }
 
-
-    // gdrive ka kaam
     public function add_external_file()
     {
         if ($this->input->post()) {
@@ -471,9 +511,6 @@ class Projects extends AdminController
             $this->projects_model->add_external_file($data);
         }
     }
-
-
-
 
     public function download_all_files($id)
     {
@@ -623,28 +660,11 @@ class Projects extends AdminController
             $this->projects_model->update_milestone_color($this->input->post());
         }
     }
-// uper file uplaod
-// public function upload_file($project_id)
-// {
-//     handle_project_file_uploads($project_id);
-// }
 
-public function upload_file($project_id)
-{
-    // Check if a folder_id has been sent with the request
-    if (isset($_POST['folder_id'])) {
-        $folder_id = $_POST['folder_id'];
-    } else {
-        $folder_id = null;  // Or set to a default folder_id if necessary
+    public function upload_file($project_id)
+    {
+        handle_project_file_uploads($project_id);
     }
-
-    // Pass the folder_id to the handle_project_file_uploads function
-    handle_project_file_uploads($project_id, $folder_id);
-}
-
- 
-    
-// uper file uplaod end     
 
     public function change_file_visibility($id, $visible)
     {
@@ -668,28 +688,28 @@ public function upload_file($project_id)
         redirect(admin_url('projects/view/' . $project_id . '?group=project_files'));
     }
 
-    public function milestones_kanban()
-    {
-        $data['milestones_exclude_completed_tasks'] = $this->input->get('exclude_completed_tasks') && $this->input->get('exclude_completed_tasks') == 'yes';
+    // public function milestones_kanban()
+    // {
+    //     $data['milestones_exclude_completed_tasks'] = $this->input->get('exclude_completed_tasks') && $this->input->get('exclude_completed_tasks') == 'yes';
 
-        $data['project_id'] = $this->input->get('project_id');
-        $data['milestones'] = [];
+    //     $data['project_id'] = $this->input->get('project_id');
+    //     $data['milestones'] = [];
 
-        $data['milestones'][] = [
-            'name'              => _l('milestones_uncategorized'),
-            'id'                => 0,
-            'total_logged_time' => $this->projects_model->calc_milestone_logged_time($data['project_id'], 0),
-            'color'             => null,
-        ];
+    //     $data['milestones'][] = [
+    //         'name'              => _l('milestones_uncategorized'),
+    //         'id'                => 0,
+    //         'total_logged_time' => $this->projects_model->calc_milestone_logged_time($data['project_id'], 0),
+    //         'color'             => null,
+    //     ];
 
-        $_milestones = $this->projects_model->get_milestones($data['project_id']);
+    //     $_milestones = $this->projects_model->get_milestones($data['project_id']);
 
-        foreach ($_milestones as $m) {
-            $data['milestones'][] = $m;
-        }
+    //     foreach ($_milestones as $m) {
+    //         $data['milestones'][] = $m;
+    //     }
 
-        echo $this->load->view('admin/projects/milestones_kan_ban', $data, true);
-    }
+    //     echo $this->load->view('admin/projects/milestones_kan_ban', $data, true);
+    // }
 
     public function milestones_kanban_load_more()
     {
@@ -1226,70 +1246,124 @@ public function upload_file($project_id)
         }
     }
 
-
-
-
-// folder work
-    public function addFolder() {
-    $this->load->model('Projects_model'); // load the model
-    $folderName = $this->input->post('folder_name'); // get the POST data
-    $result = $this->Projects_model->insert_folder($folderName); // call the model function to save the folder name in the database
-
-    echo $result;
-}
-   
-// specific files k zarie data 
-// public function get_files_by_folder($folder_id)
-// {
-//     $this->db->where('project_folder_id', $folder_id);
-//     $files = $this->db->get(db_prefix() . 'project_files')->result_array();
-
-//     echo json_encode($files);
-// }
-public function get_files_by_folder($folder_id)
-{
-    $this->db->where('project_folder_id', $folder_id);
-    $files = $this->db->get(db_prefix() . 'project_files')->result_array();
-
-    // Instead of sending JSON, we'll just output the data in HTML table format
-    foreach ($files as $file) {
-        echo '<tr>';
-        echo '<td data-order="' . $file['file_name'] . '">
-        <a href="#" onclick="view_project_file(' . $file['id'] . ',' . $file['project_id'] . '); return false;" data-dismiss="modal">';
-            
-        if (is_image(PROJECT_ATTACHMENTS_FOLDER . $file['project_id'] . '/' . $file['file_name']) || (!empty($file['external']) && !empty($file['thumbnail_link']))) {
-            echo '<img class="project-file-image img-fluid img-table-loading" src="' . project_file_url($file, true) . '" width="100">';
-        }
-        echo $file['subject'];
-        echo '</a></td>';
-        echo '<td data-order="' . $file['filetype'] . '">' . $file['filetype'] . '</td>'; // Add extra field 'filetype'
-
-        // Added new <td>
-        echo '<td>
-                <div class="tw-flex tw-items-center tw-space-x-3">';
-                if (empty($file['external'])) {
-                    $file_name = $file['original_file_name'] != '' ? $file['original_file_name'] : $file['file_name'];
-                    echo '<a href="#" data-toggle="modal" data-original-file-name="' . $file_name . '"
-                            data-filetype="' . $file['filetype'] . '"
-                            data-file-name="' . $file['original_file_name'] . '"
-                            data-path="' . PROJECT_ATTACHMENTS_FOLDER . $file['project_id'] . '/' . $file['file_name'] . '"
-                            data-target="#send_file"
-                            class="tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700 tw-mt-1">
-                            <i class="fa-regular fa-envelope fa-lg"></i>
-                        </a>';
-                }
-                if ($file['staffid'] == get_staff_user_id() || has_permission('projects', '', 'delete')) {
-                    echo '<a href="' . admin_url('projects/remove_file/' . $file['project_id'] . '/' . $file['id']) . '"
-                            class="tw-mt-px tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700 _delete">
-                            <i class="fa-regular fa-trash-can fa-lg"></i>
-                        </a>';
-                }
-        echo '</div>
-            </td>';
-        echo '</tr>';
+    //SCRUM METHODOLOGIES
+    public function create_epic() {
+        $project_id = $this->input->post('project_id');
+        $epic_name = $this->input->post('name');
+        $epic_id = $this->projects_model->create_epic($project_id, $epic_name);
+        echo json_encode(['epic_id' => $epic_id]);
     }
-}
 
+    public function move_story() {
+        $story_id = $this->input->post('story_id');
+        $new_issue_type = $this->input->post('new_issue_type');
+        $new_issue_id = $this->input->post('new_issue_id');
+        
+        // Call the model function to update the database
+        $success = $this->projects_model->move_story($story_id, $new_issue_id, $new_issue_type);
+        
+        // Return a JSON response
+        echo json_encode(array('success' => $success));
+    }
+
+    public function create_new_sprint() {
+        $project_id = $this->input->post('project_id');
+        $sprint_name = $this->input->post('name');
+        $sprint_start_date = $this->input->post('start_date');
+        $sprint_end_date = $this->input->post('end_date');
+        $story_ids = $this->input->post('story_ids');
+
+        $data = [
+            'name' => $sprint_name,
+            'project_id' => $project_id,
+            'start_date' => $sprint_start_date,
+            'end_date' => $sprint_end_date,
+            'created_at' => date("Y-m-d H:i:s")
+        ];
+
+        $new_sprint_id = $this->projects_model->create_new_sprint($data);
+
+        $success = $this->projects_model->update_stories_sprint($story_ids, $new_sprint_id);
+
+        echo json_encode(['new_sprint_id' => $new_sprint_id, 'success' => $success]);
+    }
+
+    public function update_sprint_name() {
+        $sprint_id = $this->input->post('sprint_id');
+        $new_name = $this->input->post('new_name');
+        
+        // Call the model function to update the database
+        $success = $this->projects_model->update_sprint_name($sprint_id, $new_name);
+        
+        // Return a JSON response
+        echo json_encode(array('success' => $success));
+    }
+
+    public function update_epic_name() {
+        $epic_id = $this->input->post('epic_id');
+        $new_name = $this->input->post('new_name');
+        
+        // Call the model function to update the database
+        $success = $this->projects_model->update_epic_name($epic_id, $new_name);
+        
+        // Return a JSON response
+        echo json_encode(array('success' => $success));
+    }
+
+    public function update_sprint_date() {
+        $sprint_id = $this->input->post('sprint_id');
+        $new_date = $this->input->post('new_date');
+        $col_name = $this->input->post('col_name');
+        
+        // Call the model function to update the database
+        $success = $this->projects_model->update_sprint_date($col_name, $sprint_id, $new_date);
+        
+        // Return a JSON response
+        echo json_encode(array('success' => $success));
+    }
+
+    public function update_sprint_status() {
+        $sprint_id = $this->input->post('sprint_id');
+        $new_status = $this->input->post('sprint_status');
+        $project_id = $this->input->post('project_id');
+    
+        // Check if there's already an active sprint
+        if ($new_status == '1' && $this->projects_model->is_active_sprint_exists($project_id)['is']) {
+            echo json_encode(array('success' => false, 'error' => 'Another sprint is already active.'));
+            return;
+        }
+    
+        // Update the sprint status
+        $success = $this->projects_model->update_sprint_status($sprint_id, $new_status);
+    
+        echo json_encode(array('success' => $success));
+    }
+
+    public function delete_sprint() {
+        $sprint_id = $this->input->post('sprint_id');
+    
+        // Update the sprint status
+        $success = $this->projects_model->delete_sprint($sprint_id);
+    
+        echo json_encode(array('success' => $success));
+    }
+
+    public function get_epic_list($project_id) {
+        $epics = $this->projects_model->get_epic_list($project_id);
+        echo json_encode($epics);
+    }
+
+    public function delete_epic() {
+
+        $from_epic_id = $this->input->post('from_epic_id');
+        $to_epic_id = $this->input->post('to_epic_id');
+
+        $success = $this->projects_model->delete_epic($from_epic_id, $to_epic_id);
+        echo json_encode(array('success' => $success));
+    }
+    
+    
+    
 
 }
 

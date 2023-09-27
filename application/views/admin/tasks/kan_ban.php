@@ -5,11 +5,16 @@ if ($this->input->get('project_id')) {
     $where['rel_id']   = $this->input->get('project_id');
     $where['rel_type'] = 'project';
 }
+
+if ($this->input->get('sprint_id')) {
+    $where['sprint_id']   = $this->input->get('sprint_id');
+}
 foreach ($task_statuses as $status) {
     $kanBan = new \app\services\tasks\TasksKanban($status['id']);
     $kanBan->search($this->input->get('search'))
             ->sortBy($this->input->get('sort_by'), $this->input->get('sort'))
-            ->forProject($this->input->get('project_id'));
+            ->forProject($this->input->get('project_id'))
+            ->forSprint($this->input->get('sprint_id'));
 
     if ($this->input->get('refresh')) {
         $kanBan->refresh($this->input->get('refresh')[$status['id']] ?? null);

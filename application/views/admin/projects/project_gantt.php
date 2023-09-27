@@ -15,9 +15,9 @@
         <?php } ?>
         <div class="form-group pull-right mright10">
             <select class="selectpicker" name="gantt_type" onchange="gantt_filter();">
-                <option value="milestones" <?php if (!$this->input->get('gantt_type') || $this->input->get('gantt_type') == 'milestones') {
+                <option value="sprints" <?php if (!$this->input->get('gantt_type') || $this->input->get('gantt_type') == 'sprints') {
                                                 echo ' selected';
-                                            } ?>><?php echo _l('project_milestones'); ?></option>
+                                            } ?>><?php echo "Sprints" ?></option>
                 <option value="members" <?php if ($this->input->get('gantt_type') == 'members') {
                                             echo ' selected';
                                         } ?>>
@@ -57,7 +57,7 @@
         if (gantt_data.length > 0) {
             var gantt = new Gantt("#gantt", gantt_data, {
                 view_modes: ['Day', 'Week', 'Month', 'Year'],
-                view_mode: 'Month',
+                view_mode: 'Week',
                 date_format: 'YYYY-MM-DD',
                 popup_trigger: 'click mouseover',
                 on_date_change: function(data, start, end) {

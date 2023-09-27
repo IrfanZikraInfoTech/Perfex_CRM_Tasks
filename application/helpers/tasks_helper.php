@@ -158,8 +158,12 @@ function format_members_by_ids_and_names($ids, $names, $hidden_export_table = tr
     $outputAssignees = '';
     $exportAssignees = '';
 
+    if(!$ids || !$names){
+        return '';
+    }
     $assignees   = explode(',', $names);
     $assigneeIds = explode(',', $ids);
+
     foreach ($assignees as $key => $assigned) {
         $assignee_id = $assigneeIds[$key];
         $assignee_id = trim($assignee_id);

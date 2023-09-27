@@ -424,30 +424,15 @@ class Projects_model extends App_Model
         return $tasks;
     }
 
-    // public function get_files($project_id)
-    // {
-    //     if (is_client_logged_in()) {
-    //         $this->db->where('visible_to_customer', 1);
-    //     }
-    //     $this->db->where('project_id', $project_id);
-
-    //     return $this->db->get(db_prefix() . 'project_files')->result_array();
-    // }
     public function get_files($project_id)
     {
         if (is_client_logged_in()) {
             $this->db->where('visible_to_customer', 1);
         }
-    
-        $this->db->select(db_prefix() . 'project_files.*, ' . db_prefix() . '_project_folder.folder_name');
-        $this->db->join(db_prefix() . '_project_folder', db_prefix() . '_project_folder.folder_id = ' . db_prefix() . 'project_files.project_folder_id', 'left');
-        $this->db->where(db_prefix() . 'project_files.project_id', $project_id);
-        $this->db->group_by(db_prefix() . 'project_files.project_folder_id');  // Group records by folder id
-    
+        $this->db->where('project_id', $project_id);
+
         return $this->db->get(db_prefix() . 'project_files')->result_array();
     }
-    
-
 
     public function get_file($id, $project_id = false)
     {
@@ -2370,58 +2355,22 @@ class Projects_model extends App_Model
             ]
         );
     }
-// gdrive sy file upload k lie
-    // public function add_external_file($data)
-    // {
-    //     $insert['dateadded']           = date('Y-m-d H:i:s');
-    //     $insert['project_id']          = $data['project_id'];
-    //     $insert['external']            = $data['external'];
-    //     $insert['visible_to_customer'] = $data['visible_to_customer'];
-    //     $insert['file_name']           = $data['files'][0]['name'];
-    //     $insert['subject']             = $data['files'][0]['name'];
-    //     $insert['external_link']       = $data['files'][0]['link'];
 
-    //     $path_parts         = pathinfo($data['files'][0]['name']);
-    //     $insert['filetype'] = get_mime_by_extension('.' . $path_parts['extension']);
-
-    //     if (isset($data['files'][0]['thumbnailLink'])) {
-    //         $insert['thumbnail_link'] = $data['files'][0]['thumbnailLink'];
-    //     }
-
-    //     if (isset($data['staffid'])) {
-    //         $insert['staffid'] = $data['staffid'];
-    //     } elseif (isset($data['contact_id'])) {
-    //         $insert['contact_id'] = $data['contact_id'];
-    //     }
-
-    //     $this->db->insert(db_prefix() . 'project_files', $insert);
-    //     $insert_id = $this->db->insert_id();
-    //     if ($insert_id) {
-    //         $this->new_project_file_notification($insert_id, $data['project_id']);
-
-    //         return $insert_id;
-    //     }
-
-    //     return false;
-    // }
-    public function add_external_files($data)
-{
-    $insert_id = false;
-    
-    foreach ($data['files'] as $file) {
-        $insert['dateadded'] = date('Y-m-d H:i:s');
-        $insert['project_id'] = $data['project_id'];
-        $insert['external'] = $data['external'];
+    public function add_external_file($data)
+    {
+        $insert['dateadded']           = date('Y-m-d H:i:s');
+        $insert['project_id']          = $data['project_id'];
+        $insert['external']            = $data['external'];
         $insert['visible_to_customer'] = $data['visible_to_customer'];
-        $insert['file_name'] = $file['name'];
-        $insert['subject'] = $file['name'];
-        $insert['external_link'] = $file['link'];
+        $insert['file_name']           = $data['files'][0]['name'];
+        $insert['subject']             = $data['files'][0]['name'];
+        $insert['external_link']       = $data['files'][0]['link'];
 
-        $path_parts = pathinfo($file['name']);
+        $path_parts         = pathinfo($data['files'][0]['name']);
         $insert['filetype'] = get_mime_by_extension('.' . $path_parts['extension']);
 
-        if (isset($file['thumbnailLink'])) {
-            $insert['thumbnail_link'] = $file['thumbnailLink'];
+        if (isset($data['files'][0]['thumbnailLink'])) {
+            $insert['thumbnail_link'] = $data['files'][0]['thumbnailLink'];
         }
 
         if (isset($data['staffid'])) {
@@ -2432,15 +2381,14 @@ class Projects_model extends App_Model
 
         $this->db->insert(db_prefix() . 'project_files', $insert);
         $insert_id = $this->db->insert_id();
-        
         if ($insert_id) {
             $this->new_project_file_notification($insert_id, $data['project_id']);
+
+            return $insert_id;
         }
+
+        return false;
     }
-
-    return $insert_id ? true : false;
-}
-
 
     public function send_project_email_template($project_id, $staff_template, $customer_template, $action_visible_to_customer, $additional_data = [])
     {
@@ -2691,29 +2639,160 @@ class Projects_model extends App_Model
             ->get();
     }
 
+    //SCRUM METHODOLOGIES
+    public function create_epic($project_id, $name) {
+        $data = [
+            'project_id' => $project_id,
+            'name' => $name,
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+        $this->db->insert('tblepics', $data);
+        return $this->db->insert_id();
+    }
 
+    public function get_epic($epic_id) {
+        $this->db->where('id', $epic_id);
+        $query = $this->db->get('tblepics');
+        return $query->row();
+    }
 
+    public function get_epics($project_id) {
+        $this->db->where('project_id', $project_id);
+        $query = $this->db->get('tblepics');
+        return $query->result();
+    }
 
-    // folder work
-
-    public function insert_folder($folderName) {
-        $data = array(
-            'folder_name' => $folderName
-        );
+    public function get_sprints($project_id) {
+        $this->db->where('project_id', $project_id);
+        $query = $this->db->get('tblsprints');
+        return $query->result();
+    }
     
-        $this->db->insert('tbl_project_folder', $data);
+    public function get_stories($type, $type_id) {
+        $this->db->select('id');
+        $this->db->where($type.'_id', $type_id);
+
+        ($type == "epic") ? $this->db->where('sprint_id IS NULL') : '';
+
+        $query = $this->db->get('tbltasks');
+        return $query->result();
+    }
     
-        if ($this->db->affected_rows() > 0) {
-            return true;
+    public function move_story($story_id, $new_issue_id, $new_issue_type) {
+
+        $data = [$new_issue_type.'_id' => $new_issue_id];
+
+        if($new_issue_type === "epic"){
+            $data['sprint_id'] = null;
+        }
+
+        $this->db->where('id', $story_id);
+        return $this->db->update('tbltasks', $data);
+    }
+
+    public function create_new_sprint($data) {
+        $this->db->insert('tblsprints', $data);
+        return $this->db->insert_id();  // returns the ID of the new sprint
+    }
+
+    public function update_stories_sprint($story_ids, $sprint_id) {
+        $data = array('sprint_id' => $sprint_id);
+        $this->db->where_in('id', $story_ids);
+        return $this->db->update('tbltasks', $data);
+    }
+
+    public function update_sprint_name($sprint_id, $new_name) {
+
+        $data = ['name' => $new_name];
+
+        $this->db->where('id', $sprint_id);
+        return $this->db->update('tblsprints', $data);
+    }
+
+    public function update_epic_name($epic_id, $new_name) {
+
+        $data = ['name' => $new_name];
+
+        $this->db->where('id', $epic_id);
+        return $this->db->update('tblepics', $data);
+    }
+
+    public function update_sprint_date($col_name, $sprint_id, $new_date) {
+
+        $data = [$col_name => $new_date];
+
+        $this->db->where('id', $sprint_id);
+        return $this->db->update('tblsprints', $data);
+    }
+
+    public function update_sprint_status($sprint_id, $new_status)
+    {
+        $data = ['status' => $new_status];
+
+        if($new_status == 1){
+            $data['date_started'] = date("Y-m-d");
+        }else if($new_status == 2){
+            $data['date_ended'] = date("Y-m-d");
+        }
+
+        $this->db->where('id', $sprint_id);
+        return $this->db->update('tblsprints', $data);
+    }
+
+    public function delete_sprint($sprint_id)
+    {
+        // Start a transaction to ensure data integrity
+        $this->db->trans_start();
+
+        // Delete the sprint
+        $this->db->where('id', $sprint_id);
+        $this->db->delete('tblsprints');  // Assume your sprints table is named tblsprints
+
+        // Set sprint_id to NULL for all tasks associated with this sprint
+        $this->db->where('sprint_id', $sprint_id);
+        $this->db->update('tbltasks', ['sprint_id' => NULL]);  // Assume your tasks table is named tbltasks
+
+        // Complete the transaction
+        $this->db->trans_complete();
+
+        // Check whether the transaction was successful
+        if ($this->db->trans_status() === FALSE) {
+            // The transaction failed, you can log this error or take other actions here
+            return FALSE;
         } else {
+            // The transaction succeeded
+            return TRUE;
+        }
+    }
+
+
+
+    public function is_active_sprint_exists($project_id)
+    {
+        $this->db->where('project_id', $project_id);
+        $this->db->where('status', '1');  // Assuming '1' represents an active sprint
+        $query = $this->db->get('tblsprints');
+        return ['is' => $query->num_rows() > 0, 'sprint' => $query->row()];
+    }
+
+    public function get_epic_list($project_id) {
+        $this->db->where('project_id ', $project_id);
+        $query = $this->db->get('tblepics');  // Assume your epics table is named tblepics
+        return $query->result();
+    }
+
+    public function delete_epic($from_epic_id, $to_epic_id) {
+        $this->db->where('epic_id', $from_epic_id);
+        $this->db->update('tbltasks', ['epic_id' => $to_epic_id]);  // Assume your tasks table is named tbltasks
+        if($this->db->affected_rows() > 0){
+            $this->db->where('id', $from_epic_id);
+            $this->db->delete('tblepics');
+
+            return $this->db->affected_rows() > 0;
+        }else{
             return false;
         }
     }
-    public function get_folders() {
-        $this->db->select('*');
-        $this->db->from('tbl_project_folder');
-        $query = $this->db->get();
-        return $query->result();
-    }
+    
     
 }

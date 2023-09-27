@@ -36,6 +36,15 @@ class TasksKanban extends AbstractKanban
         });
     }
 
+    public function forSprint($sprintId)
+    {
+        return $this->tapQuery(function ($status, $ci) use ($sprintId) {
+            if ($sprintId) {
+                $ci->db->where('sprint_id', $sprintId);
+            }
+        });
+    }
+
     protected function applySearchQuery($q)
     {
         if (!startsWith($q, '#')) {

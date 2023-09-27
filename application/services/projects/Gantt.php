@@ -26,20 +26,13 @@ class Gantt extends AbstractGantt
         $project   = $this->ci->projects_model->get($this->id);
         $type_data = [];
 
-        if ($this->type == 'milestones') {
-            $type_data[] = [
-                'name'   => _l('milestones_uncategorized'),
-                'dep_id' => 'milestone_0',
-                'id'     => 0,
-            ];
+        if ($this->type == 'sprints') {
+            $sprints = json_decode(json_encode($this->ci->projects_model->get_sprints($this->id)), true);
 
-            foreach ($this->ci->projects_model->get_milestones(
-                $this->id,
-                $this->excludeMilestonesFromCustomer ? ['hide_from_customer' => '!= 1'] : []
-            ) as $m) {
+            foreach ($sprints as $m) {
                 $type_data[] = array_merge($m, [
-                    'dep_id'       => 'milestone_' . $m['id'],
-                    'milestone_id' => $m['id'],
+                    'dep_id'       => 'sprint_' . $m['id'],
+                    'sprint_id' => $m['id'],
                 ]);
             }
         } elseif ($this->type == 'members') {
@@ -66,10 +59,10 @@ class Gantt extends AbstractGantt
         }
 
         $gantt_data = [];
-
         foreach ($type_data as $data) {
-            if ($this->type == 'milestones') {
-                $tasks = $this->ci->projects_model->get_tasks($this->id, 'milestone=' . $this->ci->db->escape_str($data['id']) . ($this->taskStatus ? ' AND ' . db_prefix() . 'tasks.status=' . $this->ci->db->escape_str($this->taskStatus) : ''), true);
+            if ($this->type == 'sprints') {
+                
+                $tasks = $this->ci->projects_model->get_tasks($this->id, 'sprint_id=' . $this->ci->db->escape_str($data['id']) . ($this->taskStatus ? ' AND ' . db_prefix() . 'tasks.status=' . $this->ci->db->escape_str($this->taskStatus) : ''), true);
 
                 if (isset($data['start_date'])) {
                     $data['start'] = $data['start_date'];
