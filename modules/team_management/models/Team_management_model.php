@@ -1793,7 +1793,7 @@ class Team_management_model extends App_Model
         $this->db->from(db_prefix() . '_staff_shifts');
         $this->db->where('month', date('m', strtotime($date)));
         $this->db->where('day', date('d', strtotime($date)));
-$this->db->where(db_prefix() . '_staff_shifts.staff_id !=', 1);  // This line excludes staff with ID=1
+        $this->db->where(db_prefix() . '_staff_shifts.staff_id !=', 1);  // This line excludes staff with ID=1
         $query = $this->db->get();
         $daywise_shifts = $query->result_array();
         
@@ -1842,7 +1842,7 @@ $this->db->where(db_prefix() . '_staff_shifts.staff_id !=', 1);  // This line ex
         $this->db->select('staff_id, DATE(clock_in) as date, clock_in, clock_out');
         $this->db->from(db_prefix() . '_staff_time_entries');
         $this->db->where('DATE(clock_in)', $date); // Fetch records for specific date
-$this->db->where(db_prefix() . '_staff_time_entries.staff_id !=', 1);  // Exclude staff with ID=1
+        $this->db->where(db_prefix() . '_staff_time_entries.staff_id !=', 1);  // Exclude staff with ID=1
         $clock_ins = $this->db->get()->result_array();
         
         $clock_times = [];
@@ -1871,8 +1871,8 @@ $this->db->where(db_prefix() . '_staff_time_entries.staff_id !=', 1);  // Exclud
 
         // Actual Total Logged in Time
         $this->db->select('*');
-$this->db->where(db_prefix() . 'staff.staffid !=', 1);  // This line excludes staff with ID=1
-
+        $this->db->where(db_prefix() . 'staff.staffid !=', 1);  // This line excludes staff with ID=1
+        $this->db->where('tblstaff.active', 1);
         $query = $this->db->get(db_prefix() . 'staff');
         $all_staff_global = $query->result_array();
         
@@ -1951,6 +1951,8 @@ $this->db->where(db_prefix() . 'staff.staffid !=', 1);  // This line excludes st
         // Total Present Staff
         $this->db->select('COUNT(DISTINCT staff_id) as total_present_staff');
         $this->db->select('staff_id, firstname');
+        $this->db->where('tblstaff.staffid !=', 1);  // This line excludes staff with ID=1
+        $this->db->where('tblstaff.active', 1);
         $this->db->from(db_prefix() . '_staff_time_entries');
         $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . '_staff_time_entries.staff_id');
         $this->db->where('DATE(clock_in)', $date);
@@ -1967,6 +1969,8 @@ $this->db->where(db_prefix() . '_staff_time_entries.staff_id !=', 1);  // This l
         $this->db->where('staffid !=', 1);  // This line excludes staff with ID=1
         $this->db->where('active', 1);
         $all_staff = $this->db->get()->result_array();
+
+
         $present_staff = $report_data['present_staff_list'];
         $staff_on_leave = $this->get_staff_on_leave($date);
         $present_staff_ids = array_column($present_staff, 'staff_id');
