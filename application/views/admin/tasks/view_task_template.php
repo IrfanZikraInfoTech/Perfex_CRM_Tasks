@@ -36,7 +36,7 @@
 <div class="modal-body">
     <input id="taskid" type="hidden" value="<?php echo $task->id?>">
     <div class="row">
-        <div class="col-md-8 task-single-col-left">
+        <div class="col-md-8 task-single-col-left relative">
             <?php if (total_rows(db_prefix() . 'taskstimers', ['end_time' => null, 'staff_id !=' => get_staff_user_id(), 'task_id' => $task->id]) > 0) {
           $startedTimers = $this->tasks_model->get_timers($task->id, ['staff_id !=' => get_staff_user_id(), 'end_time' => null]);
 
@@ -95,9 +95,8 @@
             <?php if ($task->status != Tasks_model::STATUS_COMPLETE && ($task->current_user_is_assigned || has_permission('tasks', '', 'edit') || $task->current_user_is_creator)) { ?>
             <p class="no-margin pull-left"
                 style="<?php echo 'margin-' . (is_rtl() ? 'left' : 'right') . ':5px !important'; ?>">
-                <a href="#" class="btn btn-primary" id="task-single-mark-complete-btn" autocomplete="off"
-                    data-loading-text="<?php echo _l('wait_text'); ?>"
-                    onclick="mark_complete(<?php echo $task->id; ?>); return false;" data-toggle="tooltip"
+                <a href="#" class="btn btn-primary"
+                    onclick="show_task_complete_summary(<?php echo $task->id; ?>); return false;" data-toggle="tooltip"
                     title="<?php echo _l('task_single_mark_as_complete'); ?>">
                     <i class="fa fa-check"></i>
                 </a>
@@ -553,6 +552,8 @@
             </div>
             <?php } ?>
             <hr />
+            <div>
+
             <a href="#" id="taskCommentSlide" onclick="slideToggle('.tasks-comments'); return false;">
                 <h4 class="mbot20 font-medium"><?php echo _l('task_comments'); ?></h4>
             </a>
@@ -648,6 +649,20 @@
                   ?>
                 </div>
             </div>
+
+            </div>
+
+            <div class="w-full py-2 pr-20">
+                <?php if($task->closing_summary){ ?>
+                  <h4 class="mt-4 text-lg font-bold"> Closing Summary</h4>
+                
+                  <div class="w-full text-md">
+                    <?= $task->closing_summary; ?>
+                  </div>
+
+                  <?php  } ?>
+            </div>
+
         </div>
         <div class="col-md-4 task-single-col-right">
             <div class="pull-right mbot10 task-single-menu task-menu-options">
@@ -836,21 +851,32 @@
                     <?php } ?>
                 </h5>
             </div>
-            <?php if ($task->current_user_is_creator || has_permission('tasks', '', 'edit')) { ?>
-            <div class="task-info task-info-hourly-rate">
+
+            <div class="task-info task-info-estimated_hours">
                 <h5 class="tw-inline-flex tw-items-center tw-space-x-1.5">
                     <i class="fa-regular fa-clock fa-fw fa-lg task-info-icon pull-left"></i>
-                    <?php echo _l('task_hourly_rate'); ?>: <span class="tw-text-neutral-800">
-                        <?php if ($task->rel_type == 'project' && $task->project_data->billing_type == 2) {
-                               echo app_format_number($task->project_data->project_rate_per_hour);
-                           } else {
-                               echo app_format_number($task->hourly_rate);
-                           }
-                  ?>
+                    Estimated Hours: <span class="tw-text-neutral-800">
+
+                    <?= app_format_number($task->estimated_hours); ?>
+              
                     </span>
                 </h5>
             </div>
-            <div class="task-info task-info-billable">
+
+            <div class="task-info task-info-estimated_hours">
+                <h5 class="tw-inline-flex tw-items-center tw-space-x-1.5">
+                    <i class="fas fa-running fa-fw fa-lg task-info-icon pull-left"></i>
+                    Sprint: <span class="tw-text-neutral-800">
+
+                    <?= isset($task->sprint) ? $task->sprint->name : 'No Sprint';  ?>
+              
+                    </span>
+                </h5>
+            </div>
+
+            <?php if ($task->current_user_is_creator || has_permission('tasks', '', 'edit')) { ?>
+            
+            <div class="task-info task-info-billable hidden">
                 <h5 class="tw-inline-flex tw-items-center tw-space-x-1.5">
                     <i class="fa fa-credit-card fa-fw fa-lg task-info-icon pull-left"></i>
                     <?php echo _l('task_billable'); ?>: <span class="tw-text-neutral-800">
@@ -864,11 +890,12 @@
                       echo '<br /><span class="tw-ml-5 tw-text-sm">(' . _l('project') . ' ' . _l('project_billing_type_fixed_cost') . ')</span>';
                   } ?>
             </div>
+
             <?php if ($task->billable == 1
             && $task->billed == 0
             && ($task->rel_type != 'project' || ($task->rel_type == 'project' && $task->project_data->billing_type != 1))
             && staff_can('create', 'invoices')) { ?>
-            <div class="task-info task-billable-amount">
+            <div class="task-info task-billable-amount hidden">
                 <h5 class="tw-inline-flex tw-items-center tw-space-x-1.5">
                     <i class="fa fa-regular fa-file-lines fa-fw fa-lg pull-left task-info-icon"></i>
                     <?php echo _l('billable_amount'); ?>:
@@ -879,6 +906,8 @@
             </div>
             <?php } ?>
             <?php } ?>
+
+            
             <?php if ($task->current_user_is_assigned || total_rows(db_prefix() . 'taskstimers', ['task_id' => $task->id, 'staff_id' => get_staff_user_id()]) > 0) { ?>
             <div class="task-info task-info-user-logged-time">
                 <h5 class="tw-inline-flex tw-items-center tw-space-x-1.5">
@@ -1247,4 +1276,74 @@ $('.task-modal-edit-timesheet-form').submit(event => {
         $('.edit-timesheet-submit').prop('disabled', false);
     });
 });
+
+function show_task_complete_summary(task_id){
+
+    $.ajax({
+            url: admin_url + 'tasks/get_task_by_id/'+task_id,
+            type: 'GET',
+            success: function(response) {
+                response = JSON.parse(response);
+
+                let summary = '';
+                if(response.closing_summary){
+                    summary = response.closing_summary;
+                }
+
+                if (response.id) {
+                    Swal.fire({
+                    title: 'Story closing summary',
+                    html: '<div class="w-full"><textarea class="border-2 border-solid border-gray-200 h-64 w-full p-2" id="story_closing_summary">'+summary+'</textarea></div>',
+                    allowOutsideClick: false,
+                    showConfirmButton: true,
+                    showCancelButton: true,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            var summary = $("#story_closing_summary").val();
+                            if(summary == ""){
+                                Swal.fire(
+                                    'Error!',
+                                    "Please write something!",
+                                    'error'
+                                );
+                            }else{
+
+                                $.ajax({
+                                    url: admin_url + 'tasks/set_task_closing_summary',
+                                    type: 'POST',
+                                    data: {
+                                        task_id: task_id,
+                                        summary: summary
+                                    },
+                                    success: function(response) {
+                                        Swal.close();
+                                        response = JSON.parse(response);
+                                        if (response.success) {
+                                            //Mark as complete
+                                            mark_complete(task_id);
+                                        } else {
+                                            // Handle error, e.g., another sprint is already active
+                                            Swal.fire('Error!', response.error, 'error');
+                                        }
+                                    },
+                                    error: function() {
+                                        Swal.close();
+                                        Swal.fire('Error!', 'Failed to update sprint status.', 'error');
+                                    }
+                                });
+                                
+                            }
+                        }
+                    });
+                }
+                 
+            },
+            error: function() {
+                Swal.close();
+                Swal.fire('Error!', 'Failed to get sprint summary.', 'error');
+            }
+        });
+
+
+}
 </script>

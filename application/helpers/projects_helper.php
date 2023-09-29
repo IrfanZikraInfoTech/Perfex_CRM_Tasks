@@ -65,7 +65,7 @@ function app_init_project_tabs()
         'icon'                      => 'fa-brands fa-trello',
         'view'                      => 'admin/projects/project_board',
         'position'                  => 15,
-        'linked_to_customer_option' => ['view_board'],
+        // 'linked_to_customer_option' => ['view_board'],
     ]);
 
     $CI->app_tabs->add_project_tab('project_gantt', [

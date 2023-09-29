@@ -2806,5 +2806,52 @@ class Projects_model extends App_Model
         return $this->db->affected_rows() > 0;
     }
     
+    public function get_all_templates() {
+        $query = $this->db->get('tblprojecttemplates');
+        return $query->result();
+    }
+
+    public function get_template($id) {
+        $this->db->where("id", $id);
+        $query = $this->db->get('tblprojecttemplates');
+        return $query->row();
+    }
+
+    public function add_template($template_name, $template_data) {
+        $data = [
+            'name' => $template_name,
+            'epics_and_stories' => $template_data,
+            'created_at' => date("Y-m-d H:i:s")
+        ];
+
+        $this->db->insert('tblprojecttemplates', $data);
+
+        if ($this->db->affected_rows() > 0) {
+            return $this->db->insert_id();
+        } else {
+            return false;
+        }
+    }
+
+    public function edit_template($id, $template_name, $template_data) {
+        $data = [
+            'name' => $template_name,
+            'epics_and_stories' => $template_data,
+            'updated_at' => date("Y-m-d H:i:s")
+        ];
+
+        $this->db->where('id', $id);
+        $this->db->update('tblprojecttemplates', $data);
+
+        return $this->db->affected_rows() > 0;
+
+    }
+
+    public function delete_template($id) {
+
+        $this->db->where('id', $id);
+        $this->db->delete('tblprojecttemplates');
+
+    }
     
 }

@@ -294,17 +294,17 @@ class Tasks extends AdminController
         }
 
         $data = [];
-        // FOr new task add directly from the projects milestones
-        if ($this->input->get('milestone_id')) {
-            $this->db->where('id', $this->input->get('milestone_id'));
-            $milestone = $this->db->get(db_prefix() . 'milestones')->row();
-            if ($milestone) {
-                $data['_milestone_selected_data'] = [
-                    'id'       => $milestone->id,
-                    'due_date' => _d($milestone->due_date),
+
+        if ($this->input->get('epic_id')) {
+            $this->db->where('id', $this->input->get('epic_id'));
+            $epic = $this->db->get(db_prefix() . 'epics')->row();
+            if ($epic) {
+                $data['_epic_selected_data'] = [
+                    'id'       => $epic->id,
                 ];
             }
         }
+
         if ($this->input->get('start_date')) {
             $data['start_date'] = $this->input->get('start_date');
         }
@@ -363,14 +363,16 @@ class Tasks extends AdminController
             die;
         }
 
-        $data['milestones']         = [];
+        $data['epics']         = [];
         $data['checklistTemplates'] = $this->tasks_model->get_checklist_templates();
         if ($id == '') {
             $title = _l('add_new', _l('task_lowercase'));
         } else {
             $data['task'] = $this->tasks_model->get($id);
             if ($data['task']->rel_type == 'project') {
-                $data['milestones'] = $this->projects_model->get_milestones($data['task']->rel_id);
+                $data['epics'] = $this->projects_model->get_epics($data['task']->rel_id);
+                // print_r($data['epics']);
+                // return;
             }
             $title = _l('edit', _l('task_lowercase')) . ' ' . $data['task']->name;
         }
@@ -384,6 +386,9 @@ class Tasks extends AdminController
                     'data-date-end-date' => $project->deadline,
                 ];
             }
+
+            $data['epics'] = $this->projects_model->get_epics($project->id);
+            
         }
         $data['members'] = $this->staff_model->get();
         $data['id']      = $id;
@@ -1268,5 +1273,15 @@ class Tasks extends AdminController
 
             ajax_access_denied();
         }
+    }
+
+    public function set_task_closing_summary() {
+        $task_id = $this->input->post('task_id');
+        $summary = $this->input->post('summary');
+
+        // Update the sprint status
+        $success = $this->tasks_model->update_story_summary($task_id, $summary);
+    
+        echo json_encode(array('success' => $success));
     }
 }

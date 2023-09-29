@@ -17,6 +17,22 @@ class Projects extends AdminController
         $this->load->helper('date');
     }
 
+    public function templates($url = null, $id = null) {
+        if(!$url){
+            $data['templates'] = $this->projects_model->get_all_templates();
+            $this->load->view('admin/projects/templates/manage', $data);
+        }else if($url == 'add'){
+            $this->load->view('admin/projects/templates/add');
+        }else if($url == 'edit' && $id){
+            $data['template'] = $this->projects_model->get_template($id);
+            $this->load->view('admin/projects/templates/edit', $data);
+        }else if($url == 'delete' && $id){
+            $this->projects_model->delete_template($id);
+            header('Location: '.admin_url("projects/templates"));
+        }
+        
+    }    
+
     public function index()
     {
         close_setup_menu();
@@ -1169,10 +1185,12 @@ class Projects extends AdminController
     {
         if ($this->input->is_ajax_request()) {
             $selected_milestone = '';
+            $selected_epic = '';
             $assigned           = '';
             if ($task_id != '' && $task_id != 'undefined') {
                 $task               = $this->tasks_model->get($task_id);
                 $selected_milestone = $task->milestone;
+                $selected_epic = $task->epic_id;
                 $assigned           = array_map(function ($member) {
                     return $member['assigneeid'];
                 }, $this->tasks_model->get_task_assignees($task_id));
@@ -1188,6 +1206,9 @@ class Projects extends AdminController
 
             $deadline = get_project_deadline($id);
 
+            $epics = $this->projects_model->get_epics($id);
+            $epics = json_decode(json_encode($epics),true);
+
             echo json_encode([
                 'deadline'            => $deadline,
                 'deadline_formatted'  => $deadline ? _d($deadline) : null,
@@ -1197,6 +1218,12 @@ class Projects extends AdminController
                     'id',
                     'name',
                 ], 'task_milestone', $selected_milestone),
+
+                'epics'                 => render_select('epic_id', $epics , [
+                    'id',
+                    'name',
+                ], 'task_epic', $selected_epic),
+
                 'assignees' => render_select('assignees[]', $this->projects_model->get_project_members($id, true), [
                     'staff_id', ['firstname', 'lastname'],
                 ], 'task_single_assignees', $assigned, ['multiple' => true], [], '', '', false),
@@ -1380,7 +1407,102 @@ class Projects extends AdminController
         echo json_encode(array('success' => $success));
     }
     
+    public function save_template() {
+
+        $template_name = $this->input->post('template_name');
+        $template_data = $this->input->post('template_data');
+
+        $template_id = $this->input->post('template_id');
+
+        if(!$template_id){
+            // Adding Ajax
+            $template_id = $this->projects_model->add_template($template_name, $template_data);
+
+            if ($template_id) {
+                echo json_encode(['success' => true, 'template_id' => $template_id]);
+            } else {
+                echo json_encode(['success' => false]);
+            }
+        }else{
+            //Updating Ajax
+            $success = $this->projects_model->edit_template($template_id, $template_name, $template_data);
+     
+            echo json_encode(['success' => $success]);
+        }
+        
+        
+    }
+
+    public function get_templates() {
+
+        echo json_encode($this->projects_model->get_all_templates());
+    }
+
+    public function import_template() {
+
+        $this->load->model('tasks_model');
+
+        $template_id = $this->input->post('template_id');
+        $project_id = $this->input->post('project_id');
+
+        $template = $this->projects_model->get_template($template_id);
+        $data = json_decode($template->epics_and_stories);
+
+        $success = true;
+        $message = 'Success';
+
+        foreach ($data as $epic) {
+            $epic_name = $epic->name;
+
+            $epic_id = $this->projects_model->create_epic($project_id, $epic_name);
+
+            if($epic_id){
+
+                foreach ($epic->stories as $story) {
+                    $task['rel_type'] = 'project';
+                    $task['rel_id'] = $project_id;
+                    $task['name'] = $story->name;
+                    $task['description'] = $story->description;
+                    $task['estimated_hours'] = $story->estimatedHours;
+
+                    $task['startdate'] = date("Y-m-d");
+                    $task['duedate'] = date("Y-m-d");
+
+                    $task['epic_id'] = $epic_id;
+
+                    // Call the method to create a new task
+                    $task_id = $this->tasks_model->add($task);
+                    if($task_id){
+                        foreach($story->checklistItems as $checklistItem){
+                            $item['taskid'] = $task_id;
+                            $item['description'] = $checklistItem;
+
+                            if(!$this->tasks_model->add_checklist_item($item)){
+                                $success = false;
+                                $message = $checklistItem." :: Item insert failed!";
+                            }
+                        }
+
+                        $this->db->where('id', $task_id);
+                        $this->db->update('tbltasks', ['status' => 1]);
+
+                    }else{
+                        $success = false;
+                        $message = $story->name." :: Story insert failed!";
+                    } 
+                }
+
+            }else{
+                $success = false;
+                $message = $epic_name." :: Epic insert failed!";
+            }
     
+            
+        }
+
+
+        echo json_encode(['success' => $success, 'message' => $message]);
+    }
     
 
 }

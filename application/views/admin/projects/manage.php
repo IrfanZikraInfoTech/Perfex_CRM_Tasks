@@ -16,6 +16,7 @@
                         data-title="<?php echo _l('project_gant'); ?>" class="btn btn-default btn-with-tooltip">
                         <i class="fa fa-align-left" aria-hidden="true"></i>
                     </a>
+                    <button onclick="window.location.href='<?= admin_url('projects/templates') ?>'" class="btn btn-primary pull-right display-block mleft5 !rounded-md">SCRUM Templates</button>
                     <div class="btn-group pull-right mleft4 btn-with-tooltip-group _filter_data" data-toggle="tooltip"
                         data-title="<?php echo _l('filter_by'); ?>">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
@@ -52,7 +53,10 @@
                             </li>
                             <?php } ?>
                         </ul>
+                        
+                        
                     </div>
+                    
                     <div class="clearfix"></div>
                 </div>
 

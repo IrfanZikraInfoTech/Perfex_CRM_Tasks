@@ -104,7 +104,7 @@
                             </div>
 
                             <?php if (has_permission('projects', '', 'edit')) { ?>
-                            <div class="sm:tw-col-span-1 project-overview-billing">
+                            <div class="sm:tw-col-span-1 project-overview-billing hidden">
                                 <dt class="tw-text-sm tw-font-medium tw-text-neutral-500">
                                     <?php echo _l('project_billing_type'); ?>
                                 </dt>
@@ -122,9 +122,9 @@
                                 </dd>
                             </div>
                             <?php if ($project->billing_type == 1 || $project->billing_type == 2) { ?>
-                            <div class="sm:tw-col-span-1 project-overview-amount">
+                            <div class="sm:tw-col-span-1 project-overview-amount hidden">
                                 <?php if ($project->billing_type == 1) { ?>
-                                <dt class="tw-text-sm tw-font-medium tw-text-neutral-500">
+                                <dt class="tw-text-sm tw-font-medium tw-text-neutral-500 ">
                                     <?php echo _l('project_total_cost'); ?>
                                 </dt>
                                 <dd class="tw-mt-1 tw-text-sm tw-text-neutral-900">
@@ -252,6 +252,20 @@
                                     </p>
                                     <?php } ?>
                                     <?php echo check_for_links($project->description); ?>
+                                </dd>
+                            </div>
+
+                            <div class="sm:tw-col-span-2 project-overview-description tc-content">
+                                <dt class="tw-text-sm tw-font-medium tw-text-neutral-500">
+                                    Project Overview
+                                </dt>
+                                <dd class="tw-mt-1 tw-space-y-5 tw-text-sm tw-text-neutral-900">
+                                    <?php if (empty($project->project_goals)) { ?>
+                                    <p class="text-muted tw-mb-0">
+                                        No goals set!
+                                    </p>
+                                    <?php } ?>
+                                    <?php echo check_for_links($project->project_goals); ?>
                                 </dd>
                             </div>
                         </dl>

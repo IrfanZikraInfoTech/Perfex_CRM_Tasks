@@ -36,13 +36,7 @@
 
                                 <?php
                         $disable_type_edit = '';
-                        if (isset($project)) {
-                            if ($project->billing_type != 1) {
-                                if (total_rows(db_prefix() . 'tasks', ['rel_id' => $project->id, 'rel_type' => 'project', 'billable' => 1, 'billed' => 1]) > 0) {
-                                    $disable_type_edit = 'disabled';
-                                }
-                            }
-                        }
+
                         ?>
                                 <?php $value = (isset($project) ? $project->name : ''); ?>
                                 <?php echo render_input('name', 'project_name', $value); ?>
@@ -86,7 +80,7 @@
                                 <?php echo form_hidden('progress', $value); ?>
                                 <div class="project_progress_slider project_progress_slider_horizontal mbot15"></div>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 hidden">
                                         <div class="form-group select-placeholder">
                                             <label for="billing_type"><?php echo _l('project_billing_type'); ?></label>
                                             <div class="clearfix"></div>
@@ -111,7 +105,7 @@
                                 ?>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         <div class="form-group select-placeholder">
                                             <label for="status"><?php echo _l('project_status'); ?></label>
                                             <div class="clearfix"></div>
@@ -168,7 +162,7 @@
                         $input_field_hide_class_total_cost = 'hide';
                     }
                     ?>
-                                <div id="project_cost" class="<?php echo $input_field_hide_class_total_cost; ?>">
+                                <div id="project_cost" class="hidden <?php echo $input_field_hide_class_total_cost; ?>">
                                     <?php $value = (isset($project) ? $project->project_cost : ''); ?>
                                     <?php echo render_input('project_cost', 'project_total_cost', $value, 'number'); ?>
                                 </div>
@@ -233,11 +227,17 @@
                                 </div>
                                 <?php $rel_id_custom_field = (isset($project) ? $project->id : false); ?>
                                 <?php echo render_custom_fields('projects', $rel_id_custom_field); ?>
-                                <p class="bold"><?php echo _l('project_description'); ?></p>
+                                <p class="bold">Project Overview</p>
                                 <?php $contents = ''; if (isset($project)) {
                             $contents           = $project->description;
                         } ?>
                                 <?php echo render_textarea('description', '', $contents, [], [], '', 'tinymce'); ?>
+
+                                <p class="bold">Project Goals</p>
+                                <?php $contents = ''; if (isset($project)) {
+                            $contents           = $project->project_goals;
+                        } ?>
+                                <?php echo render_textarea('project_goals', '', $contents, [], [], '', 'tinymce'); ?>
 
                                 <?php if (isset($estimate)) {?>
                                 <hr class="hr-panel-separator" />

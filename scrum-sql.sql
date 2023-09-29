@@ -25,7 +25,22 @@ CREATE TABLE tblsprints (
 -- Altering tblTasks Table
 ALTER TABLE tbltasks
 ADD COLUMN epic_id INT DEFAULT NULL,
-ADD COLUMN sprint_id INT DEFAULT NULL;
+ADD COLUMN sprint_id INT DEFAULT NULL,
+ADD COLUMN estimated_hours DECIMAL NULL,
+ADD COLUMN closing_summary TEXT NULL;
+
+ALTER TABLE tblprojects
+ADD COLUMN project_goals TEXT NULL;
+
 
 -- ALTER COMMAND IF closing_summary isnt added, Copy and paste
 -- alter table tblsprints add closing_summary TEXT NULL;
+
+
+CREATE TABLE tblprojecttemplates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name TEXT,
+    epics_and_stories JSON,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL
+);

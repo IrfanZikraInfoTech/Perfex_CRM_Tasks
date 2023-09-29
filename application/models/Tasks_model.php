@@ -128,6 +128,10 @@ class Tasks_model extends App_Model
                     }
                 }
             }
+
+            if($task->sprint_id){
+                $task->sprint = $this->projects_model->get_sprint($task->sprint_id);
+            }
         }
 
         return hooks()->apply_filters('get_task', $task);
@@ -2376,4 +2380,12 @@ class Tasks_model extends App_Model
 
         return $kanBan->get();
     }
+    public function update_story_summary($story_id, $summary)
+    {
+        $data = ['closing_summary' => $summary];
+
+        $this->db->where('id', $story_id);
+        return $this->db->update('tbltasks', $data);
+    }
+
 }

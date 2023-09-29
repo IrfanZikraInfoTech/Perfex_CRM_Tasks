@@ -456,26 +456,8 @@ function addEpicToUI(epicId, epicName) {
 }
 
 function newStory(epic_id) {
-    new_task_from_relation(undefined, 'project', <?= $project->id ?>);
-
-    // Wait for the modal HTML to be loaded, then add the select and hidden fields
-    waitForElement('#task-form', function() {
-
-        var selectField = `
-            <div class="form-group mt-4" app-field-wrapper="epic_id">
-                <label for="epic_id" class="control-label">Epic</label>
-                <select name="epic_id" id="epic_id" class="form-control">
-                    ${epics.map(epic => `<option value="${epic.id}" ${epic.id == epic_id ? 'selected' : ''}>${epic.name}</option>`).join('')}
-                </select>
-            </div>
-        `;
-
-
-        // Assuming the Subject field is wrapped in a div with class 'form-group'
-        var subjectFieldGroup = $('.form-group #name').closest('.form-group');
-        subjectFieldGroup.before(selectField);  // Insert the select field before the Subject field
-        $('.project-details').hide();
-    });  
+    var url = admin_url + "tasks/task?rel_id=<?= $project->id ?>&rel_type=project&epic_id="+epic_id;
+    new_task(url);
 }
 
 function newSprint() {

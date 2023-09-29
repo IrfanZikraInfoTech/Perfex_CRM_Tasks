@@ -5,7 +5,9 @@
     <div class="horizontal-tabs">
         <ul class="nav nav-tabs tw-mb-0 project-tabs nav-tabs-horizontal tw-border-b-0" role="tablist">
             <?php
+           
         foreach (filter_project_visible_tabs($tabs, $project->settings->available_features) as $key => $tab) {
+
             $dropdown = isset($tab['collapse']) ? true : false; ?>
             <li class="<?php if ($key == 'project_overview' && !$this->input->get('group')) {
                 echo 'active ';

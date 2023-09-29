@@ -38,6 +38,9 @@
         .btn-secondary{
             background-color: rgb(241 245 249/var(--tw-bg-opacity)) !important;
         }
+        .swal2-container{
+            z-index: 99999 !important;
+        } 
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="

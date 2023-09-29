@@ -143,7 +143,7 @@
                   } ?>
                         <hr class="-tw-mx-3.5" />
                         <?php $value = (isset($task) ? $task->name : ''); ?>
-                        <?php echo render_input('name', 'task_add_edit_subject', $value); ?>
+                        <?php echo render_input('name', "Story", $value); ?>
                         <div class="task-hours<?php if (isset($task) && $task->rel_type == 'project' && total_rows(db_prefix() . 'projects', ['id' => $task->rel_id, 'billing_type' => 3]) == 0) {
                       echo ' hide';
                   } ?>">
@@ -153,18 +153,31 @@
                         <div class="project-details<?php if ($rel_type != 'project') {
                       echo ' hide';
                   } ?>">
-                            <div class="form-group">
+                            <div class="form-group hidden">
                                 <label for="milestone"><?php echo _l('task_milestone'); ?></label>
                                 <select name="milestone" id="milestone" class="selectpicker" data-width="100%"
                                     data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
                                     <option value=""></option>
-                                    <?php foreach ($milestones as $milestone) { ?>
-                                    <option value="<?php echo $milestone['id']; ?>" <?php if (isset($task) && $task->milestone == $milestone['id']) {
-                      echo 'selected';
-                  } ?>><?php echo $milestone['name']; ?></option>
-                                    <?php } ?>
+                                    
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label for="epic_id" class="control-label">Epic</label>
+                                <select name="epic_id" id="epic_id" class="selectpicker" data-width="100%" data-width="100%"
+                                    data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
+
+                                    <option value=""></option>
+                                <?php
+                                $epics = json_decode(json_encode($epics),true);
+                                foreach ($epics as $epic) { ?>
+                                    <option value="<?php echo $epic['id']; ?>" <?php if (isset($task) && $task->epic_id == $epic['id']) {
+                      echo 'selected';
+                  } ?>><?php echo $epic['name']; ?></option>
+                                    <?php } ?>
+
+                                </select>
+                            </div>
+
                         </div>
                         <div class="row">
                             <div class="col-md-6">
@@ -202,37 +215,52 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group hidden">
                                     <label for="repeat_every"
                                         class="control-label"><?php echo _l('task_repeat_every'); ?></label>
                                     <select name="repeat_every" id="repeat_every" class="selectpicker" data-width="100%"
                                         data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
                                         <option value=""></option>
                                         <option value="1-week" <?php if (isset($task) && $task->repeat_every == 1 && $task->recurring_type == 'week') {
-                            echo 'selected';
-                        } ?>><?php echo _l('week'); ?></option>
-                                        <option value="2-week" <?php if (isset($task) && $task->repeat_every == 2 && $task->recurring_type == 'week') {
-                            echo 'selected';
-                        } ?>>2 <?php echo _l('weeks'); ?></option>
-                                        <option value="1-month" <?php if (isset($task) && $task->repeat_every == 1 && $task->recurring_type == 'month') {
-                            echo 'selected';
-                        } ?>>1 <?php echo _l('month'); ?></option>
-                                        <option value="2-month" <?php if (isset($task) && $task->repeat_every == 2 && $task->recurring_type == 'month') {
-                            echo 'selected';
-                        } ?>>2 <?php echo _l('months'); ?></option>
-                                        <option value="3-month" <?php if (isset($task) && $task->repeat_every == 3 && $task->recurring_type == 'month') {
-                            echo 'selected';
-                        } ?>>3 <?php echo _l('months'); ?></option>
-                                        <option value="6-month" <?php if (isset($task) && $task->repeat_every == 6 && $task->recurring_type == 'month') {
-                            echo 'selected';
-                        } ?>>6 <?php echo _l('months'); ?></option>
-                                        <option value="1-year" <?php if (isset($task) && $task->repeat_every == 1 && $task->recurring_type == 'year') {
-                            echo 'selected';
-                        } ?>>1 <?php echo _l('year'); ?></option>
-                                        <option value="custom" <?php if (isset($task) && $task->custom_recurring == 1) {
-                            echo 'selected';
-                        } ?>><?php echo _l('recurring_custom'); ?></option>
+                                            echo 'selected';
+                                        } ?>><?php echo _l('week'); ?></option>
+                                                        <option value="2-week" <?php if (isset($task) && $task->repeat_every == 2 && $task->recurring_type == 'week') {
+                                            echo 'selected';
+                                        } ?>>2 <?php echo _l('weeks'); ?></option>
+                                                        <option value="1-month" <?php if (isset($task) && $task->repeat_every == 1 && $task->recurring_type == 'month') {
+                                            echo 'selected';
+                                        } ?>>1 <?php echo _l('month'); ?></option>
+                                                        <option value="2-month" <?php if (isset($task) && $task->repeat_every == 2 && $task->recurring_type == 'month') {
+                                            echo 'selected';
+                                        } ?>>2 <?php echo _l('months'); ?></option>
+                                                        <option value="3-month" <?php if (isset($task) && $task->repeat_every == 3 && $task->recurring_type == 'month') {
+                                            echo 'selected';
+                                        } ?>>3 <?php echo _l('months'); ?></option>
+                                                        <option value="6-month" <?php if (isset($task) && $task->repeat_every == 6 && $task->recurring_type == 'month') {
+                                            echo 'selected';
+                                        } ?>>6 <?php echo _l('months'); ?></option>
+                                                        <option value="1-year" <?php if (isset($task) && $task->repeat_every == 1 && $task->recurring_type == 'year') {
+                                            echo 'selected';
+                                        } ?>>1 <?php echo _l('year'); ?></option>
+                                                        <option value="custom" <?php if (isset($task) && $task->custom_recurring == 1) {
+                                            echo 'selected';
+                                        } ?>><?php echo _l('recurring_custom'); ?></option>
                                     </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="estimated_hours" class="control-label">Estimated Hours</label>
+
+                                    <?php if (isset($task)) {
+                                            $hours = _d($task->estimated_hours);
+                                        }else{
+                                            $hours = 0;
+                                        }?>
+
+                                    <div class="input-group">
+                                        <input type="number" id="estimated_hours" name="estimated_hours" class="form-control " min="1" value="<?= htmlspecialchars($hours); ?>" aria-invalid="false">
+                                        <div class="input-group-addon">Hours</div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -469,8 +497,8 @@
         _current_member = undefined,
         data = {};
 
-    var _milestone_selected_data;
-    _milestone_selected_data = undefined;
+    var _epic_selected_data;
+    _epic_selected_data = undefined;
 
     <?php if (get_option('new_task_auto_assign_current_member') == '1') { ?>
     _current_member = "<?php echo get_staff_user_id(); ?>";
@@ -541,6 +569,13 @@
                             }
                             $("select[name='milestone']").selectpicker('refresh');
 
+
+                            $("select[name='epic_id']").html(project.epics);
+                            if (typeof(_epic_selected_data) != 'undefined') {
+                                $("select[name='epic_id']").val(_epic_selected_data.id);
+                            }
+                            $("select[name='epic_id']").selectpicker('refresh');
+
                             $("#assignees").html(project.assignees);
                             if (typeof(_current_member) != 'undefined') {
                                 $("#assignees").val(_current_member);
@@ -599,6 +634,11 @@
     <?php if (isset($_milestone_selected_data)) { ?>
     _milestone_selected_data = '<?php echo json_encode($_milestone_selected_data); ?>';
     _milestone_selected_data = JSON.parse(_milestone_selected_data);
+    <?php } ?>
+
+    <?php if (isset($_epic_selected_data)) { ?>
+        _epic_selected_data = '<?php echo json_encode($_epic_selected_data); ?>';
+        _epic_selected_data = JSON.parse(_epic_selected_data);
     <?php } ?>
 
     function task_rel_select() {

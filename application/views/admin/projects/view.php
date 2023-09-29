@@ -67,6 +67,7 @@
                             </div>
                         </div>
                         <div class="col-md-5 text-right">
+                            <button class="btn btn-primary" onclick="importScrum();">Import SCRUM</button>
                             <?php if (has_permission('tasks', '', 'create')) { ?>
                             <a href="#"
                                 onclick="new_task_from_relation(undefined,'project',<?php echo $project->id; ?>); return false;"
@@ -558,6 +559,83 @@ $(".folder-name").click(function() {
     // Open the modal
     $("#folderModal").modal('show');
 });
+
+function importScrum(){
+    $.ajax({
+        url: "<?php echo admin_url('projects/get_templates/'); ?>",
+        type: 'GET',
+        success: function(data) {
+            // Parse the response data
+            var templates = JSON.parse(data);
+            
+            // Build the HTML for the buttons
+            var buttonsHtml = '';
+            templates.forEach(function(template, index){
+                buttonsHtml += '<button class="template-button px-4 py-2 bg-blue-500 hover:bg-blue-600 shadow rounded text-white" data-template-id="' + template.id + '" data-template-json=\'' + template.epics_and_stories + '\'>Template ' + (index + 1) + ': ' + template.name + '</button>';
+            });
+            
+            // Display the buttons in a SweetAlert
+            Swal.fire({
+                title: 'Select a template',
+                html: '<div class="w-full flex flex-col gap-2">' + buttonsHtml + '</div>',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                showCancelButton: true,
+                didOpen: function () {
+                    // Attach an event listener to each button
+                    $('.template-button').on('click', function() {
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You are about to import an entire template.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, import!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                                Swal.fire({
+                                title: 'Processing',
+                                html: 'Importing Template...',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }});
+
+                                var templateId = $(this).data('template-id');
+                                
+                                // Trigger the POST AJAX request when a button is clicked
+                                $.ajax({
+                                    url: "<?php echo admin_url('projects/import_template'); ?>",
+                                    type: 'POST',
+                                    data: {
+                                        project_id: <?= $project->id ?>,
+                                        template_id: templateId
+                                    },
+                                    success: function(response) {
+                                        response = JSON.parse(response);
+                                        if(response.success){
+                                            window.location.href= admin_url + "projects/view/<?= $project->id ?>?group=project_backlog";
+                                        }
+                                        //console.log('Template imported successfully:', response);
+                                    },
+                                    error: function(xhr, status, error) {
+                                        // Handle the error case
+                                        console.error('Error importing template:', error);
+                                    }
+                                });
+
+                            }
+                        });
+
+                    });
+                }
+            });
+        }
+    });
+}
 
 </script>
 
