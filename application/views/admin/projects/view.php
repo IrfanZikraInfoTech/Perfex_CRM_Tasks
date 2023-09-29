@@ -67,15 +67,18 @@
                             </div>
                         </div>
                         <div class="col-md-5 text-right">
+                            
                             <button class="btn btn-primary" onclick="importScrum();">Import SCRUM</button>
-                            <?php if (has_permission('tasks', '', 'create')) { ?>
+                            <button class="px-4 py-2 rounded-lg shaodw bg-green-500 hover:bg-green-600 transition-all text-white" onclick="initReport();">Initiation Report</button>
+                            
+                            <!-- <?php if (has_permission('tasks', '', 'create')) { ?>
                             <a href="#"
                                 onclick="new_task_from_relation(undefined,'project',<?php echo $project->id; ?>); return false;"
                                 class="btn btn-primary">
                                 <i class="fa-regular fa-plus tw-mr-1"></i>
                                 <?php echo _l('new_task'); ?>
                             </a>
-                            <?php } ?>
+                            <?php } ?> -->
                             <?php
                            $invoice_func = 'pre_invoice_project';
                            ?>
@@ -637,6 +640,52 @@ function importScrum(){
     });
 }
 
+function initReport(){
+
+    Swal.fire({
+    title: 'Processing',
+    html: 'Creating Report...',
+    allowOutsideClick: false,
+    didOpen: () => {
+        Swal.showLoading();
+    }});
+    
+    // Trigger the POST AJAX request when a button is clicked
+    $.ajax({
+        url: "<?php echo admin_url('projects/project_init_report'); ?>",
+        type: 'POST',
+        data: {
+            project_id: <?= $project->id ?>
+        },
+        success: function(response) {
+            response = JSON.parse(response);
+            if(response.success){
+                Swal.close();
+                Swal.fire({
+                    title: 'Success',
+                    html: 'Report is added in your drive!',
+                    allowOutsideClick: false,
+                    cancelButtonText: "Close",
+                    confirmButtonText: "Open",
+                    showCancelButton: true,
+                    showConfirmButton: true
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        window.open(response.url, '_blank').focus();
+                    }
+                });
+            }else{
+                Swal.close();
+                Swal.fire("Error!", response.message, "error");
+            }
+        },
+        error: function(xhr, status, error) {
+            // Handle the error case
+            Swal.close();
+            console.error('Error importing template:', error);
+        }
+    });
+}
 </script>
 
 

@@ -1503,6 +1503,69 @@ class Projects extends AdminController
 
         echo json_encode(['success' => $success, 'message' => $message]);
     }
+
+    public function project_init_report(){
+        try {
+            $project_id = $this->input->post('project_id');
+    
+            $project = $this->projects_model->get($project_id);
+    
+            if(!$project){
+                throw new Exception('Project not found!');
+            }
+    
+            $client = $this->custom_google_client;
+            $client->setClientId('769395247432-st7i60r55cm9sifnt3n4mmuspd41n4hp.apps.googleusercontent.com');
+            $client->setClientSecret('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');
+            $client->setRedirectUri(base_url('authentication/google_callback'));
+    
+            $accessToken = $this->session->userdata('google_access_token');
+            if ($accessToken) {
+                $client->setAccessToken($accessToken);
+            } else {
+                throw new Exception('Authentication required!');
+            }
+    
+            $driveService = new Google_Service_Drive($client);
+            $copy = new Google_Service_Drive_DriveFile(array(
+                'name' => 'Project 1',
+            ));
+            $driveResponse = $driveService->files->copy('1cVxEz72j7k76TYOijtt8dNvgnTevNnn-U4cyelTR-oI', $copy);
+            $documentId = $driveResponse->getId();
+    
+            $docs = new Google_Service_Docs($client);
+            $requests = [
+                new Google_Service_Docs_Request([
+                    'replaceAllText' => [
+                        'containsText' => [
+                            'text' => '{project_name}',
+                            'matchCase' => true,
+                        ],
+                        'replaceText' => 'Project 1',
+                    ],
+                ]),
+            ];
+    
+            $batchUpdateRequest = new Google_Service_Docs_BatchUpdateDocumentRequest([
+                'requests' => $requests,
+            ]);
+            $response = $docs->documents->batchUpdate($documentId, $batchUpdateRequest);
+    
+            $documentUrl = 'https://docs.google.com/document/d/' . $documentId . '/edit';
+    
+            echo json_encode(['success' => true, 'url' => $documentUrl]);
+        } catch (Google_Service_Exception $e) {
+            // Google API error
+            $errors = $e->getErrors();
+            $errorMessage = isset($errors[0]) ? $errors[0]['message'] : 'An error occurred';
+            echo json_encode(['success' => false, 'message' => $errorMessage]);
+        } catch (Exception $e) {
+            // General PHP error
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+    
+    
     
 
 }
