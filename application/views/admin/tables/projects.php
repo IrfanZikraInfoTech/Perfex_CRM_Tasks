@@ -115,7 +115,14 @@ foreach ($rResult as $aRow) {
 
     $membersOutput = '';
 
-    $members       = explode(',', $aRow['members']);
+    // $members       = explode(',', $aRow['members']);
+
+    if (isset($aRow['members'])) {
+        $members = explode(',', $aRow['members']);
+    } else {
+        $members= [];
+    }
+    
     $exportMembers = '';
     foreach ($members as $key => $member) {
         if ($member != '') {

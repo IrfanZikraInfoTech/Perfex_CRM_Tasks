@@ -40,11 +40,11 @@
             <?php } ?>
             <?php echo form_open_multipart($this->uri->uri_string(), ['class' => 'staff-form', 'autocomplete' => 'off']); ?>
             <div class="col-md-<?php if (!isset($member)) {
-    echo '8 col-md-offset-2';
-} else {
-    echo '5';
-} ?>" id="small-table">
-                <div class="panel_s">
+                    echo '8 col-md-offset-2';
+                } else {
+                    echo '5';
+                } ?>" id="small-table">
+                 <div class="panel_s">
                     <div class="panel-body ">
                         <div class="horizontal-scrollable-tabs panel-full-width-tabs">
                             <div class="scroller arrow-left"><i class="fa fa-angle-left"></i></div>
@@ -114,6 +114,25 @@
                                 <?php echo render_input('lastname', 'staff_add_edit_lastname', $value); ?>
                                 <?php $value = (isset($member) ? $member->email : ''); ?>
                                 <?php echo render_input('email', 'staff_add_edit_email', $value, 'email', ['autocomplete' => 'off']); ?>
+                                
+                                <div class="form-group">
+                                    <label for="date_of_birth" class="control-label">Date Of Birth</label>
+                                    <input type="date" class="form-control" name="date_of_birth" value="<?php if (isset($member)) { echo $member->date_of_birth; } ?>">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="Address" class="control-label">Address</label>
+                                    <textarea class="form-control" name="Address" rows="4"><?php if (isset($member)) { echo $member->Address; } ?></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="staff_salary" class="control-label">Staff Salary</label>
+                                    <input type="number" class="form-control" name="staff_salary" value="<?php if (isset($member)) { echo $member->staff_salary; } ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label for="staff_title" class="control-label">Title</label>
+                                    <input type="text" class="form-control" name="staff_title" value="<?php if (isset($member)) { echo $member->staff_title; } ?>">
+                                </div>
+
                                 <div class="form-group">
                                     <label for="hourly_rate"><?php echo _l('staff_hourly_rate'); ?></label>
                                     <div class="input-group">
@@ -193,30 +212,34 @@
                               } ?>>RTL</option>
                                     </select>
                                 </div>
+
                                 <div class="form-group">
-                                    <?php if (count($departments) > 0) { ?>
-                                    <label for="departments"><?php echo _l('staff_add_edit_departments'); ?></label>
-                                    <?php } ?>
-                                    <?php foreach ($departments as $department) { ?>
-                                    <div class="checkbox checkbox-primary">
-                                        <?php
-                              $checked = '';
-                              if (isset($member)) {
-                                  foreach ($staff_departments as $staff_department) {
-                                      if ($staff_department['departmentid'] == $department['departmentid']) {
-                                          $checked = ' checked';
-                                      }
-                                  }
-                              }
-                              ?>
-                                        <input type="checkbox" id="dep_<?php echo $department['departmentid']; ?>"
-                                            name="departments[]" value="<?php echo $department['departmentid']; ?>"
-                                            <?php echo $checked; ?>>
-                                        <label
-                                            for="dep_<?php echo $department['departmentid']; ?>"><?php echo $department['name']; ?></label>
-                                    </div>
-                                    <?php } ?>
-                                </div>
+    <?php if (count($departments) > 0) { ?>
+    <label for="departments"><?php echo _l('staff_add_edit_departments'); ?></label>
+    <?php } ?>
+    <?php foreach ($departments as $department) { ?>
+    <div class="radio radio-primary">
+        <?php
+        $checked = '';
+        if (isset($member)) {
+            foreach ($staff_departments as $staff_department) {
+                if ($staff_department['departmentid'] == $department['departmentid']) {
+                    $checked = ' checked';
+                }
+            }
+        }
+        ?>
+        <!-- Changing from checkbox to radio -->
+        <input type="radio" id="dep_<?php echo $department['departmentid']; ?>"
+            name="departments[]" value="<?php echo $department['departmentid']; ?>"
+            <?php echo $checked; ?>>
+        <label for="dep_<?php echo $department['departmentid']; ?>"><?php echo $department['name']; ?></label>
+    </div>
+    <?php } ?>
+</div>
+
+
+
                                 <?php $rel_id = (isset($member) ? $member->staffid : false); ?>
                                 <?php echo render_custom_fields('staff', $rel_id); ?>
 

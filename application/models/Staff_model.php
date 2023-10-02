@@ -27,6 +27,12 @@ class Staff_model extends App_Model
             'addedfrom' => $transfer_data_to,
         ]);
 
+
+        $default_value = 1; // Your default value is 1
+        $this->db->where('report_to', $id);
+        $this->db->update(db_prefix() . 'staff', ['report_to' => $default_value]);
+       
+        
         $this->db->where('sale_agent', $id);
         $this->db->update(db_prefix() . 'estimates', [
             'sale_agent' => $transfer_data_to,
