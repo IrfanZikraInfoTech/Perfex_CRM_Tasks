@@ -135,6 +135,99 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 
+    $CI = &get_instance();
+    $CI->app_menu->add_sidebar_menu_item('team_management', [
+        'name'     => 'Management', // The name if the item
+        'position' => 2, // The menu position, see below for default positions.
+        'icon'     => 'fa fa-users', // Font awesome icon
+    ]);
+
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'team_dashboard', // Required ID/slug UNIQUE for the child menu
+        'name'     => 'Dashboard', // The name if the item
+        'href'     => admin_url('team_management/dashboard'), // URL of the item
+        'position' => 1, // The menu position
+        'icon'     => 'fa fa-user-friends', // Font awesome icon
+    ]);
+
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'individual_stats', // Required ID/slug UNIQUE for the child menu
+        'name'     => 'Individual Stats', // The name if the item
+        'href'     => admin_url('team_management/individual_stats'), // URL of the item
+        'position' => 2, // The menu position
+        'icon'     => 'fa fa-user-cog', // Font awesome icon
+    ]);
+
+    
+
+    
+    
+
+    if (has_permission('team_management', '', 'admin')) {
+        $CI->app_menu->add_sidebar_children_item('team_management', [
+            'slug'     => 'applications_admin', // Required ID/slug UNIQUE for the child menu
+            'name'     => 'All Applications', // The name if the item
+            'href'     => admin_url('team_management/all_applications'), // URL of the item
+            'position' => 2, // The menu position
+            'icon'     => 'fa fa-address-book', // Font awesome icon
+        ]);
+
+        
+        $CI->app_menu->add_sidebar_children_item('team_management', [
+            'slug'     => 'staff_shifts', // Required ID/slug UNIQUE for the child menu
+            'name'     => 'Staff Shifts', // The name if the item
+            'href'     => admin_url('team_management/staff_shifts'), // URL of the item
+            'position' => 2, // The menu position
+            'icon'     => 'fa fa-user-clock', // Font awesome icon
+        ]);
+
+        $CI->app_menu->add_sidebar_children_item('team_management', [
+            'slug'     => 'chat_ids', // Required ID/slug UNIQUE for the child menu
+            'name'     => 'Chat U_IDS', // The name if the item
+            'href'     => admin_url('team_management/staff_google_chat'), // URL of the item
+            'position' => 2, // The menu position
+            'icon'     => 'fa fa-user-lock', // Font awesome icon
+        ]);
+
+           
+
+
+    }else{
+        $CI->app_menu->add_sidebar_children_item('team_management', [
+            'slug'     => 'applications', // Required ID/slug UNIQUE for the child menu
+            'name'     => 'Applications', // The name if the item
+            'href'     => admin_url('team_management/applications'), // URL of the item
+            'position' => 2, // The menu position
+            'icon'     => 'fa fa-address-book', // Font awesome icon
+        ]);
+    }
+
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'project_management', // Required ID/slug UNIQUE for the child menu
+        'name'     => 'Projects', // The name if the item
+        'href'     => admin_url('team_management/project_management'), // URL of the item
+        'position' => 2, // The menu position
+        'icon'     => 'fa fa-user-clock', // Font awesome icon
+    ]);
+
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'daily_report', // Required ID/slug UNIQUE for the child menu
+        'name'     => 'Daily Report', // The name if the item
+        'href'     => admin_url('team_management/daily_reports/'.date('m').'/'.date('d')), // URL of the item
+        'position' => 2, // The menu position
+        'icon'     => 'fa fa-hourglass-end', // Font awesome icon
+    ]);  
+
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'monthly_report', // Required ID/slug UNIQUE for the child menu
+        'name'     => 'Monthly Report', // The name if the item
+        'href'     => admin_url('team_management/monthly_reports/'.date('Y').'/'.date('m')), // URL of the item
+        'position' => 2, // The menu position
+        'icon'     => 'fa fa-calendar', // Font awesome icon
+    ]);  
+
+
+
     $CI->app_menu->add_sidebar_menu_item('projects', [
         'name'     => _l('projects'),
         'href'     => admin_url('projects'),
