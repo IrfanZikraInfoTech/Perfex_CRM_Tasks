@@ -10,6 +10,10 @@ class Dashboard extends AdminController
     {
         parent::__construct();
         $this->load->model('dashboard_model');
+        $this->load->model('newsfeed_model');
+        $this->load->model('team_management_model');
+        $this->load->model('staff_model');
+        $this->load->library('webhook_library', null, 'webhook_lib');
     }
 
     /* This is admin dashboard view */
@@ -85,6 +89,9 @@ class Dashboard extends AdminController
             $data['tickets_report'] = (new \app\services\TicketsReportByStaff())->filterBy('this_month');
         }
 
+        $data['posts'] = $this->newsfeed_model->load_newsfeed(0);
+        $data['upcoming_birthdays'] = $this->staff_model->get_upcoming_birthdays();
+
         $data = hooks()->apply_filters('before_dashboard_render', $data);
         $this->load->view('admin/dashboard/dashboard', $data);
     }
@@ -112,4 +119,6 @@ class Dashboard extends AdminController
         $data['tickets_report'] = (new \app\services\TicketsReportByStaff())->filterBy($type);
         $this->load->view('admin/dashboard/widgets/tickets_report_table', $data);
     }
+
+
 }

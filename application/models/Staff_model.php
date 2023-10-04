@@ -365,6 +365,42 @@ class Staff_model extends App_Model
         return $this->db->get(db_prefix() . 'staff')->result_array();
     }
 
+    public function get_upcoming_birthdays() {
+        $currentMonth = date('m'); //Current month
+        $currentDay = date('d'); //Current day
+    
+        $result = [];
+    
+        // Loop until we have 4 birthdays or we have checked all 12 months
+        for ($i = 0; $i < 12 && count($result) < 4; $i++) {
+            $this->db->select('*,CONCAT(firstname,\' \',lastname) as full_name');
+            $this->db->where('MONTH(date_of_birth)', $currentMonth);
+    
+            if ($i == 0) { // Only check the day for the first (current) month
+                $this->db->where('DAY(date_of_birth) >=', $currentDay);
+            }
+    
+            $this->db->order_by('DAY(date_of_birth)', 'ASC');
+            $birthdaysThisMonth = $this->db->get(db_prefix() . 'staff')->result_array();
+    
+            // Merge with our main result array
+            $result = array_merge($result, $birthdaysThisMonth);
+    
+            // If we have more than 4 birthdays, trim the array
+            if (count($result) > 4) {
+                $result = array_slice($result, 0, 4);
+                break; // Exit the loop as we have our 4 birthdays
+            }
+    
+            // Move to the next month
+            $currentMonth = ($currentMonth % 12) + 1;
+            $currentDay = 1; // Reset the day for the next iteration
+        }
+    
+        // var_dump($result);
+        return $result;
+    }
+
     /**
      * Get staff permissions
      * @param  mixed $id staff id
@@ -868,4 +904,7 @@ class Staff_model extends App_Model
 
         return $result;
     }
+
+
+
 }

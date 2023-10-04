@@ -44,3 +44,10 @@ CREATE TABLE tblprojecttemplates (
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL
 );
+
+-- Tblstaff Alter Command
+ALTER TABLE tblstaff ADD date_of_birth DATE;
+ALTER TABLE tblstaff ADD Address TEXT;
+ALTER TABLE tblstaff ADD staff_salary INT;
+ALTER TABLE tblstaff ADD staff_title VARCHAR(255);
+ALTER TABLE tblstaff ADD report_to INT DEFAULT(1);

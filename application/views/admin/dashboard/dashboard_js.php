@@ -3,6 +3,7 @@
 var weekly_payments_statistics;
 var monthly_payments_statistics;
 var user_dashboard_visibility = <?php echo $user_dashboard_visibility; ?>;
+
 $(function() {
     $("[data-container]").sortable({
         connectWith: "[data-container]",
@@ -339,25 +340,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-    
-        
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var response = xhr.responseText;
-
-                var widgetsContainer = document.querySelector('.content');
-
-                var tempDiv = document.createElement('div');
-                tempDiv.innerHTML = response;
-
-                widgetsContainer.insertBefore(tempDiv, widgetsContainer.firstChild);
-
                 //Start of the view Scripting
-                
                 var timerInterval;
                 var clockedIn = false;
                 var startTime;
+                var csrf_token_name = csrfData.token_name;
+                var csrf_token = csrfData.hash;
+
+                
 
                 const clockInBtn = document.getElementById('clock-in');
                 const clockOutBtn = document.getElementById('clock-out');
@@ -476,44 +466,47 @@ document.addEventListener('DOMContentLoaded', function () {
            
                 xhr.send();
             }
-                clockInBtn.addEventListener('click', () => {
-                   
-                    Swal.fire({
-                        title: 'Processing...',
-                        text: 'Clocking in, please wait.',
-                        timerProgressBar: true,
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-           
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('POST', admin_url + 'team_management/clock_in');
-                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
-                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-                    xhr.setRequestHeader('X-CSRF-TOKEN', csrf_token);
-                    xhr.onreadystatechange = function() {
-                        if (this.readyState == 4 && this.status == 200) {
-                            var response = JSON.parse(this.responseText);
-                            if (response.success) {
 
-                                Swal.close();
-                                Swal.fire('Success!', 'Successfully clocked in.', 'success');
 
-                                clockedIn = true;
-                                fetchStats();
-                                clockInBtn.disabled = true;
-                                timerInterval = setInterval(updateLiveTimer, 1000);
-                            } else {
-                                Swal.fire('Error!', 'Unable to clock in. Please try again.', 'error');
+                    clockInBtn.addEventListener('click', () => {
+                    
+                        Swal.fire({
+                            title: 'Processing...',
+                            text: 'Clocking in, please wait.',
+                            timerProgressBar: true,
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
                             }
-                        }
-                    };
-                    var requestData = csrf_token_name + '=' + encodeURIComponent(csrf_token);
-                    xhr.send(requestData);
+                        });
+            
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST', admin_url + 'team_management/clock_in');
+                        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
+                        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                        xhr.setRequestHeader('X-CSRF-TOKEN', csrf_token);
+                        xhr.onreadystatechange = function() {
+                            if (this.readyState == 4 && this.status == 200) {
+                                var response = JSON.parse(this.responseText);
+                                if (response.success) {
 
-                });
+                                    Swal.close();
+                                    Swal.fire('Success!', 'Successfully clocked in.', 'success');
+
+                                    clockedIn = true;
+                                    fetchStats();
+                                    clockInBtn.disabled = true;
+                                    timerInterval = setInterval(updateLiveTimer, 1000);
+                                } else {
+                                    Swal.fire('Error!', 'Unable to clock in. Please try again.', 'error');
+                                }
+                            }
+                        };
+                        var requestData = csrf_token_name + '=' + encodeURIComponent(csrf_token);
+                        xhr.send(requestData);
+
+                    });
+
                 clockOutBtn.addEventListener('click', () => {
 
                     Swal.fire({
@@ -577,6 +570,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
                 
+                    
                     //Backend Timers
                     var xhr = new XMLHttpRequest();
                     xhr.open('POST', admin_url + 'team_management/update_status');
@@ -701,10 +695,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                 const timezones = [
-                    { name: 'IST', timeZone: 'Asia/Kolkata' },
-                    { name: 'CST', timeZone: 'America/Chicago' },
-                    { name: 'PST', timeZone: 'Asia/Karachi' },
-                    { name: 'BST', timeZone: 'Asia/Dhaka' },
+                    { name: 'India', timeZone: 'Asia/Kolkata' },
+                    { name: 'USA(Central)', timeZone: 'America/Chicago' },
+                    { name: 'Pakistan', timeZone: 'Asia/Karachi' },
+                    { name: 'Bangladesh', timeZone: 'Asia/Dhaka' },
                 ];
 
                 function updateClocks() {
@@ -734,15 +728,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 initTimeline();
             }
-        };
-        xhr.open('GET', admin_url + 'team_management/widget', true);
-        xhr.send();
-    }
+        });
 
-    //}, 3000);
-
-
-});
 
 
 function statusSelectColors(element){
@@ -768,25 +755,35 @@ function updateTaskValues(staffId, newTask, isCompleted) {
 }
 
 function getOrSaveStaffSummary(summary = null) {
+    var today = new Date();
+    var selectedDate = new Date(document.getElementById("summary_date").value);
+    var diffInDays = Math.round((today - selectedDate) / (1000 * 60 * 60 * 24));
 
+    // If selected date is not yesterday or day before yesterday
+    if (diffInDays > 2) {
+        document.getElementById("summary-textarea").readOnly = true;
+    } else {
+        document.getElementById("summary-textarea").readOnly = false;
+    }
+
+    var csrf_token_name = csrfData.token_name;
+    var csrf_token = csrfData.hash;
     var date = document.getElementById("summary_date").value;
 
-
     $.ajax({
-      url: 'team_management/staff_summary',
-      type: 'POST',
-      data: { summary: summary, date , csrf_token_name : csrf_token },
-      success: function(response) {
-        if (!summary) {
-          // If you're fetching the summary, set the textarea value with the response
-          document.querySelector('#summary-textarea').value = response;
-        }else{
-            alert_float("success", "Summary Saved!");
+        url: 'team_management/staff_summary',
+        type: 'POST',
+        data: { summary: summary, date, csrf_token_name: csrf_token },
+        success: function(response) {
+            if (!summary) {
+                document.querySelector('#summary-textarea').value = response;
+            } else {
+                alert_float("success", "Summary Saved!");
+            }
+        },
+        error: function() {
+            alert('Error fetching or saving the summary.');
         }
-      },
-      error: function() {
-        alert('Error fetching or saving the summary.');
-      }
     });
 }
 

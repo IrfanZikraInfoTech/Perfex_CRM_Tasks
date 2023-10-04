@@ -879,15 +879,15 @@ class Team_management extends AdminController {
         //echo $final_html;
     }
 
-    function widget()
-    {
-        $staff_id = $this->session->userdata('staff_user_id');
-        $stats = $this->team_management_model->get_stats($staff_id);
+    // function widget()
+    // {
+    //     $staff_id = $this->session->userdata('staff_user_id');
+    //     $stats = $this->team_management_model->get_stats($staff_id);
 
-        $data['stats'] = $stats;
+    //     $data['stats'] = $stats;
 
-        $this->load->view('dashboard_widget');
-    }
+    //     $this->load->view('admin/management/dashboard_widget');
+    // }
 
     function create_thread($webhookUrl, $threadKey, $message) {
         
@@ -1057,8 +1057,10 @@ class Team_management extends AdminController {
             $this->team_management_model->insert_status_entry($staff_id, $status, $current_time);
         }
 
+
         // format the date for readability
         $formatted_date = date('g:i A');
+        $message = "NULL";
 
         $tag = $this->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
 
@@ -1468,30 +1470,37 @@ class Team_management extends AdminController {
     }
 
     public function staff_summary() {
-
-
         $staff_id = $this->session->userdata('staff_user_id');
         $date = $this->input->post('date');
         $summary = $this->input->post('summary');
-      
+    
+        $selectedDate = new DateTime($date);
+        $today = new DateTime();
+        $diff = $today->diff($selectedDate)->days;
+    
         if ($summary) {
-            
+            // If it's not yesterday or day before yesterday
+            if ($diff > 2) {
+                echo "You cannot edit this summary";
+                return;
+            }
+    
             // Save the summary
             $this->team_management_model->save_staff_summary($staff_id, $summary, $date);
-
+    
             $formatted_date = date('g:i A');
             $tag = $this->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
             $message = sprintf("📝✨ <users/%s> just shared their daily summary 🕑 *at*: %s\n\n📋*Summary*:\n%s", $tag, $formatted_date, $summary);
             $this->webhook_lib->send_chat_webhook($message, "eos");
         
         } else {
-          // Get the summary
-          $summary_record = $this->team_management_model->get_staff_summary($staff_id, $date);
-          if ($summary_record) {
-            echo $summary_record->summary;
-          } else {
-            echo '';
-          }
+            // Get the summary
+            $summary_record = $this->team_management_model->get_staff_summary($staff_id, $date);
+            if ($summary_record) {
+                echo $summary_record->summary;
+            } else {
+                echo '';
+            }
         }
     }
 

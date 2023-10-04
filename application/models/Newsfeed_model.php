@@ -130,17 +130,21 @@ class Newsfeed_model extends App_Model
     public function load_newsfeed($offset, $post_id = '')
     {
         $offset = ($offset * $this->newsfeed_posts_limit);
-
-        $this->db->order_by('datecreated', 'desc');
+    
+        $this->db->select('newsfeed_posts.*, staff.firstname as creator_name'); // Assuming 'firstname' is the name column in the staff table
+        $this->db->join('staff', 'staff.staffid = newsfeed_posts.creator', 'left');
+        $this->db->order_by('newsfeed_posts.datecreated', 'desc');
+    
         if ($post_id != '') {
-            $this->db->where('postid', $this->input->post('postid'));
+            $this->db->where('newsfeed_posts.postid', $post_id);
         } else {
-            $this->db->where('pinned', 0);
+            $this->db->where('newsfeed_posts.pinned', 0);
             $this->db->limit($this->newsfeed_posts_limit, $offset);
         }
-
+    
         return $this->db->get(db_prefix() . 'newsfeed_posts')->result_array();
     }
+
 
     /**
      * Get all sticked posts to top
