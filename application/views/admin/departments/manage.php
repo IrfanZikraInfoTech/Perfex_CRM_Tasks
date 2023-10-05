@@ -86,10 +86,6 @@
 
                     _l('department_list_name'),
 
-                    _l('department_email'),
-
-                    _l('department_calendar_id'),
-
                     _l('options'),
 
                 ], 'departments'); ?>
@@ -178,7 +174,7 @@
 
 $(function() {
 
-    initDataTable('.table-departments', window.location.href, [4], [4], undefined, [1, 'asc']);
+    initDataTable('.table-departments', window.location.href, [1,2], [], undefined, [1, 'asc']);
 
     appValidateForm($('form'), {
 

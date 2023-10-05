@@ -157,6 +157,13 @@ function app_init_admin_sidebar_menu_items()
         'position' => 2, // The menu position
         'icon'     => 'fa fa-user-cog', // Font awesome icon
     ]);
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'Individual Dashboard', // Required ID/slug UNIQUE for the child menu
+        'name'     => 'Indi. Dashboard', // The name if the item
+        'href'     => admin_url('team_management/individual_dashboard'), // URL of the item
+        'position' => 2, // The menu position
+        'icon'     => 'fa fa-user-friends', // Font awesome icon
+    ]);
 
     
 
