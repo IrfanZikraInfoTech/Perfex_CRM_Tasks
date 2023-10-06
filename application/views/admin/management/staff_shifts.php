@@ -433,7 +433,7 @@ function showShiftsModal(staffId, month) {
     // Fetch the existing shifts for the staff member and populate the input fields
     // You can make an AJAX request to your server to fetch the shifts data and then update the input fields
     $.ajax({
-        url: '<?php echo base_url('team_management/get_shift_timings/'); ?>' + staffId + '/' + month,
+        url: '<?php echo base_url('admin/team_management/get_shift_timings/'); ?>' + staffId + '/' + month,
         type: 'GET',
         dataType: 'json',
         success: function(shiftTimings) {

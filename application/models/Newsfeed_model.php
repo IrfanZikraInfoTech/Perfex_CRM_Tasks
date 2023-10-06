@@ -83,10 +83,9 @@ class Newsfeed_model extends App_Model
         $this->db->select();
         $this->db->from(db_prefix() . 'newsfeed_post_likes');
         $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'newsfeed_post_likes.userid', 'left');
-        $this->db->where('userid !=', get_staff_user_id());
         $this->db->where('postid', $id);
         $this->db->order_by('dateliked', 'asc');
-
+    
         return $this->db->get()->result_array();
     }
 
@@ -96,15 +95,15 @@ class Newsfeed_model extends App_Model
      * @param  mixed $postid post id
      * @return array
      */
-    public function load_likes_modal($offset, $postid)
-    {
-        $offset = ($offset * $this->post_likes_limit);
-        $this->db->where('postid', $postid);
-        $this->db->order_by('dateliked', 'desc');
-        $this->db->limit($this->post_likes_limit, $offset);
+        public function load_likes_modal($offset, $postid)
+        {
+            $offset = ($offset * $this->post_likes_limit);
+            $this->db->where('postid', $postid);
+            $this->db->order_by('dateliked', 'desc');
+            $this->db->limit($this->post_likes_limit, $offset);
 
-        return $this->db->get(db_prefix() . 'newsfeed_post_likes')->result_array();
-    }
+            return $this->db->get(db_prefix() . 'newsfeed_post_likes')->result_array();
+        }
 
     /**
      * Get post comments - used in modal with loading data

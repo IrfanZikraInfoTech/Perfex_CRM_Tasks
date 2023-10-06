@@ -90,6 +90,7 @@ class Dashboard extends AdminController
         }
 
         $data['posts'] = $this->newsfeed_model->load_newsfeed(0);
+
         $data['upcoming_birthdays'] = $this->staff_model->get_upcoming_birthdays();
 
         $data = hooks()->apply_filters('before_dashboard_render', $data);
@@ -120,5 +121,16 @@ class Dashboard extends AdminController
         $this->load->view('admin/dashboard/widgets/tickets_report_table', $data);
     }
 
+    public function like_or_unlike() {
+        $postId = $this->input->post('post_id');
+        
+        if ($this->newsfeed_model->user_liked_post($postId)) {
+            $result = $this->newsfeed_model->unlike_post($postId);
+            echo json_encode(['liked' => !$result]);
+        } else {
+            $result = $this->newsfeed_model->like_post($postId);
+            echo json_encode(['liked' => $result]);
+        }
+    }
 
 }
