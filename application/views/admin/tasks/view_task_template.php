@@ -857,7 +857,7 @@
                     <i class="fa-regular fa-clock fa-fw fa-lg task-info-icon pull-left"></i>
                     Estimated Hours: <span class="tw-text-neutral-800">
 
-                    <?= app_format_number($task->estimated_hours); ?>
+                    <?=($task->estimated_hours); ?>  hour(s)
               
                     </span>
                 </h5>
@@ -914,7 +914,7 @@
                     <i class="fa fa-asterisk task-info-icon fa-fw fa-lg" aria-hidden="true"></i>
                     <span class="tw-text-neutral-800">
                         <?php echo _l('task_user_logged_time'); ?>
-                        <?php echo seconds_to_time_format($this->tasks_model->calc_task_total_time($task->id, ' AND staff_id=' . get_staff_user_id())); ?>
+                        <?php echo round( ($this->tasks_model->calc_task_total_time($task->id, ' AND staff_id=' . get_staff_user_id())) / 3600 , 2 ); ?> hour(s)
                     </span>
                 </h5>
             </div>
@@ -925,7 +925,7 @@
                     <i
                         class="fa-regular fa-clock fa-fw fa-lg task-info-icon"></i><?php echo _l('task_total_logged_time'); ?>
                     <span class="text-success">
-                        <?php echo seconds_to_time_format($this->tasks_model->calc_task_total_time($task->id)); ?>
+                        <?php echo round(($this->tasks_model->calc_task_total_time($task->id) / 3600),2); ?> hour(s)
                     </span>
                 </h5>
             </div>
@@ -1147,10 +1147,22 @@
                echo $_followers;
                ?>
             </div>
-            <?php echo form_open_multipart('admin/tasks/upload_file', ['id' => 'task-attachment', 'class' => 'dropzone tw-mt-5']); ?>
-            <?php echo form_close(); ?>
+            <?php //echo form_open_multipart('admin/tasks/upload_file', ['id' => 'task-attachment', 'class' => 'dropzone tw-mt-5']); ?>
+            <?php //echo form_close(); ?>
+
+            <?php
+            
+            if($task->rel_type=='project'){
+
+                echo form_open_multipart(admin_url('projects/upload_file/' . $task->rel_id . '/'.$task->id), ['class' => 'dropzone tw-mt-5', 'id' => 'task-attachment']); 
+                
+                echo form_close(); 
+
+            }
+            
+            ?>
             <div class="tw-my-2 tw-inline-flex tw-items-end tw-w-full tw-flex-col tw-space-y-2 tw-justify-end">
-                <button class="gpicker">
+                <button class="gpicker w-full py-4 rounded text-sm shadow transition-all hover:shadow-none">
                     <i class="fa-brands fa-google" aria-hidden="true"></i>
                     <?php echo _l('choose_from_google_drive'); ?>
                 </button>
@@ -1211,6 +1223,8 @@ init_selectpicker();
 init_datepicker();
 init_lightbox();
 
+$("#task-attachment").hide();
+
 tinyMCE.remove('#task_view_description');
 
 if (typeof(taskAttachmentDropzone) != 'undefined') {
@@ -1237,8 +1251,20 @@ taskAttachmentDropzone = new Dropzone("#task-attachment", appCreateDropzoneOptio
 $('#task-modal').find('.gpicker').googleDrivePicker({
     onPick: function(pickData) {
         taskExternalFileUpload(pickData, 'gdrive', <?php echo $task->id; ?>);
+        saveProjectExternalFile(pickData, "gdrive");
     }
 });
+
+
+function saveProjectExternalFile(files, externalType) {
+  $.post(admin_url + "projects/add_external_file", {
+    files: files,
+    project_id: <?= $task->rel_id ?>,
+    external: externalType,
+    visible_to_customer: false,
+  });
+}
+
 
 $('.edit-timesheet-cancel').click(function() {
     $('.timesheet-edit').addClass('hide');

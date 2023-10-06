@@ -44,29 +44,30 @@ function app_init_project_tabs()
         'position' => 5,
     ]);
 
-    // $CI->app_tabs->add_project_tab('project_tasks', [
-    //     'name'                      => _l('tasks'),
-    //     'icon'                      => 'fa-regular fa-check-circle',
-    //     'view'                      => 'admin/projects/project_tasks',
-    //     'position'                  => 7,
-    //     'linked_to_customer_option' => ['view_tasks'],
-    // ]);
-
-    $CI->app_tabs->add_project_tab('project_backlog', [
-        'name'                      => "Backlog",
-        'icon'                      => 'fa-regular fa-check-circle',
-        'view'                      => 'admin/projects/project_backlog',
-        'position'                  => 10,
-        'linked_to_customer_option' => ['view_backlog'],
+    $CI->app_tabs->add_project_tab('project_dashboard', [
+        'name'                      => 'Dashboard',
+        'icon'                      => 'fa fa-dashboard',
+        'view'                      => 'admin/projects/project_dashboard',
+        'position'                  => 6,
+        'linked_to_customer_option' => ['view_tasks'],
     ]);
 
     $CI->app_tabs->add_project_tab('project_board', [
         'name'                      => "Board",
         'icon'                      => 'fa-brands fa-trello',
         'view'                      => 'admin/projects/project_board',
-        'position'                  => 15,
+        'position'                  => 7,
         // 'linked_to_customer_option' => ['view_board'],
     ]);
+
+    $CI->app_tabs->add_project_tab('project_backlog', [
+        'name'                      => "Backlog",
+        'icon'                      => 'fa-regular fa-check-circle',
+        'view'                      => 'admin/projects/project_backlog',
+        'position'                  => 8,
+        'linked_to_customer_option' => ['view_backlog'],
+    ]);
+
 
     $CI->app_tabs->add_project_tab('project_gantt', [
         'name'                      => _l('project_gant'),
@@ -171,36 +172,40 @@ function app_init_project_tabs()
     //     'visible'  => (has_permission('proposals', '', 'view') || has_permission('proposals', '', 'view_own') || (get_option('allow_staff_view_proposals_assigned') == 1 && staff_has_assigned_proposals())),
     // ]);
 
+    $CI->app_tabs->add_project_tab('project_activity', [
+        'name'                      => _l('project_activity'),
+        'icon'                      => 'fa-regular fa-file-lines',
+        'view'                      => 'admin/projects/project_activity',
+        'position'                  => 35,
+        'linked_to_customer_option' => ['view_activity_log'],
+    ]);
+
+    $CI->app_tabs->add_project_tab('project_discussions', [
+        'name'                      => _l('project_discussions'),
+        'icon'                      => 'fa-regular fa-message',
+        'view'                      => 'admin/projects/project_discussions',
+        'position'                  => 40,
+        'linked_to_customer_option' => ['open_discussions'],
+    ]);
+
     $CI->app_tabs->add_project_tab('project_notes', [
         'name'     => _l('project_notes'),
         'icon'     => 'fa-regular fa-note-sticky',
         'view'     => 'admin/projects/project_notes',
-        'position' => 35,
+        'position' => 45,
     ]);
 
     $CI->app_tabs->add_project_tab('project_tickets', [
         'name'     => "Support",
         'icon'     => 'fa fa-life-ring',
         'view'     => 'admin/projects/project_tickets',
-        'position' => 40,
+        'position' => 50,
         'visible'  => (get_option('access_tickets_to_none_staff_members') == 1 && !is_staff_member()) || is_staff_member(),
     ]);
 
-    $CI->app_tabs->add_project_tab('project_activity', [
-        'name'                      => _l('project_activity'),
-        'icon'                      => 'fa-regular fa-file-lines',
-        'view'                      => 'admin/projects/project_activity',
-        'position'                  => 45,
-        'linked_to_customer_option' => ['view_activity_log'],
-    ]);
     
-    $CI->app_tabs->add_project_tab('project_discussions', [
-        'name'                      => _l('project_discussions'),
-        'icon'                      => 'fa-regular fa-message',
-        'view'                      => 'admin/projects/project_discussions',
-        'position'                  => 50,
-        'linked_to_customer_option' => ['open_discussions'],
-    ]);
+    
+   
 
 }
 
@@ -487,4 +492,73 @@ function total_project_finished_tasks_by_milestone($milestone_id, $project_id)
              'status'    => 5,
              'milestone' => $milestone_id,
              ]);
+}
+
+function story($story, $show_epic = false) {
+
+    // Prepare the assignee avatars and names for tooltip
+    $assignee_avatars = '';
+    foreach ($story->assignees as $assignee) {
+        $assignee_avatars .= '<div class="w-8 h-8" data-toggle="tooltip" title="'.$assignee['full_name'].'">'.
+                                staff_profile_image($assignee['assigneeid'], ['rounded-full'], 'thumb').
+                             '</div>';
+    }
+
+    // Compute the time indicator text
+    $current_date = new DateTime();  // get the current date
+    $start_date = $story->startdate ? new DateTime($story->startdate) : null;
+    $due_date = $story->duedate ? new DateTime($story->duedate) : null;
+
+    if ($start_date && $current_date < $start_date) {
+        $interval = $current_date->diff($start_date);
+        $time_indicator_text = $interval->days . ' days remaining to start';
+    } elseif ($due_date && $current_date > $due_date) {
+        $interval = $current_date->diff($due_date);
+        $time_indicator_text = $interval->days . ' days overdue';
+    } elseif ($start_date && $due_date && $current_date >= $start_date && $current_date <= $due_date) {
+        if ($current_date == $start_date) {
+            $interval_remaining = $current_date->diff($due_date);
+            $time_indicator_text = 'Started today, ' . $interval_remaining->days . ' days left';
+        } else {
+            $interval_started = $start_date->diff($current_date);
+            $interval_remaining = $current_date->diff($due_date);
+            $time_indicator_text = $interval_started->days . ' days since started, ' . $interval_remaining->days . ' days left';
+        }
+    } else {
+        $time_indicator_text = 'Date information not available';
+    }
+
+    $color_classes = [
+        1 => 'border-gray-100 hover:border-gray-200', // Not Started
+        4 => 'border-cyan-100 hover:border-cyan-200', // In Progress
+        3 => 'border-blue-100 hover:border-blue-200', // Testing
+        2 => 'border-emerald-100 hover:border-emerald-200', // Awaiting Feedback
+        5 => 'border-lime-100 hover:border-lime-200' // Completed
+    ];
+
+    // Get the color class for the current story
+    $color_class = isset($color_classes[$story->status]) ? $color_classes[$story->status] : 'border-gray-300 hover:border-gray-400';
+
+    $epic_html = "";
+
+    if($show_epic){
+        $epic_html = '<div class="text-fuchsia-900/70 text-xs epic_'.$story->epic->id.'_name">'.htmlspecialchars($story->epic->name). '</div>';
+    }
+
+
+    // Construct and return the story HTML
+    $story_html = '
+    <div class="story" data-story-id="'.$story->id.'">
+        <div class="border-2 border-solid '.$color_class.' rounded-lg transition-all px-4 py-2 flex justify-between items-center">
+            <a onclick="init_task_modal('.$story->id.');" href="#" class="text-gray-800 font-bold flex flex-col "> <div>'.htmlspecialchars($story->name). '</div>'.$epic_html.'</a>
+            <div class="flex items-center">
+                <div class="flex space-x-2">
+                    '.$assignee_avatars.'
+                </div>
+                <div class="ml-4 text-gray-800">'.$time_indicator_text.'</div>
+            </div>
+        </div>
+    </div>';
+
+    return $story_html;
 }

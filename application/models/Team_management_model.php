@@ -107,7 +107,107 @@ class Team_management_model extends App_Model
      
          return $result;
     }
+    public function get_all_departments(){
+        $this->db->select('departmentid,name');
+        $query = $this->db->get('tbldepartments');
+        return $query->result();
+    }
+    public function get_staff_by_department($department_id){
+        $CI =& get_instance();
 
+        $this->db->select(''.db_prefix().'staff.*, '.db_prefix().'departments.name as department, '.db_prefix().'_staff_status.*'); // Note the addition here
+        $this->db->from(''.db_prefix().'staff');
+        $this->db->join(''.db_prefix().'_staff_status', ''.db_prefix().'staff.staffid = '.db_prefix().'_staff_status.staff_id');
+        $this->db->join(''.db_prefix().'staff_departments', ''.db_prefix().'staff.staffid = '.db_prefix().'staff_departments.staffid');
+        $this->db->join(''.db_prefix().'departments', ''.db_prefix().'staff_departments.departmentid = '.db_prefix().'departments.departmentid');
+        $this->db->where('is_not_staff', 0);
+        $this->db->where(''.db_prefix().'staff.staffid !=', 1);
+        $this->db->where('active', 1);
+        $this->db->where(''.db_prefix().'staff_departments.departmentid', $department_id);
+
+        $query = $this->db->get();
+        $result = $query->result();
+        // Loop through each row in the result
+        foreach ($result as $staff) {
+
+            //Today's Timer Counter
+            $staff->live_time_today = $this->get_today_live_timer($staff->staff_id);
+
+            //Task Assigned
+            $allTasks = $this->get_tasks_of_staff($staff->staff_id);
+            if($allTasks){
+                $staff->all_tasks = $allTasks;
+            }
+            
+
+            //Get current task
+            $taskId = $this->get_current_task_by_staff_id($staff->staff_id);
+            if($taskId){
+                $task = $this->get_task_by_taskid($taskId);
+                $staff->currentTaskName = $task->name;
+                if($task->rel_type == "project"){
+                    $CI->load->model('projects_model');
+                    $task_project = $CI->projects_model->get($task->rel_id);
+                    $staff->currentTaskProject = $task_project->name;
+                }
+                
+                $currentTaskTime = $this->get_timers($taskId, $staff->staff_id);
+                
+                if($currentTaskTime){
+
+                    $timestamp = $currentTaskTime->start_time;
+
+                    $given_date = new DateTime();
+                    $given_date->setTimestamp($timestamp);
+
+                    $now = DateTime::createFromFormat('Y-m-d H:i:s', date('Y-m-d H:i:s'));
+
+                    $interval = $now->diff($given_date);
+                    $seconds_passed = $interval->s + ($interval->i * 60) + ($interval->h * 3600) + ($interval->days * 86400);
+
+                    $staff->currentTaskTime = $seconds_passed;
+
+                }else{
+                    $staff->currentTaskTime = "0";
+                }
+
+                $staff->currentTaskId = $task->id;
+
+            }else{
+                $staff->currentTaskId = 0;
+                $staff->currentTaskName = "None";
+                $staff->currentTaskTime = "0";
+            }
+            
+            //Check if Shift is Active or Not
+            $current_entry = $this->db->where('staff_id', $staff->staff_id)
+                            ->where('clock_out IS NULL', null, false)
+                            ->get(''.db_prefix().'_staff_time_entries')
+                            ->row();
+            if ($current_entry) {
+                $staff->working = true;
+            }else{
+                $staff->working = false;
+            }
+
+            //Set Status Color Class
+            if($staff->status == "Online"){
+                $staff->statusColor = "emerald-200";
+            }else if ($staff->status == "AFK"){
+                $staff->statusColor = "sky-200";
+            }
+            else if ($staff->status == "Leave"){
+                $staff->statusColor = "amber-200";
+            }
+            else{
+                $staff->statusColor = "gray-200";
+            }
+
+         }
+        return $query->result();
+    }
+    
+        
     public function get_all_timers(){
         $timers = new stdClass();
         $yesterdayTime = 0;

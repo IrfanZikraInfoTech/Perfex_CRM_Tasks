@@ -134,8 +134,7 @@ $(function () {
   });
 
   if (typeof Dropbox != "undefined" && $("#dropbox-chooser").length > 0) {
-    
-    document.getElementById("dropbox-chooser").appendChild(
+        document.getElementById("dropbox-chooser").appendChild(
       Dropbox.createChooseButton({
         success: function (files) {
           saveProjectExternalFile(files, "dropbox");
@@ -204,16 +203,10 @@ $(function () {
             "visible_to_customer",
             $('input[name="visible_to_customer"]').prop("checked")
           );
-          // Add folder_id to formData.
-          formData.append(
-            "folder_id",
-            $('#folder-id-input').val()
-          );
         },
       })
     );
   }
-  
   
   if ($("#project-expense-form").length > 0) {
     expenseDropzone = new Dropzone(
@@ -465,19 +458,15 @@ $(function () {
     }
   });
 });
-
-// only file
 function projectFileGoogleDriveSave(pickData) {
   saveProjectExternalFile(pickData, "gdrive");
 }
-
 function saveProjectExternalFile(files, externalType) {
   $.post(admin_url + "projects/add_external_file", {
     files: files,
     project_id: project_id,
     external: externalType,
     visible_to_customer: $("#pf_visible_to_customer").prop("checked"),
-
   }).done(function () {
     var location = window.location.href;
     window.location.href = location.split("?")[0] + "?group=project_files";

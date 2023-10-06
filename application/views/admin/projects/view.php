@@ -69,7 +69,17 @@
                         <div class="col-md-5 text-right">
                             
                             <button class="btn btn-primary" onclick="importScrum();">Import SCRUM</button>
-                            <button class="px-4 py-2 rounded-lg shaodw bg-green-500 hover:bg-green-600 transition-all text-white" onclick="initReport();">Initiation Report</button>
+
+                            <div class="btn-group">
+                            <button type="button" class="px-4 py-2 rounded-lg shaodw bg-green-500 hover:bg-green-600 transition-all text-white dropdown-toggle border-2 border-gray-200 border-solid" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Reports
+                            </button>
+                                <div class="dropdown-menu">
+                                    <button class="w-full text-left px-4 py-2 shaodw hover:bg-gray-200 transition-all" href="#" onclick="initReport();">Initiation Report</button>
+                                    <button class="w-full text-left px-4 py-2 shaodw hover:bg-gray-200 transition-all" href="#" onclick="finalReport();">Completion Report</button>
+                                </div>
+                            </div>
+
                             
                             <!-- <?php if (has_permission('tasks', '', 'create')) { ?>
                             <a href="#"
@@ -642,6 +652,69 @@ function importScrum(){
 
 function initReport(){
 
+<?php
+    if(!empty($project->init_report)){
+        ?>
+
+            Swal.fire({
+                title: 'Report Found',
+                text: 'Report already created, Want a new one??',
+                icon: 'info',
+                confirmButtonText: 'New',
+                showCancelButton: true,
+                cancelButtonText: 'Open Existing'
+            }).then((result) => {
+                if(result.isConfirmed){
+                    createReport('init_report');
+                }else if(result.isDismissed && result.dismiss == 'cancel'){
+                    window.open("https://docs.google.com/document/d/<?= $project->init_report ?>", '_blank').focus();
+                }
+                console.log(result);
+            });
+
+        <?php
+    }else{    
+?>
+
+createReport('init_report');
+
+<?php } ?>
+
+}
+
+function finalReport(){
+
+<?php
+    if(!empty($project->final_report)){
+        ?>
+
+            Swal.fire({
+                title: 'Report Found',
+                text: 'Report already created, Want a new one??',
+                icon: 'info',
+                confirmButtonText: 'New',
+                showCancelButton: true,
+                cancelButtonText: 'Open Existing'
+            }).then((result) => {
+                if(result.isConfirmed){
+                    createReport('final_report');
+                }else if(result.isDismissed && result.dismiss == 'cancel'){
+                    window.open("https://docs.google.com/document/d/<?= $project->final_report ?>", '_blank').focus();
+                }
+                console.log(result);
+            });
+
+        <?php
+    }else{    
+?>
+
+createReport('final_report');
+
+<?php } ?>
+
+}
+
+function createReport(name){
     Swal.fire({
     title: 'Processing',
     html: 'Creating Report...',
@@ -652,7 +725,7 @@ function initReport(){
     
     // Trigger the POST AJAX request when a button is clicked
     $.ajax({
-        url: "<?php echo admin_url('projects/project_init_report'); ?>",
+        url: "<?php echo admin_url('projects/'); ?>"+name,
         type: 'POST',
         data: {
             project_id: <?= $project->id ?>
@@ -673,6 +746,7 @@ function initReport(){
                     if(result.isConfirmed){
                         window.open(response.url, '_blank').focus();
                     }
+                    location.reload();
                 });
             }else{
                 Swal.close();

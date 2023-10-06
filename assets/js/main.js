@@ -1202,28 +1202,6 @@ $(function () {
           },
           responsive: true,
           maintainAspectRatio: false,
-          tooltips: {
-            enabled: true,
-            mode: "single",
-            callbacks: {
-              label: function (tooltipItems, data) {
-                return decimalToHM(tooltipItems.yLabel);
-              },
-            },
-          },
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                  min: 0,
-                  userCallback: function (label, index, labels) {
-                    return decimalToHM(label);
-                  },
-                },
-              },
-            ],
-          },
         },
       });
     }, 800);

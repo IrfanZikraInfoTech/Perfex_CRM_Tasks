@@ -81,7 +81,7 @@
                <div class="w-full h-[200px]">
                   <canvas id="clockInGoalChart"></canvas>
                   <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                     <span class="font-bold"><?= round(($report_data['actual_total_logged_in_time']) / ($report_data['total_loggable_hours'])*100) ?>%</span>
+                     <span class="font-bold"><?= ($report_data['total_loggable_hours'] > 0) ? round(($report_data['actual_total_logged_in_time']) / ($report_data['total_loggable_hours'])*100) : '0' ?>%</span>
                   </div>
                </div>
             </div>
@@ -134,27 +134,6 @@
   </div>
 </div>
 
-
-
-
-
-<!-- modal code  -->
-<div class="modal fade" id="staffModal" tabindex="-1" role="dialog" aria-labelledby="staffModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content bg-white rounded-lg shadow-xl">
-      <div class="modal-header bg-gray-200 p-4 flex justify-between items-center">
-        <div></div> <!-- Empty div for flex justification -->
-        <h5 class="modal-title text-2xl font-semibold text-gray-700 mx-auto" id="staffModalLabel"></h5>
-        <button type="button" class="close text-gray-600 hover:text-gray-800 text-2xl" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true" class="hover:text-red-500">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body p-6 text-lg">
-        <!-- Staff names will go here -->
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <!-- Bootstrap Modal -->

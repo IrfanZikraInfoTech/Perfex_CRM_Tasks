@@ -347,7 +347,7 @@
         <?php if (has_permission('projects', '', 'create')) { ?>
         <div class="row">
             <?php if ($project->billing_type == 3 || $project->billing_type == 2) { ?>
-            <div class="col-md-12 project-overview-logged-hours-finance">
+            <div class="col-md-12 project-overview-logged-hours-finance ">
                 <div class="panel_s !tw-mb-3">
                     <div class="panel-body !tw-px-5 !tw-py-4">
                         <div class="row">
@@ -395,8 +395,8 @@
             </div>
             <?php } ?>
         </div>
-        <div class="row">
-            <div class="col-md-12 project-overview-expenses-finance">
+        <div class="row hidden">
+            <div class="col-md-12 project-overview-expenses-finance ">
                 <div class="panel_s">
                     <div class="panel-body !tw-px-5 !tw-py-4">
                         <div class="row">

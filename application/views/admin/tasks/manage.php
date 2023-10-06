@@ -15,7 +15,7 @@
                 <a href="<?php if (!$this->input->get('project_id')) {
     echo admin_url('tasks/switch_kanban/' . $switch_kanban);
 } else {
-    echo admin_url('projects/view/' . $this->input->get('project_id') . '?group=project_tasks');
+    echo admin_url('projects/view/' . $this->input->get('project_id') . '?group=project_backlog');
 }; ?>" class="btn btn-default mleft10 pull-left hidden-xs" data-toggle="tooltip" data-placement="top"
                     data-title="<?php echo $switch_kanban == 1 ? _l('switch_to_list_view') : _l('leads_switch_to_kanban'); ?>">
                     <?php if ($switch_kanban == 1) { ?>

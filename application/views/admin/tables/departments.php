@@ -5,8 +5,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 $aColumns = [
     'departmentid',
     'name',
-    'email',
-    'calendar_id',
     ];
 $sIndexColumn = 'departmentid';
 $sTable       = db_prefix() . 'departments';

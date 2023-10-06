@@ -21,12 +21,16 @@ class Team_management extends AdminController {
 
     public function individual_stats()
     {
-
         $data['staff_members'] = $this->team_management_model->get_all_staff();
-        //$data['timers'] = $this->team_management_model->get_all_timers();
 
         $this->load->view('admin/management/individual_stats', $data);
     }
+
+    public function individual_dashboard(){
+        $data['staff_members'] = $this->team_management_model->get_all_staff();
+        $this->load->view('admin/management/Individual_Dashboard', $data);
+    }
+
     
 
     public function dashboard($month = null, $day = null)
