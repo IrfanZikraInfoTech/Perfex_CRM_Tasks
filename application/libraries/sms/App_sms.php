@@ -12,6 +12,7 @@ define('SMS_TRIGGER_PROPOSAL_EXP_REMINDER', 'proposal_expiration_reminder');
 define('SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_CUSTOMER', 'proposal_new_comment_to_customer');
 define('SMS_TRIGGER_PROPOSAL_NEW_COMMENT_TO_STAFF', 'proposal_new_comment_to_staff');
 define('SMS_TRIGGER_CONTRACT_EXP_REMINDER', 'contract_expiration_reminder');
+define('SMS_TRIGGER_CONTRACT_SIGN_REMINDER', 'contract_sign_reminder_to_customer');
 define('SMS_TRIGGER_STAFF_REMINDER', 'staff_reminder');
 
 define('SMS_TRIGGER_CONTRACT_NEW_COMMENT_TO_STAFF', 'contract_new_comment_to_staff');

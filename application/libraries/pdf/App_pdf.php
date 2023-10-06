@@ -233,8 +233,8 @@ abstract class App_pdf extends TCPDF
         $content = str_replace('float: left', 'text-align: left', $content);
 
         // Tcpdf does not support float css we need to adjust this here
-        $content = str_replace('float: right', 'text-align: right', $content);
-        $content = str_replace('float: left', 'text-align: left', $content);
+        $content = str_replace('float:right', 'text-align: right', $content);
+        $content = str_replace('float:left', 'text-align: left', $content);
 
         // Image center
         $content = str_replace('margin-left: auto; margin-right: auto;', 'text-align:center;', $content);

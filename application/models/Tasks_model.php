@@ -2101,6 +2101,13 @@ class Tasks_model extends App_Model
 
     public function task_tracking_stats($id)
     {
+        $this->db->select('estimated_hours');
+        $this->db->where('id', $id);
+        $query = $this->db->get('tbltasks');
+        $row = $query->row();
+        $estimated = $row->estimated_hours;
+
+
         $loggers    = $this->db->query('SELECT DISTINCT(staff_id) FROM ' . db_prefix() . 'taskstimers WHERE task_id=' . $this->db->escape_str($id))->result_array();
         $labels     = [];
         $labels_ids = [];
@@ -2114,12 +2121,24 @@ class Tasks_model extends App_Model
                 [
                     'label' => _l('task_stats_logged_hours'),
                     'data'  => [],
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                    'borderColor' => 'rgb(54, 162, 235)'
+                ],
+                [
+                    'label' => 'Esimated Hours',
+                    'data'  => [],
+                    'backgroundColor' => 'rgba(255, 99, 132, 0.2)',
+                    'borderColor' => 'rgb(255, 99, 132)'
                 ],
             ],
         ];
         $i = 0;
         foreach ($labels_ids as $staffid) {
+
             $chart['datasets'][0]['data'][$i] = sec2qty($this->calc_task_total_time($id, ' AND staff_id=' . $staffid));
+
+            $chart['datasets'][1]['data'][$i] = $estimated;
+
             $i++;
         }
 

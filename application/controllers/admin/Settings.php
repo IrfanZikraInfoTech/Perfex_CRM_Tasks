@@ -216,4 +216,15 @@ class Settings extends AdminController
             'success' => delete_option($name),
         ]);
     }
+
+    public function clear_sessions()
+    {
+        if (!has_permission('settings', '', 'delete')) {
+            access_denied('settings');
+        }
+        $this->db->empty_table(db_prefix() . 'sessions');
+
+        set_alert('success', 'Sessions Cleared');
+            redirect(admin_url('settings?group=info'));
+    }
 }

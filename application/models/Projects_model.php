@@ -426,11 +426,11 @@ class Projects_model extends App_Model
 
     public function get_files($project_id)
     {
-        if (is_client_logged_in()) {
+                if (is_client_logged_in()) {
             $this->db->where('visible_to_customer', 1);
         }
         $this->db->where('project_id', $project_id);
-
+                
         return $this->db->get(db_prefix() . 'project_files')->result_array();
     }
 
@@ -2674,11 +2674,14 @@ class Projects_model extends App_Model
         return $query->row();
     }
     
-    public function get_stories($type, $type_id) {
+    public function get_stories($type, $type_id, $all_epics = false) {
         $this->db->select('id');
+
         $this->db->where($type.'_id', $type_id);
 
-        ($type == "epic") ? $this->db->where('sprint_id IS NULL') : '';
+        if(!$all_epics){
+            ($type == "epic") ? $this->db->where('sprint_id IS NULL') : '';
+        }
 
         $query = $this->db->get('tbltasks');
         return $query->result();

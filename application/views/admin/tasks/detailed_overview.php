@@ -11,7 +11,7 @@
                         <a href="<?php echo admin_url('tasks'); ?>"
                             class="btn btn-default tw-mt-0.5"><?php echo _l('back_to_tasks_list'); ?></a>
                         <?php } else { ?>
-                        <a href="<?php echo admin_url('projects/view/' . $this->input->get('project_id') . '?group=project_tasks'); ?>"
+                        <a href="<?php echo admin_url('projects/view/' . $this->input->get('project_id') . '?group=project_backlog'); ?>"
                             class="btn btn-default tw-mt-0.5"><?php echo _l('back_to_project'); ?></a>
                         <?php } ?>
                     </div>

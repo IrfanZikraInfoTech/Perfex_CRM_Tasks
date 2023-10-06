@@ -235,7 +235,8 @@ class Projects extends AdminController
 
             $data['staff']   = $this->staff_model->get('', ['active' => 1]);
             $percent         = $this->projects_model->calc_progress($id);
-            $data['members'] = $this->projects_model->get_project_members($id);
+            $data['members'] = $this->projects_model->get_project_members($id, true);
+
             foreach ($data['members'] as $key => $member) {
                 $data['members'][$key]['total_logged_time'] = 0;
                 $member_timesheets                          = $this->tasks_model->get_unique_member_logged_task_ids($member['staff_id'], ' AND task_id IN (SELECT id FROM ' . db_prefix() . 'tasks WHERE rel_type="project" AND rel_id="' . $this->db->escape_str($id) . '")');
@@ -244,6 +245,7 @@ class Projects extends AdminController
                     $data['members'][$key]['total_logged_time'] += $this->tasks_model->calc_task_total_time($member_task->task_id, ' AND staff_id=' . $member['staff_id']);
                 }
             }
+            
             $data['bodyclass'] = '';
 
             $this->app_scripts->add(
@@ -427,6 +429,62 @@ class Projects extends AdminController
 
                 
 
+            }elseif($group == 'project_dashboard'){
+
+                $data['epics'] = $this->projects_model->get_epics($id);
+                foreach ($data['epics'] as $epic) {
+                    $epic->stories = $this->projects_model->get_stories('epic', $epic->id, true);
+                    $epic->estimated_time = 0;
+                    $epic->total_time_spent = 0;
+                    foreach($epic->stories as &$story) {
+                        $story = $this->tasks_model->get($story->id);
+                        
+                        $epic->estimated_time += $story->estimated_hours;
+
+                        $story->total_time_spent = 0;
+                        
+                        foreach ($story->timesheets as $timesheet) {
+                            $epic->total_time_spent += $timesheet['time_spent'];
+                            $story->total_time_spent += $timesheet['time_spent'];
+                        }
+                    }
+                }
+
+                $data['sprints'] = $this->projects_model->get_sprints($id);
+                foreach ($data['sprints'] as $sprint) {
+                    $sprint->stories = $this->projects_model->get_stories('sprint', $sprint->id);
+                    
+                    $sprint->not_started_count = 0;
+                    $sprint->in_progress_count = 0;
+                    $sprint->completed_count = 0;
+                    $sprint->estimated_time = 0;
+                    $sprint->total_time_spent = 0;
+
+                    foreach($sprint->stories as &$story) {
+                        $story = $this->tasks_model->get($story->id);
+
+                        $sprint->estimated_time += $story->estimated_hours;
+
+                        $story->total_time_spent = 0;
+
+                        foreach ($story->timesheets as $timesheet) {
+                            $sprint->total_time_spent += $timesheet['time_spent'];
+                            $story->total_time_spent += $timesheet['time_spent'];
+                        }
+
+                        if ($story->status == 1) {
+                            $sprint->not_started_count++;
+                        } elseif ($story->status == 4) {
+                            $sprint->in_progress_count++;
+                        } elseif ($story->status == 5) {
+                            $sprint->completed_count++;
+                        }
+                    }
+                }
+
+
+
+
             }
 
             // Discussions
@@ -498,7 +556,10 @@ class Projects extends AdminController
         $data['discussion_user_profile_image_url'] = staff_profile_image_url(get_staff_user_id());
         $data['current_user_is_admin']             = is_admin();
 
+
         $data['file'] = $this->projects_model->get_file($id, $project_id);
+
+        
 
         if (!$data['file']) {
             header('HTTP/1.0 404 Not Found');
@@ -677,9 +738,9 @@ class Projects extends AdminController
         }
     }
 
-    public function upload_file($project_id)
+    public function upload_file($project_id, $story_id = null)
     {
-        handle_project_file_uploads($project_id);
+        handle_project_file_uploads($project_id, $story_id);
     }
 
     public function change_file_visibility($id, $visible)
@@ -1504,7 +1565,8 @@ class Projects extends AdminController
         echo json_encode(['success' => $success, 'message' => $message]);
     }
 
-    public function project_init_report(){
+
+    public function init_report(){
         try {
             $project_id = $this->input->post('project_id');
     
@@ -1552,6 +1614,9 @@ class Projects extends AdminController
             $response = $docs->documents->batchUpdate($documentId, $batchUpdateRequest);
     
             $documentUrl = 'https://docs.google.com/document/d/' . $documentId . '/edit';
+
+            $this->db->where('id', $project_id);
+            $this->db->update(db_prefix() . 'projects', ['init_report'  => $documentId]);
     
             echo json_encode(['success' => true, 'url' => $documentUrl]);
         } catch (Google_Service_Exception $e) {
@@ -1565,7 +1630,70 @@ class Projects extends AdminController
         }
     }
     
+    public function final_report(){
+        try {
+            $project_id = $this->input->post('project_id');
     
+            $project = $this->projects_model->get($project_id);
+    
+            if(!$project){
+                throw new Exception('Project not found!');
+            }
+    
+            $client = $this->custom_google_client;
+            $client->setClientId('769395247432-st7i60r55cm9sifnt3n4mmuspd41n4hp.apps.googleusercontent.com');
+            $client->setClientSecret('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');
+            $client->setRedirectUri(base_url('authentication/google_callback'));
+    
+            $accessToken = $this->session->userdata('google_access_token');
+            if ($accessToken) {
+                $client->setAccessToken($accessToken);
+            } else {
+                throw new Exception('Authentication required!');
+            }
+    
+            $driveService = new Google_Service_Drive($client);
+            $copy = new Google_Service_Drive_DriveFile(array(
+                'name' => 'Project 1',
+            ));
+            $driveResponse = $driveService->files->copy('1cVxEz72j7k76TYOijtt8dNvgnTevNnn-U4cyelTR-oI', $copy);
+            $documentId = $driveResponse->getId();
+    
+            $docs = new Google_Service_Docs($client);
+            $requests = [
+                new Google_Service_Docs_Request([
+                    'replaceAllText' => [
+                        'containsText' => [
+                            'text' => '{project_name}',
+                            'matchCase' => true,
+                        ],
+                        'replaceText' => 'Project 1',
+                    ],
+                ]),
+            ];
+    
+            $batchUpdateRequest = new Google_Service_Docs_BatchUpdateDocumentRequest([
+                'requests' => $requests,
+            ]);
+            $response = $docs->documents->batchUpdate($documentId, $batchUpdateRequest);
+    
+            $documentUrl = 'https://docs.google.com/document/d/' . $documentId . '/edit';
+
+            $this->db->where('id', $project_id);
+            $this->db->update(db_prefix() . 'projects', ['final_report'  => $documentId]);
+    
+            echo json_encode(['success' => true, 'url' => $documentUrl]);
+
+        } catch (Google_Service_Exception $e) {
+            // Google API error
+            $errors = $e->getErrors();
+            $errorMessage = isset($errors[0]) ? $errors[0]['message'] : 'An error occurred';
+            echo json_encode(['success' => false, 'message' => $errorMessage]);
+        } catch (Exception $e) {
+            // General PHP error
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
     
 
 }

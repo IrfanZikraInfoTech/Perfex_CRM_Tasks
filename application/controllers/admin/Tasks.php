@@ -564,6 +564,9 @@ class Tasks extends AdminController
     public function task_tracking_stats($task_id)
     {
         $data['stats'] = json_encode($this->tasks_model->task_tracking_stats($task_id));
+
+        
+
         $this->load->view('admin/tasks/tracking_stats', $data);
     }
 

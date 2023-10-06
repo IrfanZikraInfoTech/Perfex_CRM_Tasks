@@ -26,7 +26,7 @@ CREATE TABLE tblsprints (
 ALTER TABLE tbltasks
 ADD COLUMN epic_id INT DEFAULT NULL,
 ADD COLUMN sprint_id INT DEFAULT NULL,
-ADD COLUMN estimated_hours DECIMAL NULL,
+ADD COLUMN estimated_hours DECIMAL DEFAULT '0' NULL,
 ADD COLUMN closing_summary TEXT NULL;
 
 ALTER TABLE tblprojects
@@ -44,3 +44,16 @@ CREATE TABLE tblprojecttemplates (
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL
 );
+
+alter table tblfiles add column description text null;
+
+alter table tblprojects add column init_report text null;
+alter table tblprojects add column final_report text null;
+alter table tblproject_files add column story_id int null;
+
+--
+ALTER TABLE tblstaff ADD date_of_birth DATE;
+ALTER TABLE tblstaff ADD Address TEXT;
+ALTER TABLE tblstaff ADD staff_salary INT;
+ALTER TABLE tblstaff ADD staff_title VARCHAR(255);
+ALTER TABLE tblstaff ADD report_to INT DEFAULT(1);

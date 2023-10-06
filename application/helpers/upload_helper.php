@@ -155,7 +155,7 @@ function handle_newsfeed_post_attachments($postid)
  * @param  mixed $project_id project id
  * @return boolean
  */
-function handle_project_file_uploads($project_id , $folder_id)
+function handle_project_file_uploads($project_id, $story_id = null)
 {
     $filesIDS = [];
     $errors   = [];
@@ -214,9 +214,8 @@ function handle_project_file_uploads($project_id , $folder_id)
                             'staffid'    => $staffid,
                             'contact_id' => $contact_id,
                             'subject'    => $originalFilename,
-                            'project_folder_id' => $folder_id,  // the new field
-
-                        ];
+                            'story_id' => $story_id
+                                                    ];
                     if (is_client_logged_in()) {
                         $data['visible_to_customer'] = 1;
                     } else {
@@ -263,12 +262,7 @@ function handle_project_file_uploads($project_id , $folder_id)
 
     return false;
 }
-
-
-
-
 /**
-
 * Handle contract attachments if any
  * @param  mixed $contractid
  * @return boolean

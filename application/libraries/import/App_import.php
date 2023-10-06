@@ -694,6 +694,9 @@ abstract class App_import
             }
 
             if ($row[$fieldNumber] != '' && $row[$fieldNumber] !== 'NULL' && $row[$fieldNumber] !== 'null') {
+if ($field['type'] === 'link' && !\app\services\utilities\Str::isHtml($row[$fieldNumber])) {
+                    $row[$fieldNumber] = sprintf('<a href="%s" target="_blank">%s</a>', $row[$fieldNumber], $row[$fieldNumber]);
+                }
                 $customFieldData = [
                                         'relid'   => $rel_id,
                                         'fieldid' => $field['id'],
