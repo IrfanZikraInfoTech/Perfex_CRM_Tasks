@@ -178,14 +178,14 @@
                                     <input type="email" class="form-control" name="personal_email_address" value="<?php if (isset($member)) { echo $member->personal_email_address; } ?>">
                                 </div>
                                 <div class="form-group">
-                                    <label for="CNIC_Number" class="control-label">CNIC Number</label>
-                                    <input type="text" class="form-control" name="CNIC_Number" value="<?php if (isset($member)) { echo $member->CNIC_Number; } ?>">
+                                    <label for="national_identity" class="control-label">National Identity</label>
+                                    <input type="text" class="form-control" name="national_identity" value="<?php if (isset($member)) { echo $member->national_identity; } ?>">
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="emergency_Contact_name" class="control-label">Emergency Contact Name:</label>
-                                            <input type="text" class="form-control" name="emergency_Contact_name" value="<?php if (isset($member)) { echo $member->emergency_Contact_name; } ?>">
+                                            <label for="emergency_contact_name" class="control-label">Emergency Contact Name:</label>
+                                            <input type="text" class="form-control" name="emergency_contact_name" value="<?php if (isset($member)) { echo $member->emergency_contact_name; } ?>">
                                         </div>
                                     </div>
                                     <div class="col-md-6">                         
@@ -211,21 +211,21 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="Next_of_KIN" class="control-label">Next To Kin</label>
-                                    <input type="text" <?php if (has_permission('staff', '', 'edit')) { ?> name="Next_of_KIN"
+                                    <label for="next_of_kin" class="control-label">Next To Kin</label>
+                                    <input type="text" <?php if (has_permission('staff', '', 'edit')) { ?> name="next_of_kin"
                                         <?php } else { ?> disabled="true" <?php } ?> class="form-control"
-                                        value="<?php echo $member->Next_of_KIN; ?>" id="Next_of_KIN">
+                                        value="<?php echo $member->next_of_kin; ?>" id="next_of_kin">
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group select-placeholder">
-                                            <label for="Marital_Status">Marital Status:</label>
+                                            <label for="marital_status">Marital Status:</label>
                                             <select class="selectpicker"
                                                 data-live-search="true"
                                                 data-none-selected-text="<?php echo _l('system_default_string'); ?>" data-width="100%"
-                                                name="Marital_Status" id="Marital_Status">
-                                                <option value="Single" <?php if(isset($member) && $member->Marital_Status == 'Single') { echo 'selected'; } ?>>Single</option>
-                                                <option value="Married" <?php if(isset($member) && $member->Marital_Status == 'Married') { echo 'selected'; } ?>>Married</option>
+                                                name="marital_status" id="marital_status">
+                                                <option value="Single" <?php if(isset($member) && $member->marital_status == 'Single') { echo 'selected'; } ?>>Single</option>
+                                                <option value="Married" <?php if(isset($member) && $member->marital_status == 'Married') { echo 'selected'; } ?>>Married</option>
                                             </select>
                                         </div>
                                     </div>

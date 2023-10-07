@@ -196,20 +196,6 @@ class Team_management extends AdminController {
     
     //Methods
 
-    public function update_google_chat_id(){
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-            $postData = $this->input->post();
-        
-            foreach ($postData as $staffId => $googleChatUserId) {
-                // Update each ID
-                $this->team_management_model->update_or_insert_google_chat_id($staffId, $googleChatUserId);
-            }
-
-            echo json_encode(['status' => 'success']);
-        }        
-    }
-    
 
     public function save_shift_timings() {
 
@@ -379,12 +365,15 @@ class Team_management extends AdminController {
                 // Check if the staff member is on leave
                 if ($this->team_management_model->is_on_leave($staff_id, date('Y-m-d H:i:s'))) {
                     // Log message that the user is on leave
-                    $tag = $this->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
+
+                    $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
+
                     $message = sprintf("😴 *<users/%s>* is on leave today. 🌴", $tag);
+
                     $this->webhook_lib->send_chat_webhook($message, 'workingHours');
                 } else {
                     // Log shift timings
-                    $tag = $this->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
+                    $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
 
                     $shift_number = $shift['shift_number'];
                     $start_time = $shift['shift_start_time'];
@@ -410,7 +399,7 @@ class Team_management extends AdminController {
             // format the date for readability
             $formatted_date = date('g:i A');
 
-            $tag = $this->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
+            $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
 
             $message = sprintf("👋 <users/%s> is `Clocking In` 🕒 *at*: %s", $tag, $formatted_date);
          
@@ -438,7 +427,7 @@ class Team_management extends AdminController {
             // format the date for readability
             $formatted_date = date('g:i A');
 
-            $tag = $this->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
+            $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
 
             $message = sprintf("🏃‍♂️ <users/%s> is `Clocking Out` 🕒 *at*: %s", $tag, $formatted_date);
          
@@ -471,9 +460,8 @@ class Team_management extends AdminController {
 
         // format the date for readability
         $formatted_date = date('g:i A');
-        $message = "NULL";
 
-        $tag = $this->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
+        $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
 
         // choose the right phrase depending on the status
         if ($status === 'AFK') {
@@ -485,7 +473,7 @@ class Team_management extends AdminController {
             $message = sprintf("*🎉 Yay!* <users/%s> is back `Online` 🕒 *at*: %s after *%s* ⏱️", $tag, $formatted_date, $duration);
         }
 
-        if($status != "Leave"){
+        if($status != "Leave" && $status != "Offline"){
             $this->webhook_lib->send_chat_webhook($message, "afk");
         }
         
@@ -644,7 +632,7 @@ class Team_management extends AdminController {
             $this->team_management_model->save_staff_summary($staff_id, $summary, $date);
     
             $formatted_date = date('g:i A');
-            $tag = $this->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
+            $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
             $message = sprintf("📝✨ <users/%s> just shared their daily summary 🕑 *at*: %s\n\n📋*Summary*:\n%s", $tag, $formatted_date, $summary);
             $this->webhook_lib->send_chat_webhook($message, "eos");
         
@@ -660,79 +648,12 @@ class Team_management extends AdminController {
         }
     }
 
-    public function userDataAPI_cron_access($api_key, $staffChatId) {
-        if($api_key != $this->cronAPI()){
-            return;
-        }
-
-        $staffId = $this->team_management_model->id_to_name($staffChatId, 'tbl_staff_google_chat', 'google_chat_user_id', 'staff_id');
-    
-        $today = date('Y-m-d');
-    
-        $output = [];
-        $output['Shifts_Today'] = $this->team_management_model->get_shift_timings_of_date($today, $staffId);
-        $output['Clocked_Times'] = $this->team_management_model->get_staff_time_entries($staffId, $today);
-        $output['Task_Timers'] = $this->team_management_model->get_staff_task_timers($staffId, $today);
-
-        $tasksRemaining = $this->team_management_model->get_incomplete_or_today_tasks($staffId);
-    
-        // Iterate over the tasks to modify each task array
-        foreach ($tasksRemaining as $key => $task) {
-
-            $taskArray = (array) $task;
-
-            // Remove unwanted properties
-            unset($taskArray['visible_to_client']);
-            unset($taskArray['milestone_order']);
-            unset($taskArray['kanban_order']);
-            unset($taskArray['milestone']);
-            unset($taskArray['hourly_rate']);
-            unset($taskArray['invoice_id']);
-            unset($taskArray['billed']);
-            unset($taskArray['billable']);
-            unset($taskArray['last_recurring_date']);
-            unset($taskArray['cycles']);
-            unset($taskArray['total_cycles']);
-            unset($taskArray['is_added_from_contact']);
-            unset($taskArray['recurring_type']);
-            unset($taskArray['repeat_every']);
-            unset($taskArray['recurring']);
-            unset($taskArray['is_recurring_from']);
-            unset($taskArray['custom_recurring']);
-            unset($taskArray['is_public']);
-            unset($taskArray['deadline_notified']);
-            unset($taskArray['duedate']);
-            unset($taskArray['rel_type']);
-            unset($taskArray['rel_id']);
-            unset($taskArray['dateadded']);
-            
-
-    
-            // Add statusText property
-            $taskArray['status'] = format_task_status($taskArray['status'], null, true);  // You can modify this line as per your logic to get status text
-    
-            // Change addedfrom's user id to user_name
-            $taskArray['addedfrom'] = $this->team_management_model->id_to_name($taskArray['addedfrom'], 'tblstaff', 'staffid', 'firstname');
-        
-            $tasksRemaining[$key] = $taskArray;
-        }
-    
-        // Overwrite the tasks in the output array with the modified tasks
-        $output['TasksAssgined'] = $tasksRemaining;
-
-        $output['Status'] = $this->team_management_model->get_status($staffId);
-    
-        header('Content-Type: application/json');
-    
-        echo json_encode($output);
-    }
-    
     public function reminderAPI_cron_access($api_key, $staffChatId) {
         if($api_key != $this->cronAPI()){
             return;
         }
 
-        $staffId = $this->team_management_model->id_to_name($staffChatId, 'tbl_staff_google_chat', 'google_chat_user_id', 'staff_id');
+        $staffId = $this->team_management_model->id_to_name($staffChatId, 'tblstaff', 'google_chat_id', 'staffid');
     
         $today = date('Y-m-d');
 
@@ -772,85 +693,6 @@ class Team_management extends AdminController {
         header('Content-Type: application/json');
     
         echo json_encode($output);
-    }
-
-    public function buddy_logs_cron_access() {
-        // Fetch all staff members from the database
-        $staffMembers = $this->team_management_model->get_staff_chat_ids();
-        shuffle($staffMembers);
-        $numStaffMembers = count($staffMembers);
-    
-        // Fetch the previous pairs from the database
-        $history = $this->team_management_model->get_pair_history();
-    
-        // Convert history into an associative array for quick lookup
-        $historyDict = array();
-        foreach ($history as $oldPair) {
-            $historyDict[$oldPair['staff_tag_1'] . '-' . $oldPair['staff_tag_2']] = true;
-        }
-    
-        // If we don't have enough new pairs, clear history and pair everyone with everyone else
-        if (count($historyDict) >= $numStaffMembers * ($numStaffMembers - 1) / 2) {
-            $this->team_management_model->clear_pair_history();
-            $historyDict = array();
-        }
-    
-        // List to store new pairs
-        $newPairs = array();
-    
-        // Array to keep track of paired staff members
-        $pairedStaffMembers = array();
-    
-        for ($i = 0; $i < $numStaffMembers; $i++) {
-            for ($j = $i + 1; $j < $numStaffMembers; $j++) {
-                $pair = [$staffMembers[$i]['google_chat_user_id'], $staffMembers[$j]['google_chat_user_id']];
-                sort($pair);
-    
-                // Check if this pair is already in history, and none of the staff members are already paired
-                if (!isset($historyDict[$pair[0] . '-' . $pair[1]]) &&
-                    !isset($pairedStaffMembers[$pair[0]]) &&
-                    !isset($pairedStaffMembers[$pair[1]])) {
-                    // Add pair to new pairs list
-                    $newPairs[] = $pair;
-                    // Mark staff members as paired
-                    $pairedStaffMembers[$pair[0]] = true;
-                    $pairedStaffMembers[$pair[1]] = true;
-    
-                    // If we have enough new pairs, break the loops
-                    if (count($newPairs) == floor($numStaffMembers / 2)) {
-                        break 2;
-                    }
-                }
-            }
-        }
-    
-        // If there are unpaired staff members left, pair them randomly
-        $unpairedStaffMembers = array();
-        foreach ($staffMembers as $staffMember) {
-            if (!isset($pairedStaffMembers[$staffMember['google_chat_user_id']])) {
-                $unpairedStaffMembers[] = $staffMember['google_chat_user_id'];
-            }
-        }
-        shuffle($unpairedStaffMembers);
-        while (count($unpairedStaffMembers) >= 2) {
-            $pair = array_splice($unpairedStaffMembers, 0, 2);
-            $pair['is_dup'] = true;
-            $newPairs[] = $pair;
-        }
-        $count = 0;
-        // Store and print the new pairs
-        foreach ($newPairs as $pair) {
-
-            $message = "👥 *Coffee Break Pair*\n";
-            $message .= "-------------------\n";
-            $message .= "<users/" . $pair[0] . "> and <users/" . $pair[1] . ">";
-
-            $this->webhook_lib->send_chat_webhook($message, "buddy");
-
-            if(!isset($pair['is_dup']) && $pair['is_dup'] != true){
-                $this->team_management_model->save_pair_history($pair[0], $pair[1]);
-            }
-        }
     }
 
     public function submit_application() {
@@ -1182,6 +1024,10 @@ class Team_management extends AdminController {
         //header('Content-Type: application/json');
         echo json_encode($response);
     }
+
+    public function staff_under($id){
+        print_r(get_staff_above($id));
+    }
         
     
     // Function to compute factorial (used to calculate total possible pairs)
@@ -1192,7 +1038,6 @@ class Team_management extends AdminController {
         }
         return $fact;
     }
-    
 
   
     public function test_late($staff_id, $date){

@@ -155,7 +155,16 @@ function get_staff_above($staff_id){
 
     $staff_ids_above = [];
 
-    $is_hr = ($CI->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'department_id') == 5);
+    $is_hr = false;
+    $department = $CI->db->select('departmentid')
+                        ->from('tblstaff_departments')
+                        ->where('staffid', $staff_id)
+                        ->get()->row();
+
+    if($department && $department->departmentid == 3) {
+        $is_hr = true;
+    }
+
 
     if(is_admin($staff_id)){
         $staff_above = $CI->staff_model->get('', ['staffid !=' => $staff_id, 'admin'=>1]);
@@ -182,7 +191,12 @@ function get_staff_above($staff_id){
             $staff_ids_above[] = $admin['staffid'];
         }
 
-        $hrs = $CI->staff_model->get('', ['active'=>1, 'department_id' => 5]);
+        $hrs = $CI->db->select('tblstaff.*')
+              ->from('tblstaff')
+              ->join('tblstaff_departments', 'tblstaff.staffid = tblstaff_departments.staffid')
+              ->where('tblstaff_departments.departmentid', 3)
+              ->where('tblstaff.active', 1)
+              ->get()->result_array();
 
         foreach($hrs as $hr){
             $staff_ids_above[] = $hr['staffid'];
@@ -197,14 +211,24 @@ function get_staff_above($staff_id){
 
 
 function get_staff_under($staff_id){
-        
+
     $CI = &get_instance();
     $CI->load->model('staff_model');
     $CI->load->model('team_management_model');
 
-    $is_hr = ($CI->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'department_id') == 5);
+    $is_hr = false;
+    $department = $CI->db->select('departmentid')
+                          ->from('tblstaff_departments')
+                          ->where('staffid', $staff_id)
+                          ->get()->row();
+    
+    if($department && $department->departmentid == 3) {
+        $is_hr = true;
+    }
+    
 
     if(is_admin($staff_id)){
+        
         $staff_under = $CI->staff_model->get('', ['staffid !=' => $staff_id, 'staffid !=' => 1]);
     }else if($is_hr){
         $staff_under = $CI->staff_model->get('', ['active' => 1, 'staffid !=' => $staff_id , 'admin' => 0]);
@@ -212,8 +236,14 @@ function get_staff_under($staff_id){
         $staff_under =  $CI->staff_model->get('', ['active' => 1, 'report_to' => $staff_id]);
     }
 
-    foreach($staff_under as &$staff){
+    foreach($staff_under as $id => &$staff){
+
         $staff = $staff['staffid'];
+
+        if($staff == $staff_id){
+            unset($staff_under[$id]);
+        }
+        
     }
 
     return $staff_under;

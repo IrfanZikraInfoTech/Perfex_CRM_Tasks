@@ -39,9 +39,9 @@ function convertSecondsToRoundedTime($seconds)
         
         <?php  foreach ($departments as $department): ?>
 
-            <div class="rounded-[40px] border-2 bg-white border-white border-solid">
+            <div class="rounded-[40px] bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all">
 
-            <h2 class="text-2xl pl-7 uppercase font-semibold py-4"><?php echo $department->name; ?></h2>
+            <h2 class="text-xl pl-7 uppercase font-bold text-gray-800 text-center py-4"><?php echo $department->name; ?></h2>
             
             <div class="px-5 pb-5">
                 <?php $staff_members = $this->team_management_model->get_staff_by_department($department->departmentid); 
@@ -50,7 +50,7 @@ function convertSecondsToRoundedTime($seconds)
                     <div class="p-5 rounded-[40px] bg-gray-100 flex flex-row flex-wrap gap-10">
                     <?php  foreach ($staff_members as $staff): ?>
                         <!-- Your staff card code starts here -->
-                        <div class="flex flex-col bg-white xl:w-1/4 2xl:w-1/5 lg:w-1/3 md:w-[40%] w-full rounded-[30px] overflow-hidden transform transition-all duration-500 ease-in-out hover:scale-[0.97] shadow-md hover:shadow-lg">
+                        <div class="flex flex-col bg-white xl:w-1/4 2xl:w-1/5 lg:w-1/3 md:w-[40%] w-full rounded-[30px] overflow-hidden transition-all duration-500 ease-in-out hover:scale-[0.97] shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400">
                             <div class="flex justify-center items-center p-4 bg-gray-200">
                                 <?php echo staff_profile_image($staff->staffid, ['h-48', 'w-48', 'rounded-full', 'object-cover'], 'thumb'); ?>
                             </div>

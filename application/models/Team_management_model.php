@@ -1989,37 +1989,6 @@ class Team_management_model extends App_Model
     }
     
 
-    // Save a pair to the history
-    public function save_pair_history($staff_tag_1, $staff_tag_2) {
-        $this->db->insert(db_prefix() . '_staff_pair_history', [
-            'staff_tag_1' => $staff_tag_1,
-            'staff_tag_2' => $staff_tag_2,
-            'paired_at' => date('Y-m-d H:i:s')
-        ]);
-    }
-
-    // Get all pairs from the history
-    public function get_pair_history() {
-        return $this->db->get(db_prefix() . '_staff_pair_history')->result_array();
-    }
-
-    // Clear the pair history
-    public function clear_pair_history() {
-        $this->db->empty_table(db_prefix() . '_staff_pair_history');
-    }
-
-    // Get all pairs from the history
-    public function get_staff_chat_ids() {
-
-        $this->db->select('*');
-        $this->db->from('tbl_staff_google_chat');
-        $this->db->join('tblstaff', 'tbl_staff_google_chat.staff_id = tblstaff.staffid', 'inner');
-        
-        return $this->db->get()->result_array();
-    }
-
-    
-
     public function check_staff_late($staff_id, $date){
 
 

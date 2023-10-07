@@ -57,13 +57,14 @@ ALTER TABLE tblstaff ADD Address TEXT;
 ALTER TABLE tblstaff ADD staff_salary INT;
 ALTER TABLE tblstaff ADD staff_title VARCHAR(255);
 ALTER TABLE tblstaff ADD report_to INT DEFAULT(1);
+
 ALTER TABLE tblstaff ADD gender VARCHAR(10) ;
-ALTER TABLE tblstaff ADD Marital_Status VARCHAR(50);
-ALTER TABLE tblstaff ADD CNIC_Number VARCHAR(30) ;
-ALTER TABLE tblstaff ADD emergency_Contact_name VARCHAR(255) NULL, 
+ALTER TABLE tblstaff ADD marital_status VARCHAR(50);
+ALTER TABLE tblstaff ADD national_identity VARCHAR(30) ;
+ALTER TABLE tblstaff ADD emergency_contact_name VARCHAR(255) NULL, 
 ALTER TABLE tblstaff ADD emergency_contact_number VARCHAR(50) NULL;
 ALTER TABLE tblstaff ADD personal_email_address VARCHAR(255) NULL;
 ALTER TABLE tblstaff ADD  bank_name VARCHAR(255) NULL;
 ALTER TABLE tblstaff ADD  bank_acc_no VARCHAR(50) NULL;
-ALTER TABLE tblstaff ADD Next_of_KIN VARCHAR(255) NULL;
+ALTER TABLE tblstaff ADD next_of_kin VARCHAR(255) NULL;
 ALTER TABLE tblstaff ADD google_chat_id VARCHAR(255) NULL;
