@@ -147,6 +147,92 @@ function staff_can($capability, $feature = null, $staff_id = '')
     return hooks()->apply_filters('staff_can', false, $capability, $feature, $staff_id);
 }
 
+function get_staff_above($staff_id){
+        
+    $CI = &get_instance();
+    $CI->load->model('staff_model');
+    $CI->load->model('team_management_model');
+
+    $staff_ids_above = [];
+
+    $is_hr = ($CI->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'department_id') == 5);
+
+    if(is_admin($staff_id)){
+        $staff_above = $CI->staff_model->get('', ['staffid !=' => $staff_id, 'admin'=>1]);
+        foreach($staff_above as $staff){
+            $staff_ids_above[] = $staff['staffid'];
+        }
+    }else if($is_hr){
+
+        $staff_above = $CI->staff_model->get('', ['admin' => 1]);
+
+        foreach($staff_above as $staff){
+            $staff_ids_above[] = $staff['staffid'];
+        }
+
+    }else{
+
+        $report_to = $CI->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'report_to');
+
+        $staff_ids_above[] = $report_to;
+
+        $admins =  $CI->staff_model->get('', ['admin' => 1]);
+
+        foreach($admins as $admin){
+            $staff_ids_above[] = $admin['staffid'];
+        }
+
+        $hrs = $CI->staff_model->get('', ['active'=>1, 'department_id' => 5]);
+
+        foreach($hrs as $hr){
+            $staff_ids_above[] = $hr['staffid'];
+        }
+
+    }
+
+    $staff_ids_above = array_unique($staff_ids_above);
+
+    return $staff_ids_above;
+}
+
+
+function get_staff_under($staff_id){
+        
+    $CI = &get_instance();
+    $CI->load->model('staff_model');
+    $CI->load->model('team_management_model');
+
+    $is_hr = ($CI->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'department_id') == 5);
+
+    if(is_admin($staff_id)){
+        $staff_under = $CI->staff_model->get('', ['staffid !=' => $staff_id, 'staffid !=' => 1]);
+    }else if($is_hr){
+        $staff_under = $CI->staff_model->get('', ['active' => 1, 'staffid !=' => $staff_id , 'admin' => 0]);
+    }else{
+        $staff_under =  $CI->staff_model->get('', ['active' => 1, 'report_to' => $staff_id]);
+    }
+
+    foreach($staff_under as &$staff){
+        $staff = $staff['staffid'];
+    }
+
+    return $staff_under;
+}
+
+
+function has_staff_under(){
+
+    $staff_id = get_staff_user_id();
+
+    $staff = get_staff_under($staff_id);
+
+    if(count($staff) > 0){
+        return true;
+    }else{
+        return false;
+    }
+}
+
 /**
  * @since  2.3.3
  * Check whether a role has specific permission applied

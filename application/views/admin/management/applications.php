@@ -11,11 +11,60 @@
                 <h2 class="text-3xl font-bold text-center">Application Form</h2>
             </div>
 
-            <div class="flex flex-row gap-4">
-                <div>Paid Leaves: <?php echo 7 - $paid_no; ?></div>
-                <div>Unpaid Leaves: <?php echo 10 - $unpaid_no; ?></div>
-                <div>Gazetted Leaves: <?php echo 5 - $gaz_no; ?></div>
+
+            <div class="grid grid-cols-3 gap-6 mb-10">
+                <!-- Paid Leaves Details -->
+                <div class="bg-blue-100 rounded-lg p-4 shadow">
+                    <?php 
+                    $paidDifference = (int)get_option('paid_leaves') - (int)$app_paid_no;
+                    $paidDisplayText = $paidDifference >= 0 ? $paidDifference . " left" : abs($paidDifference) . " Exceeded";
+                    ?>
+                    <div class="flex flex-row justify-between">
+                        <h3 class="text-xl font-bold mb-2">Paid Leaves:</h3>
+                        <div><h2 class="px-4 flex items-center justify-center h-5 rounded-full bg-white text-black"><?= $paidDisplayText ?></h2></div>
+                    </div>
+                    <div class="text-lg font-semibold flex xl:flex-row flex-col justify-between">
+                        <div>Pending: <?= $pen_paid_no ?></div>
+                        <div>Approved: <?= $app_paid_no ?></div>
+                        <div>Disapproved: <?= $dis_paid_no ?></div>
+                    </div>
+                </div>
+
+                <!-- Unpaid Leaves Details -->
+                <div class="bg-green-100 rounded-lg p-4 shadow">
+                    <?php 
+                    $unpaidDifference = (int)get_option('unpaid_leaves') - (int)$app_unpaid_no;
+                    $unpaidDisplayText = $unpaidDifference >= 0 ? $unpaidDifference . " left" : abs($unpaidDifference) . " Exceeded";
+                    ?>
+                    <div class="flex flex-row justify-between">
+                        <h3 class="text-xl font-bold mb-2">Unpaid Leaves:</h3>
+                        <div><h2 class="px-4 flex items-center justify-center h-5 rounded-full bg-white text-black"><?= $unpaidDisplayText ?></h2></div>
+                    </div>
+                    <div class="text-lg font-semibold flex xl:flex-row flex-col justify-between">
+                        <div>Pending: <?= $pen_unpaid_no ?></div>
+                        <div>Approved: <?= $app_unpaid_no ?></div>
+                        <div>Disapproved: <?= $dis_unpaid_no ?></div>
+                    </div>
+                </div>
+
+                <!-- Gazetted Leaves Details -->
+                <div class="bg-yellow-100 rounded-lg p-4 shadow">
+                    <?php 
+                    $gazDifference = (int)get_option('gaz_leaves') - (int)$app_gaz_no;
+                    $gazDisplayText = $gazDifference >= 0 ? $gazDifference . " left" : abs($gazDifference) . " Exceeded";
+                    ?>
+                    <div class="flex flex-row justify-between">
+                        <h3 class="text-xl font-bold mb-2">Gazetted Leaves:</h3>
+                        <div><h2 class="px-4 flex items-center justify-center h-5 rounded-full bg-white text-black"><?= $gazDisplayText ?></h2></div>
+                    </div>
+                    <div class="text-lg font-semibold flex xl:flex-row flex-col justify-between">
+                        <div>Pending: <?= $pen_gaz_no ?></div>
+                        <div>Approved: <?= $app_gaz_no ?></div>
+                        <div>Disapproved: <?= $dis_gaz_no ?></div>
+                    </div>
+                </div>
             </div>
+
 
             <form id="application-form" class="space-y-4 bg-white p-10">
                 <div class="flex flex-col">
@@ -180,22 +229,31 @@ $(document).ready(function() {
 
 
     $("#application-form").submit(function(event) {
-        alert_float('info', 'Sending...');
-        event.preventDefault(); // Prevent the default form submission behavior
+    event.preventDefault(); // Prevent the default form submission behavior
 
-        var formData = new FormData(this);
-        formData.append(csrfData.token_name, csrfData.hash);
+    var startDate = new Date($("#start_date").val());
+    var endDate = new Date($("#end_date").val());
 
-        $.ajax({
-            url: "submit_application",
-            type: "POST",
-            data: formData,
-            dataType: "json", // Expect a JSON response from the server
-            processData: false, // Tell jQuery not to process the data
-            contentType: false,
-            success: function(response) {
-                // Check if the controller returned success: true or false
-                if (response.success) {
+    if (endDate < startDate) {
+        alert_float('danger', 'End date cannot be earlier than the start date.');
+        return; // Stop the function if the dates are invalid
+    }
+
+    alert_float('info', 'Sending...');
+
+    var formData = new FormData(this);
+    formData.append(csrfData.token_name, csrfData.hash);
+
+    $.ajax({
+        url: "submit_application",
+        type: "POST",
+        data: formData,
+        dataType: "json", // Expect a JSON response from the server
+        processData: false, // Tell jQuery not to process the data
+        contentType: false,
+        success: function(response) {
+            // Check if the controller returned success: true or false
+            if (response.success) {
                 // Handle the successful submission here
                 alert_float('success', 'Application submitted successfully!');
                 
@@ -205,20 +263,19 @@ $(document).ready(function() {
                 $("#attachment").val("");
 
                 refreshDataTable();
-                } else {
+            } else {
                 // Handle any errors that occurred during submission
-                alert_float('danger', 'There was an error submitting the application: ');
-                }
-            },
-            error: function(xhr, status, error) {
-                // Handle any errors that occurred during the AJAX request itself
+                alert_float('danger', 'There was an error submitting the application.');
+            }
+        },
+        error: function(xhr, status, error) {
+            // Handle any errors that occurred during the AJAX request itself
                 console.error(status, error);
                 alert_float('danger', 'There was an error submitting the application.');
             },
         });
-
-
     });
+
 
     function checkDatesAndToggleShift() {
         var startDate = $('#start_date').val();

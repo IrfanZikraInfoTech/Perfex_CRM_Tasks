@@ -14,11 +14,6 @@ function convertSecondsToRoundedTime($seconds)
 }
 
 ?>
-<style>
-    .row-options{
-        display: none;
-    }
-</style>
 <div id="wrapper">
 
    <div class="content flex flex-col gap-10">
@@ -37,57 +32,66 @@ function convertSecondsToRoundedTime($seconds)
         <?php } ?>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-        <?php $departments = $this->team_management_model->get_all_departments(); ?>
+    <div class="flex flex-col gap-4">
+        <?php $departments = $this->team_management_model->get_all_departments();
+
+        ?>
         
         <?php  foreach ($departments as $department): ?>
-            <h2 class="text-xl font-bold col-span-full mt-4 mb-2"><?php echo $department->name; ?></h2>
-            
-            <?php $staff_members = $this->team_management_model->get_staff_by_department($department->departmentid); ?>
-            
-            <?php  foreach ($staff_members as $staff): ?>
-                <!-- Your staff card code starts here -->
-                <div class="flex flex-col bg-white rounded-lg overflow-hidden transform transition-all duration-500 ease-in-out hover:scale-[0.97] shadow-md hover:shadow-lg">
-                    <div class="flex justify-center items-center p-4 bg-gray-200">
-                        <?php echo staff_profile_image($staff->staffid, ['h-48', 'w-48', 'rounded-full', 'object-cover'], 'thumb'); ?>
-                    </div>
-                    <div class="p-4">
-                        <h2 class="text-lg font-bold text-center"><?php echo $staff->firstname. ' ' .$staff->lastname ?></h2>
-                        <h2 class="text-lg font-bold text-center"><?php echo $staff->staff_title ?></h2>
-                        <div class="mt-2">
-                            <div class="text-sm font-semibold text-gray-500">Current Status</div>
-                            <div class="flex flex-row gap-1 mt-1 text-gray-800"><div class="w-1 <?php echo 'bg-' . $staff->statusColor; ?> h-5 mr-2"></div><?php echo $staff->status; ?> \ <?php echo $staff->working ? 'Working' : 'Not working'; ?></div>
-                        </div>
-                        <div class="mt-4">
-                            <div class="text-sm font-semibold text-gray-500">Time spent today</div>
-                            <div class="mt-1 text-gray-800"><?php echo convertSecondsToRoundedTime($staff->live_time_today); ?></div>
-                        </div>
-                        <div class="mt-4">
-                            <div class="text-sm font-semibold text-gray-500">Current Task</div>
-                            <div class="mt-1 text-gray-800"><?php echo $staff->currentTaskName; ?></div>
-                        </div>
-                        <div class="mt-4">
-                            <div class="text-sm font-semibold text-gray-500">Current Project</div>
-                            <div class="mt-1 text-gray-800"><?php echo $staff->currentTaskProject ?? 'None'; ?></div>
-                        </div>
-                        <div class="mt-4">
-                            <div class="text-sm font-semibold text-gray-500">Task Timer</div>
-                            <div class="mt-1 text-gray-800"><?php echo convertSecondsToRoundedTime($staff->currentTaskTime); ?></div>
-                        </div>
-                        <?php if(has_permission('team_management', '', 'admin')){ ?>
-                        <div class="mt-6 grid grid-cols-2 gap-2">
-                            <a target="_blank" href="<?= admin_url();?>team_management/staff_stats/<?= $staff->staffid.'/'.date('n') ?>" class="text-center py-2 px-3 text-white rounded bg-blue-500 hover:bg-blue-600 hover:text-gray-100">View Stats</a>
-                            <a target="_blank" href="<?= admin_url();?>team_management/control_room/<?= $staff->staffid ?>" class="text-center py-2 px-3 text-white rounded bg-green-500 hover:bg-green-600 hover:text-gray-100">Control Room</a>
-                        </div>
-                        <?php }?>
-                    </div>
-                </div>
-                <!-- Your staff card code ends here -->
-            <?php endforeach; ?>
-        <?php endforeach; ?>
-    </div>
 
-</div>
+            <div class="rounded-[40px] border-2 bg-white border-white border-solid">
+
+            <h2 class="text-2xl pl-7 uppercase font-semibold py-4"><?php echo $department->name; ?></h2>
+            
+            <div class="px-5 pb-5">
+                <?php $staff_members = $this->team_management_model->get_staff_by_department($department->departmentid); 
+                
+                ?>
+                    <div class="p-5 rounded-[40px] bg-gray-100 flex flex-row flex-wrap gap-10">
+                    <?php  foreach ($staff_members as $staff): ?>
+                        <!-- Your staff card code starts here -->
+                        <div class="flex flex-col bg-white xl:w-1/4 2xl:w-1/5 lg:w-1/3 md:w-[40%] w-full rounded-[30px] overflow-hidden transform transition-all duration-500 ease-in-out hover:scale-[0.97] shadow-md hover:shadow-lg">
+                            <div class="flex justify-center items-center p-4 bg-gray-200">
+                                <?php echo staff_profile_image($staff->staffid, ['h-48', 'w-48', 'rounded-full', 'object-cover'], 'thumb'); ?>
+                            </div>
+                            <div class="p-4">
+                                <h2 class="text-lg font-bold text-center"><?php echo $staff->firstname. ' ' .$staff->lastname ?></h2>
+                                <h2 class="text-lg font-bold text-center"><?php echo $staff->staff_title ?></h2>
+                                <div class="mt-2">
+                                    <div class="text-sm font-semibold text-gray-500">Current Status</div>
+                                    <div class="flex flex-row gap-1 mt-1 text-gray-800"><div class="w-1 <?php echo 'bg-' . $staff->statusColor; ?> h-5 mr-2"></div><?php echo $staff->status; ?> \ <?php echo $staff->working ? 'Working' : 'Not working'; ?></div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="text-sm font-semibold text-gray-500">Time spent today</div>
+                                    <div class="mt-1 text-gray-800"><?php echo convertSecondsToRoundedTime($staff->live_time_today); ?></div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="text-sm font-semibold text-gray-500">Current Task</div>
+                                    <div class="mt-1 text-gray-800"><?php echo $staff->currentTaskName; ?></div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="text-sm font-semibold text-gray-500">Current Project</div>
+                                    <div class="mt-1 text-gray-800"><?php echo $staff->currentTaskProject ?? 'None'; ?></div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="text-sm font-semibold text-gray-500">Task Timer</div>
+                                    <div class="mt-1 text-gray-800"><?php echo convertSecondsToRoundedTime($staff->currentTaskTime); ?></div>
+                                </div>
+                                <?php if(has_permission('team_management', '', 'admin')){ ?>
+                                <div class="mt-6 grid grid-cols-2 gap-2">
+                                    <a target="_blank" href="<?= admin_url();?>team_management/staff_stats/<?= $staff->staffid.'/'.date('n') ?>" class="text-center py-2 px-3 text-white rounded bg-blue-500 hover:bg-blue-600 hover:text-gray-100">View Stats</a>
+                                    <a target="_blank" href="<?= admin_url();?>team_management/control_room/<?= $staff->staffid ?>" class="text-center py-2 px-3 text-white rounded bg-green-500 hover:bg-green-600 hover:text-gray-100">Control Room</a>
+                                </div>
+                                <?php }?>
+                            </div>
+                        </div>
+                        <!-- Your staff card code ends here -->
+                    <?php endforeach; ?>
+                    </div>            
+                </div>
+
+            </div>
+        <?php endforeach; ?>
 
       
    </div>

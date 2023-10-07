@@ -105,6 +105,23 @@ class Dashboard extends AdminController
         $data['daily_stats'] = $daily_stats;
 // var_dump($daily_stats);
         $data = hooks()->apply_filters('before_dashboard_render', $data);
+
+        $data['total_time'] = $this->team_management_model->get_today_live_timer($staff_id);
+
+
+        $shift_timings = $this->team_management_model->get_shift_timings_of_date(date("Y-m-d"), $staff_id);
+        $shift_secs = 0;
+
+        if(isset($shift_timings['first_shift']['end']) && isset($shift_timings['first_shift']['start'])){
+            $shift_secs += strtotime($shift_timings['first_shift']['end']) - strtotime($shift_timings['first_shift']['start']);
+        }
+
+        if(isset($shift_timings['second_shift']['end']) && isset($shift_timings['second_shift']['start'])){
+            $shift_secs += strtotime($shift_timings['second_shift']['end']) - strtotime($shift_timings['second_shift']['start']);
+        }
+
+        $data['shift_seconds'] = $shift_secs;
+        
         $this->load->view('admin/dashboard/dashboard', $data);
     }
 

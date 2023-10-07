@@ -73,5 +73,11 @@
 		<?php render_yes_no_option('rtl_support_client','settings_rtl_support_client'); ?>
 		<hr />
 		<?php echo render_input('settings[allowed_files]','settings_allowed_upload_file_types',get_option('allowed_files')); ?>
+
+		<?php echo render_input('settings[paid_leaves]','Paid Leaves',get_option('paid_leaves'), 'number'); ?>
+
+		<?php echo render_input('settings[unpaid_leaves]','Unpaid Leaves',get_option('unpaid_leaves'), 'number'); ?>
+
+		<?php echo render_input('settings[gaz_leaves]','Gazetted Leaves',get_option('gaz_leaves'), 'number'); ?>
 	</div>
 </div>

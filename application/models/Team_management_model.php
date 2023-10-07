@@ -109,11 +109,12 @@ class Team_management_model extends App_Model
     }
     public function get_all_departments(){
         $this->db->select('departmentid,name');
+        $this->db->order_by('name');
         $query = $this->db->get('tbldepartments');
         return $query->result();
     }
     public function get_staff_by_department($department_id){
-        $CI =& get_instance();
+
 
         $this->db->select(''.db_prefix().'staff.*, '.db_prefix().'departments.name as department, '.db_prefix().'_staff_status.*'); // Note the addition here
         $this->db->from(''.db_prefix().'staff');
@@ -124,6 +125,7 @@ class Team_management_model extends App_Model
         $this->db->where(''.db_prefix().'staff.staffid !=', 1);
         $this->db->where('active', 1);
         $this->db->where(''.db_prefix().'staff_departments.departmentid', $department_id);
+        $this->db->order_by('tblstaff.firstname');
 
         $query = $this->db->get();
         $result = $query->result();
@@ -278,71 +280,6 @@ class Team_management_model extends App_Model
         return $query->num_rows();
     }
 
-    public function get_tasks_records($type) {
-
-        $current_date = date('Y-m-d');
-
-        $this->db->select(''.db_prefix().'tasks.*, '.db_prefix().'projects.name as project_name');
-        $this->db->from(''.db_prefix().'tasks');
-
-        
-        if($type == 1){
-            $this->db->where('duedate <', $current_date);
-            $this->db->where(''.db_prefix().'tasks.status !=', 5);
-        }else if ($type == 2){
-            $this->db->where('duedate', $current_date);
-        }else{
-            $this->db->where(''.db_prefix().'tasks.status !=', 5);
-            $this->db->group_start();
-            $this->db->where('duedate >', $current_date);
-            $this->db->or_where('duedate IS NULL', null, false);     
-            $this->db->order_by('id DESC');
-            $this->db->group_end();
-        }
-
-        $this->db->join(''.db_prefix().'projects', ''.db_prefix().'tasks.rel_id = '.db_prefix().'projects.id AND '.db_prefix().'tasks.rel_type = "project"', 'left');
-
-        $query = $this->db->get();
-        $allTasks = $query->result();
-
-        foreach ($allTasks as $task) {
-
-            $task->assigned = array();
-
-            $this->db->select('staffid');
-            $this->db->from(''.db_prefix().'task_assigned');
-            $this->db->where('taskid', $task->id);
-            $query = $this->db->get();
-            $allStaff = $query->result();
-            foreach ($allStaff as $staff) {
-                array_push($task->assigned, staff_profile_image($staff->staffid, ['object-cover', 'md:h-full' , 'md:w-10 inline' , 'staff-profile-image-thumb'], 'thumb'));
-            }
-            if($task->duedate == null){
-                $task->duedate = "None";
-            }
-
-            $task->priority = $this->id_to_name($task->priority, ''.db_prefix().'tickets_priorities', 'priorityid', 'name');
-
-            if($task->status == 1){
-                $task->status = "Not Started";
-            }
-            if($task->status == 2){
-                $task->status = "Awaiting Feedback";
-            }
-            if($task->status == 3){
-                $task->status = "Testing";
-            }
-            if($task->status == 4){
-                $task->status = "In Progress";
-            }
-            if($task->status == 5){
-                $task->status = "Completed";
-            }
-        }
-
-        return $allTasks;
-    }
-
     public function id_to_name($id, $tableName, $idName, $nameName) {
         $this->db->select($nameName);
         $this->db->from($tableName);
@@ -368,93 +305,6 @@ class Team_management_model extends App_Model
 
         return $query->result();
 
-    }
-    
-    public function get_incomplete_or_today_tasks($staff_id)
-    {
-        $today = date('Y-m-d');
-        
-        $this->db->select(''.db_prefix().'tasks.*, '.db_prefix().'projects.name as project_name');
-        $this->db->from(''.db_prefix().'tasks');
-        $this->db->join(''.db_prefix().'task_assigned', ''.db_prefix().'task_assigned.taskid = '.db_prefix().'tasks.id');
-        $this->db->join(''.db_prefix().'projects', ''.db_prefix().'tasks.rel_id = '.db_prefix().'projects.id AND '.db_prefix().'tasks.rel_type = "project"', 'left');
-        $this->db->where(''.db_prefix().'task_assigned.staffid', $staff_id);
-        $this->db->group_start(); // Start group
-        $this->db->where(''.db_prefix().'tasks.status !=', 5); // Incomplete tasks
-        $this->db->or_where("DATE(".db_prefix()."tasks.startdate)", $today); // Tasks created today
-        $this->db->group_end(); // End group
-        $query = $this->db->get();
-
-        return $query->result();
-    }
-
-
-    public function get_staff_with_highest_today_live_timer() {
-        $all_staff = $this->get_all_staff();
-
-        $highest_timer_staff = null;
-        $highest_timer = 0;
-
-        foreach ($all_staff as $staff) {
-            $timer = $this->get_today_live_timer($staff->staffid);
-
-            if ($timer > $highest_timer) {
-                $highest_timer = $timer;
-                $highest_timer_staff = $staff;
-            }
-        }
-
-        return $highest_timer_staff;
-    }
-
-    public function get_staff_with_most_tasks_completed_today($date_start = null, $date_end = null)
-    {
-        $today_start = ($date_start == null) ? date('Y-m-d') : $date_start;
-        $today_end = ($date_end == null) ? date('Y-m-d', strtotime(date("Y-m-d") . ' +1 day')) : $date_end;
-        
-        $most_eff_staff_member = null;
-
-        $this->db->select('*');
-        $query = $this->db->get(db_prefix() . 'staff');
-        $all_staff_global = $query->result_array();
-
-        $max_completed_tasks = 0;
-
-        foreach ($all_staff_global as &$staff) {
-            $staff_id = $staff['staffid'];
-
-            $tasks = $this->team_management_model->get_tasks_by_staff_member($staff_id);
-            $completed_tasks = 0;
-            foreach ($tasks as $task) {
-
-                $dueConsideration = ($task->duedate) ? $task->duedate : date("Y-m-d", strtotime($task->dateadded));
-                $startConsideration = ($task->startdate) ? $task->startdate : date("Y-m-d", strtotime($task->dateadded));
-
-                if (
-                    (strtotime($startConsideration) <= strtotime($today_start) && strtotime($dueConsideration) >= strtotime($today_end)) 
-                    || 
-                    ($task->status != 5)
-                )
-                {
-                    if ($task->status == 5) {
-                        $completed_tasks++;
-                    }
-                }
-            }
-
-            if($max_completed_tasks < $completed_tasks){
-                $max_completed_tasks = $completed_tasks;
-                $most_eff_staff_member = $staff;
-            }
-        }
-
-        
-
-        $most_eff_staff_member = (object) $most_eff_staff_member;
-
-        
-
-        return $most_eff_staff_member;
     }
 
     public function get_today_live_timer($staff_id)
@@ -577,8 +427,6 @@ class Team_management_model extends App_Model
         return ['success' => $this->db->affected_rows() > 0, 'message' => "Successfully clocked out"];
     }
 
-
-
     public function update_status($staff_id, $status)
     {
         // Check if the staff_id already exists in the table
@@ -700,7 +548,7 @@ class Team_management_model extends App_Model
         }
 
         
-        $stats->todays_total_time = $this->get_todays_total_time($staff_id);
+        $stats->todays_total_time = $this->get_today_live_timer($staff_id);
 
         $stats->yesterdays_total_time = $this->get_yesterdays_total_time($staff_id);
         $stats->this_weeks_total_time = $this->get_this_weeks_total_time($staff_id);
@@ -862,53 +710,7 @@ class Team_management_model extends App_Model
         return $total_clocked_in_time;
     }
 
-    public function get_total_time_of_month($staff_id, $start_date, $end_date) {
 
-        if (is_string($start_date)) {
-            $start_date = new DateTime($start_date);
-        }
-        if (is_string($end_date)) {
-            $end_date = new DateTime($end_date);
-        }
-    
-        $this->db->select('*');
-        $this->db->from(db_prefix() . '_staff_time_entries');
-        $this->db->where('staff_id', $staff_id);
-        $this->db->where('clock_in >=', $start_date->format('Y-m-d'));
-        $this->db->where('clock_in <=', $end_date->format('Y-m-d'));
-        $query = $this->db->get();
-        $clock_ins_outs = $query->result_array();
-    
-        $this->db->select('*');
-        $this->db->from(db_prefix() . '_staff_status_entries');
-        $this->db->where('staff_id', $staff_id);
-        $this->db->where('start_time >=', $start_date->format('Y-m-d'));
-        $this->db->where('start_time <=', $end_date->format('Y-m-d'));
-        $query = $this->db->get();
-        $afk_and_offline = $query->result_array();
-    
-        // Calculate the total clocked in time
-        $total_clocked_in_time = 0;
-    
-        // Calculate total_clocked_in_time and total_shift_duration
-        foreach ($clock_ins_outs as $clock_in_out) {
-    
-            $clock_in_time = strtotime($clock_in_out['clock_in']);
-            if(!empty($clock_in_out['clock_out'])){
-                $clock_out_time = strtotime($clock_in_out['clock_out']);
-    
-                $total_time = $clock_out_time - $clock_in_time;
-    
-                $sum_afk_offline_times = $this->team_management_model->get_sum_afk_and_offline_times($staff_id, $clock_in_out['clock_in'], $clock_in_out['clock_out']);
-                
-                $total_clocked_in_time += $total_time;
-                $total_clocked_in_time -= $sum_afk_offline_times;
-            }
-        }
-    
-        return $total_clocked_in_time;
-    }
-    
 
     public function save_shift_timings($staff_id, $month, $shift_timings) {
         // Delete existing shift timings for the staff member and month
@@ -1098,14 +900,18 @@ class Team_management_model extends App_Model
         return $query->result();
     }
 
-    public function get_all_applications($status) {
+    public function get_all_applications($status, $staff_under) {
         $this->db->select('*');
         $this->db->from('tbl_applications');
         $this->db->where('status', $status);
+        
+        // Add this line to filter by staff_id
+        $this->db->where_in('staff_id', $staff_under);
+        
         $this->db->order_by('id DESC');
         $query = $this->db->get();
         return $query->result();
-    }
+    }    
 
     public function get_application($application_id) {
         $this->db->from('tbl_applications');
@@ -1808,7 +1614,7 @@ class Team_management_model extends App_Model
 
         foreach ($afk_and_offline as &$entry) {
             $entry['start_time'] = date('h:i A', strtotime($entry['start_time']));
-            $entry['end_time'] = date('h:i A', strtotime($entry['end_time']));
+            $entry['end_time'] = date('h:i A', ($entry['end_time']) ? strtotime($entry['end_time']) : time());
         
             $start_unix = strtotime($entry['start_time']);
             $end_unix = strtotime($entry['end_time']);
@@ -1866,528 +1672,12 @@ class Team_management_model extends App_Model
 
         return $daily_stats;
     }
-// daily report daata 
-    public function get_daily_report_data($month, $day)
-    {
-        $date = date('Y') . '-' . $month . '-' . $day;
 
-        $report_data = [];
-
-        // Total Loggable Hours
-        $this->db->select_sum(
-            'CASE WHEN shift_end_time < shift_start_time 
-            THEN TIMESTAMPDIFF(SECOND, shift_start_time, ADDTIME(shift_end_time, "24:00:00")) 
-            ELSE TIMESTAMPDIFF(SECOND, shift_start_time, shift_end_time) 
-            END', 
-            'total_loggable_hours');        
-        $this->db->from(db_prefix() . '_staff_shifts');
-        $this->db->where('month', date('m', strtotime($date)));
-        $this->db->where('day', date('d', strtotime($date)));
-        $this->db->where(db_prefix() . '_staff_shifts.staff_id !=', 1);  // This line excludes staff with ID=1
-        $this->db->where("NOT EXISTS (SELECT " . db_prefix() . "_staff_leaves.staff_id FROM " . db_prefix() . "_staff_leaves WHERE " . db_prefix() . "_staff_leaves.staff_id = " . db_prefix() . "_staff_shifts.staff_id AND " . db_prefix() . "_staff_leaves.start_date <= '" . $date . "' AND " . db_prefix() . "_staff_leaves.end_date >= '" . $date . "')");
-        $query = $this->db->get();
-        $report_data['total_loggable_hours'] = $query->row()->total_loggable_hours;
-
-        // Fetching day-wise shifts
-         $this->db->select('*');
-        $this->db->from(db_prefix() . '_staff_shifts');
-        $this->db->where('month', date('m', strtotime($date)));
-        $this->db->where('day', date('d', strtotime($date)));
-        $this->db->where(db_prefix() . '_staff_shifts.staff_id !=', 1);  // This line excludes staff with ID=1
-        $query = $this->db->get();
-        $daywise_shifts = $query->result_array();
-        
-
-        $daywise_shift_data = [];
-        foreach ($daywise_shifts as $shift) {
-            $staff_id = $shift['staff_id'];
-            $daywise_shift_data[$staff_id][] = [
-                'start_time' => $shift['shift_start_time'],
-                'end_time' => $shift['shift_end_time']
-            ];
-        }
-        $report_data['shift_timings_daywise'] = $daywise_shift_data;
-
-        // End of processing day-wise shifts
-
-
-        // All Tasks Worked On
-        $this->db->select('task_id, staff_id, SUM(TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(start_time), FROM_UNIXTIME(end_time))) as total_worked_time');
-        $this->db->from(db_prefix() . 'taskstimers');
-        $this->db->where('DATE(FROM_UNIXTIME(start_time))', $date);
-        $this->db->where(db_prefix() . 'taskstimers.staff_id !=', 1);  // This line excludes staff with ID=1
-        $this->db->group_by(['task_id', 'staff_id']);
-        $query = $this->db->get();
-        $all_tasks_worked_on = $query->result_array();
-
-        // Initialize an array to hold total task time for each staff
-        $total_task_time_by_staff = [];
-
-        // Sum up total time worked on tasks for each staff
-        foreach ($all_tasks_worked_on as $task) {
-            $staff_id = $task['staff_id'];
-            $total_worked_time = $task['total_worked_time'];
-            
-            if (!isset($total_task_time_by_staff[$staff_id])) {
-                $total_task_time_by_staff[$staff_id] = 0;
-            }
-            
-            $total_task_time_by_staff[$staff_id] += $total_worked_time;
-        }
-
-        $report_data['total_task_time'] = $total_task_time_by_staff;
-
-
-        // times clock in
-        $this->db->select('staff_id, DATE(clock_in) as date, clock_in, clock_out');
-        $this->db->from(db_prefix() . '_staff_time_entries');
-        $this->db->where('DATE(clock_in)', $date); // Fetch records for specific date
-        $this->db->where(db_prefix() . '_staff_time_entries.staff_id !=', 1);  // Exclude staff with ID=1
-        $clock_ins = $this->db->get()->result_array();
-        
-        $clock_times = [];
-        foreach ($clock_ins as $clock_in) {
-            $staff_id = $clock_in['staff_id'];
-            if (!isset($clock_times[$staff_id])) {
-                $clock_times[$staff_id] = [];
-            }
-            
-            if (isset($clock_in['clock_in'])) {
-                if(isset($clock_in['clock_out'])){
-                    $clock_times[$staff_id][] = date('h:i A', strtotime($clock_in['clock_in'])) . ' - ' . date('h:i A', strtotime($clock_in['clock_out']));
-                }else{
-                    $clock_times[$staff_id][] = date('h:i A', strtotime($clock_in['clock_in'])) . ' - ' . date('h:i A');
-                }
-                
-            }
-        }
-        
-        foreach ($clock_times as $staff_id => $times) {
-            $clock_times[$staff_id] = implode('<br>', $times);
-        }
-        
-        $report_data['clock_times'] = $clock_times;
-        
-
-        // Actual Total Logged in Time
-        $this->db->select('*');
-        $this->db->where(db_prefix() . 'staff.staffid !=', 1);  // This line excludes staff with ID=1
-        $this->db->where('tblstaff.active', 1);
-        $query = $this->db->get(db_prefix() . 'staff');
-        $all_staff_global = $query->result_array();
-        
-        $actual_total_logged_in_time = 0;
-
-        $total_all_tasks = 0;
-        $total_completed_tasks = 0;
-        $total_tasks_rate = 0;
-
-        $most_clocked_time = 0;
-        $most_clocked_in_staff_member = null;
-        
-        foreach ($all_staff_global as &$staff) {
-            $staff_id = $staff['staffid'];
-        
-            // Get total time within range
-            $total_time = $this->get_total_time_of_date($staff_id, $date);
-            $staff['total_logged_in_time'] = $total_time;
-
-            if($total_time > $most_clocked_time){
-                $most_clocked_in_staff_member = $staff;
-                $most_clocked_time = $total_time;
-            }
-            
-            $actual_total_logged_in_time += $total_time;
-
-            $total_tasks = $this->get_task_stats_by_staff_date($staff_id, $date)['total_tasks'];
-            $completed_tasks = $this->get_task_stats_by_staff_date($staff_id, $date)['completed_tasks'];
-
-
-        
-            $task_rate_percentage = $total_tasks > 0 ? round(($completed_tasks / $total_tasks) * 100) : 0;
-            $task_rate = $completed_tasks . '/' . $total_tasks . ' (' . $task_rate_percentage . '%)';
-            $staff['task_rate'] = $task_rate;
-
-            $total_all_tasks += $total_tasks;
-            $total_completed_tasks += $completed_tasks;
-            
-
-            $shift_timings = $this->get_shift_timings_of_date($date, $staff_id);
-
-            $first_shift_start = isset($shift_timings['first_shift']['start']) ? $shift_timings['first_shift']['start'] : '00:00:00';
-            $first_shift_end = isset($shift_timings['first_shift']['end']) ? $shift_timings['first_shift']['end'] : '00:00:00';
-            $sec_shift_start = isset($shift_timings['second_shift']['start']) ? $shift_timings['second_shift']['start'] : '00:00:00';
-            $sec_shift_end = isset($shift_timings['second_shift']['end']) ? $shift_timings['second_shift']['end'] : '00:00:00';
-
-            $first_shift_start_time = new DateTime($first_shift_start);
-            $first_shift_end_time = new DateTime($first_shift_end);
-            $sec_shift_start_time = new DateTime($sec_shift_start);
-            $sec_shift_end_time = new DateTime($sec_shift_end);
-
-            if ($sec_shift_end_time < $sec_shift_start_time) {
-                $sec_shift_end_time->modify('+1 day');
-            }
-            
-
-            $first_shift_seconds = $first_shift_end_time->getTimestamp() - $first_shift_start_time->getTimestamp();
-            $second_shift_seconds = $sec_shift_end_time->getTimestamp() - $sec_shift_start_time->getTimestamp();
-
-            $total_shift_seconds = $first_shift_seconds + $second_shift_seconds;
-
-
-            // Add total_shift_timings to the staff array
-            $staff['total_shift_timings'] = $total_shift_seconds;
-        }
-
-        $total_tasks_rate = $total_all_tasks > 0 ? round(($total_completed_tasks / $total_all_tasks) * 100) : 0;
-
-        $report_data['total_all_tasks'] = $total_all_tasks;
-        $report_data['total_completed_tasks'] = $total_completed_tasks;
-        $report_data['total_tasks_rate'] = $total_tasks_rate;
-        
-        $report_data['actual_total_logged_in_time'] = $actual_total_logged_in_time;
-
-
-        // Total Present Staff
-        $this->db->select('COUNT(DISTINCT staff_id) as total_present_staff');
-        $this->db->select('staff_id, firstname');
-        $this->db->where('tblstaff.staffid !=', 1);  // This line excludes staff with ID=1
-        $this->db->where('tblstaff.active', 1);
-        $this->db->from(db_prefix() . '_staff_time_entries');
-        $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . '_staff_time_entries.staff_id');
-        $this->db->where('DATE(clock_in)', $date);
-$this->db->where(db_prefix() . '_staff_time_entries.staff_id !=', 1);  // This line excludes staff with ID=1
-
-        $this->db->group_by('staff_id');
-        $query = $this->db->get();
-        $report_data['total_present_staff'] = $query->num_rows(); // Get the total number of present staff
-        $report_data['present_staff_list'] = $query->result_array(); // Get the list of present staff with their id and firstname
-
-        
-        $this->db->select('staffid, firstname');
-        $this->db->from(db_prefix() . 'staff');
-        $this->db->where('staffid !=', 1);  // This line excludes staff with ID=1
-        $this->db->where('active', 1);
-        $all_staff = $this->db->get()->result_array();
-
-
-        $present_staff = $report_data['present_staff_list'];
-        $staff_on_leave = $this->get_staff_on_leave($date);
-        $present_staff_ids = array_column($present_staff, 'staff_id');
-        $staff_on_leave_ids = array_column($staff_on_leave, 'staff_id');
-
-        $absent_staff = array_filter($all_staff, function ($staff) use ($present_staff_ids, $staff_on_leave_ids) {
-            return !in_array($staff['staffid'], $present_staff_ids) && !in_array($staff['staffid'], $staff_on_leave_ids);
-        });
-
-        $report_data['absentees'] = $absent_staff;
-
-        // Fetch all tasks worked on, grouped by projects
-        $this->db->select('*, SUM(TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(start_time), FROM_UNIXTIME(end_time))) as total_worked_time');
-        $this->db->select('IF('.db_prefix().'tasks.rel_type="project", '.db_prefix().'projects.name, NULL) as project_name', false);
-        $this->db->select(db_prefix().'tasks.rel_id as project_task_id');
-        $this->db->select(db_prefix().'tasks.name as task_name');
-        $this->db->select(db_prefix().'tasks.status as task_status');
-        $this->db->from(db_prefix() . 'taskstimers');
-        $this->db->where('DATE(FROM_UNIXTIME(start_time))', $date);
-        $this->db->join(db_prefix() . 'tasks', db_prefix() . 'tasks.id = ' . db_prefix() . 'taskstimers.task_id');
-        $this->db->join(db_prefix() . 'projects', db_prefix() . 'projects.id = ' . db_prefix() . 'tasks.rel_id AND '.db_prefix().'tasks.rel_type = "project"', 'left');
-        $this->db->group_by(db_prefix() . 'projects.id, '.db_prefix().'taskstimers.task_id');
-        $query = $this->db->get();
-        $tasks = $query->result_array();
-
-        // Group tasks by their project IDs
-        $groupedTasks = [];
-        foreach($tasks as $task) {
-            $projectId = $task['project_task_id'];
-
-            $task['staff'] = $this->get_staff_members_for_task($task['task_id'], $date);
-            $groupedTasks[$projectId]['project_name'] = $task['project_name'];
-            $groupedTasks[$projectId]['tasks'][] = $task;
-            $groupedTasks[$projectId]['project_id'] = $projectId;
-        }
-        $report_data['all_tasks_worked_on'] = $groupedTasks;
-
-
-
-
-        $report_data['late_joiners'] = $this->get_on_time_and_late_staff($date)['late_joiners'];
-        $report_data['on_timers'] = $this->get_on_time_and_late_staff($date)['on_timers'];
-
-        $report_data['staff_on_leave'] = $this->get_staff_on_leave($date);
-        $report_data['most_clocked_in_staff_member'] = $most_clocked_in_staff_member;
-       
-
-        $report_data['all_staff'] = $all_staff_global;
-
-
-
-        $maxTasksCompleted = $this->get_staff_with_most_tasks_completed_today($date,$date);
-
-        if($maxTasksCompleted){
-            $maxTasksCompleted = $maxTasksCompleted;
-        }else{
-            $maxTasksCompleted = null;
-        }
-
-        $report_data['most_eff_staff_member'] = $maxTasksCompleted;
-
-
-        
-        return $report_data;
-    }
-
-
-    public function get_monthly_report_data($month, $year)
-    {
-        $start_date = $year . '-' . $month . '-01';
-        $end_date = date('Y-m-t', strtotime($start_date));
-
-        $start_date_obj = new DateTime($start_date);
-        $end_date_obj = new DateTime($end_date);
-
-        $report_data = [];
-
-        // Total Loggable Hours for the month
-        $this->db->select_sum('TIMESTAMPDIFF(SECOND, shift_start_time, shift_end_time)', 'total_loggable_hours');
-        $this->db->from(db_prefix() . '_staff_shifts');
-        $this->db->where('month', $month);
-        $this->db->where('year', $year);
-        $this->db->where(db_prefix() . '_staff_shifts.staff_id !=', 1);  // This line excludes staff_id 1 from the query
-
-        // Exclude staff on leave in the given month
-        $this->db->where("NOT EXISTS (SELECT " . db_prefix() . "_staff_leaves.staff_id FROM " . db_prefix() . "_staff_leaves WHERE " . db_prefix() . "_staff_leaves.staff_id = " . db_prefix() . "_staff_shifts.staff_id AND (" . db_prefix() . "_staff_leaves.start_date BETWEEN '" . $start_date . "' AND '" . $end_date . "' OR " . db_prefix() . "_staff_leaves.end_date BETWEEN '" . $start_date . "' AND '" . $end_date . "'))");
-        $query = $this->db->get();
-        $report_data['total_loggable_hours'] = $query->row()->total_loggable_hours;
-
-
-        // Actual Total Logged in Time for the month
-        $this->db->select('*');
-$this->db->where('staffid !=', 1); // Excluding staff with ID 1
-
-        $query = $this->db->get(db_prefix() . 'staff');
-
-        $all_staff_global = $query->result_array();
-
-        $actual_total_logged_in_time = 0;
-        $total_all_tasks = 0;
-        $total_completed_tasks = 0;
-
-        $max_completed_tasks = 0;
-
-        foreach ($all_staff_global as &$staff) {
-            $staff_id = $staff['staffid'];
-
-            // Get total time within range
-            $total_time = $this->get_total_time_of_month($staff_id, $start_date, $end_date);
-            $staff['total_logged_in_time'] = $total_time;
-
-            $actual_total_logged_in_time += $total_time;
-
-            $tasks = $this->team_management_model->get_tasks_by_staff_member($staff_id);
-            $total_tasks = 0;
-            $completed_tasks = 0;
-
-
-            foreach ($tasks as $task) {
-
-                $task_start_date = ($task->startdate) ? date('Y-m-d', strtotime($task->startdate)) : date('Y-m-d', strtotime($task->dateadded));
-
-
-                $task_end_date = isset($task->datefinished) ? date('Y-m-d', strtotime($task->datefinished)) : $task_start_date;
-
-                $duedate = ($task->duedate) ? strtotime($task->duedate) : strtotime($task->dateadded);
-                
-
-                if (($task_start_date >= $start_date && $task_start_date <= $end_date) || ($task_end_date >= $start_date && $task_end_date <= $end_date)) {
-                    $total_tasks++;
-                    if($task->datefinished){
-                        if ($task->status == 5 && $duedate >= strtotime(date("Y-m-d", strtotime($task->datefinished)))) {
-                            $completed_tasks++;
-                        }
-                    }
-                    
-                }
-            }
-
-            $task_rate_percentage = $total_tasks > 0 ? round(($completed_tasks / $total_tasks) * 100) : 0;
-            $task_rate = $completed_tasks . '/' . $total_tasks . ' (' . $task_rate_percentage . '%)';
-            $staff['task_rate'] = $task_rate;
-
-            $total_all_tasks += $total_tasks;
-            $total_completed_tasks += $completed_tasks;
-
-            $staff['total_shift_timings'] = $this->get_shift_timings_of_month($month, $year, $staff_id);
-
-            if($max_completed_tasks < $completed_tasks){
-                $max_completed_tasks = $completed_tasks;
-                $most_eff_staff_member = $staff;
-            }
-        }
-
-        $total_tasks_rate = $total_all_tasks > 0 ? round(($total_completed_tasks / $total_all_tasks) * 100) : 0;
-
-        $report_data['total_all_tasks'] = $total_all_tasks;
-        $report_data['total_completed_tasks'] = $total_completed_tasks;
-        $report_data['total_tasks_rate'] = $total_tasks_rate;
-
-        $report_data['actual_total_logged_in_time'] = $actual_total_logged_in_time;
-
-
-        $this->db->select('*, SUM(TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(start_time), FROM_UNIXTIME(end_time))) as total_worked_time');
-        $this->db->select('IF('.db_prefix().'tasks.rel_type="project", '.db_prefix().'projects.name, NULL) as project_name', false);
-        $this->db->select('IF('.db_prefix().'tasks.rel_type="project", '.db_prefix().'projects.id, NULL) as project_id', false);
-        $this->db->select(db_prefix().'tasks.name as task_name');
-        $this->db->select(db_prefix().'tasks.status as task_status');
-        $this->db->distinct();
-        $this->db->from(db_prefix() . 'taskstimers');
-        $this->db->where('MONTH(FROM_UNIXTIME(start_time)) >=', $start_date_obj->format('m'));
-        $this->db->where('MONTH(FROM_UNIXTIME(start_time)) <=', $end_date_obj->format('m'));
-        $this->db->where('YEAR(FROM_UNIXTIME(start_time))', $start_date_obj->format('Y'));
-$this->db->where(db_prefix() . 'taskstimers.staff_id !=', 1); // This line excludes staff_id 1 from the query
-
-        $this->db->join(db_prefix() . 'tasks', db_prefix() . 'tasks.id = ' . db_prefix() . 'taskstimers.task_id');
-        $this->db->join(db_prefix() . 'projects', db_prefix() . 'projects.id = ' . db_prefix() . 'tasks.rel_id AND '.db_prefix().'tasks.rel_type = "project"', 'left');
-        $this->db->group_by(db_prefix() . 'taskstimers.task_id');
-        $query = $this->db->get();
-        $report_data['all_tasks_worked_on'] = $query->result_array();
-
-        foreach ($report_data['all_tasks_worked_on'] as &$task) {
-            $task['staff'] = $this->get_staff_members_for_task_month($task['task_id'], $month, $year);
-        }
-
-        // Get the number of days in the month
-        $num_days = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-
-        // Initialize an array to hold all daily reports
-        $report_data['all_daily_reports'] = [];
-
-        // Loop through all days in the month
-        for ($day = 1; $day <= $num_days; $day++) {
-            $daily_report = $this->get_daily_report_data($month, $day);
-            $report_data['all_daily_reports'][$day] = $daily_report;
-        }
-        
-        $report_data['most_clocked_in_staff_member'] = $this->get_most_clocked_in_staff_member_monthly($start_date, $end_date);
-
-        $report_data['all_staff'] = $all_staff_global;
-        
-
-        // Initialize the variable before using it
-        $most_eff_staff_member = array(); // or some default value suitable for your logic
-
-
-        // $most_eff_staff_member = (object) $most_eff_staff_member;
-        // if(!$most_eff_staff_member) {
-        //     $most_eff_staff_member = null;
-        // }
-
-        // $report_data['most_eff_staff_member'] = $most_eff_staff_member;
-
-
-        return $report_data;
-    }
-
-
-    public function get_staff_members_for_task($task_id, $date) {
-        $this->db->select(db_prefix() . 'taskstimers.staff_id');
-        $this->db->distinct();
-        $this->db->from(db_prefix() . 'taskstimers');
-        $this->db->where('task_id', $task_id);
-        $this->db->where('DATE(FROM_UNIXTIME(start_time))', $date);
-        $query = $this->db->get();
-        return $query->result_array();
-    }
-
-    public function get_staff_members_for_task_month($task_id, $month, $year) {
-        $this->db->select(db_prefix() . 'taskstimers.staff_id');
-        $this->db->distinct();
-        $this->db->from(db_prefix() . 'taskstimers');
-        $this->db->where('task_id', $task_id);
-        $this->db->where('MONTH(FROM_UNIXTIME(start_time))', $month);
-        $this->db->where('YEAR(FROM_UNIXTIME(start_time))', $year);
-$this->db->where('staff_id !=', 1);  // Exclude staff with staff_id = 1
-        $query = $this->db->get();
-        return $query->result_array();
-    }
-    
-    
-    
-    public function get_on_time_and_late_staff($date)
-    {   
-        // Get all staff data
-        $this->db->select('*');
-        $this->db->from('tblstaff');
-        $this->db->where('staffid !=', 1);
-        $this->db->where('active', 1);  // Exclude staff with staff_id = 1
-
-        $staffs = $this->db->get()->result();
-
-        $on_timers = array();
-        $late_joiners = array();
-
-        // Iterate each staff
-        foreach($staffs as $staff) {
-            
-            $late_status = $this->check_staff_late($staff->staffid, $date);
-
-            if($late_status['status'] === 'absent'){
-                // Handle absent case if needed
-                continue;
-            }
-
-            $staff->late_status = $late_status;  // Attach the entire $late_status data to $staff object
-            // Check if staff is late in first shift only
-            if($late_status['status'] === 'late'){
-                $late_joiners[] = $staff;
-            } else {
-                $on_timers[] = $staff;
-            }
-        }
-
-        return ['on_timers' => $on_timers, 'late_joiners' => $late_joiners];
-    }
-
-    
-    public function get_staff_on_leave($date) {
-        $this->db->select('tbl_staff_leaves.staff_id, tbl_staff_leaves.shift,tblstaff.firstname');
-        $this->db->distinct();
-        $this->db->from(db_prefix() . '_staff_leaves');
-        $this->db->join(db_prefix() . 'staff', 'tblstaff.staffid = tbl_staff_leaves.staff_id');
-$this->db->where('tblstaff.staffid !=', 1);
-$this->db->where('tblstaff.active', 1); // Exclude staff with staff_id = 1
-        $this->db->where('start_date <=', $date);
-        $this->db->where('end_date >=', $date);
-        $query = $this->db->get();
-        return $query->result_array();
-    }
-
-    public function get_most_clocked_in_staff_member_monthly($start_date, $end_date) {
-        $this->db->select('staff_id, tblstaff.firstname, SUM(TIMESTAMPDIFF(SECOND, clock_in, clock_out)) as total_time');
-        $this->db->from(db_prefix() . '_staff_time_entries');
-        $this->db->join(db_prefix() . 'staff', 'tblstaff.staffid = tbl_staff_time_entries.staff_id');
-$this->db->where('tblstaff.staffid !=', 1); // Exclude staff with staff_id = 1
-$this->db->where('tblstaff.active', 1);
-        $this->db->where('DATE(clock_in) >=', $start_date);
-        $this->db->where('DATE(clock_out) <=', $end_date);
-        $this->db->group_by('staff_id');
-        $this->db->order_by('total_time', 'DESC');
-        $this->db->limit(1);
-        $query = $this->db->get();
-        return $query->row_array();
-    }
-    
-
-    public function get_day_summary($date) {
-        $this->db->where('date', $date);
-        $query = $this->db->get(db_prefix() . '_day_summaries');
-        return $query->row();
-    }
 
     public function get_day_summary_staff($date, $staff_id) {
         $this->db->where('date', $date);
         $this->db->where('staff_id', $staff_id);
-$this->db->where('staff_id !=', 1); // Excluding staff with ID 1
+        $this->db->where('staff_id !=', 1); // Excluding staff with ID 1
         $query = $this->db->get(db_prefix() . '_staff_summaries');
         return $query->row();
     }
@@ -2400,25 +1690,6 @@ $this->db->where('staff_id !=', 1); // Excluding staff with ID 1
             return $this->db->update(db_prefix() . '_day_summaries', ['summary' => $summary, 'updated_at' => date('Y-m-d')]);
         } else {
             return $this->db->insert(db_prefix() . '_day_summaries', ['date' => $date, 'summary' => $summary, 'created_at' => date('Y-m-d')]);
-        }
-    }
-
-    public function get_monthly_summary($month, $year) {
-        $this->db->where('month', $month);
-        $this->db->where('year', $year);
-        $query = $this->db->get(db_prefix() . '_monthly_summaries');
-        return $query->row();
-    }
-
-    public function save_monthly_summary($month, $year, $summary) {
-        $monthly_summary = $this->get_monthly_summary($month, $year);
-        
-        if ($monthly_summary) {
-            $this->db->where('month', $month);
-            $this->db->where('year', $year);
-            return $this->db->update(db_prefix() . '_monthly_summaries', ['summary' => $summary, 'updated_at' => date('Y-m-d')]);
-        } else {
-            return $this->db->insert(db_prefix() . '_monthly_summaries', ['month' => $month, 'year' => $year, 'summary' => $summary, 'created_at' => date('Y-m-d')]);
         }
     }
 
@@ -2445,38 +1716,6 @@ $this->db->where('staff_id !=', 1); // Excluding staff with ID 1
         return $this->db->delete('tbl_staff_time_entries');
     }
 
-    public function get_projects() {
-        $this->db->select('tblprojects.*, COUNT(tbltasks.id) AS total_tasks, SUM(CASE WHEN tbltasks.status = 5 THEN 1 ELSE 0 END) AS completed_tasks');
-        $this->db->from(db_prefix() . 'projects');
-        $this->db->join(db_prefix() . 'tasks', 'tblprojects.id = tbltasks.rel_id AND tbltasks.rel_type = "project"', 'left');
-        $this->db->where("tblprojects.status", "2");
-        $this->db->group_by('tblprojects.id');
-        $this->db->order_by("tblprojects.id", "DESC");
-        $query = $this->db->get();
-    
-        return $query->result_array();
-    }
-    
-
-    public function get_project_tasks($project_id) {
-        $this->db->select('*');
-        $this->db->from(db_prefix() . 'tasks');
-        $this->db->where('rel_id', $project_id);
-        $this->db->where('rel_type', 'project');
-        $this->db->order_by('datefinished', 'ASC');
-        $this->db->order_by('priority', 'ASC');
-        $query = $this->db->get();
-        return $query->result_array();
-    }
-
-    public function get_unassigned_staff($task_id) {
-        $this->db->select('tblstaff.staffid, tblstaff.firstname, tblstaff.lastname');
-        $this->db->from('tblstaff');
-        $this->db->join('tbltask_assigned', 'tblstaff.staffid = tbltask_assigned.staffid AND tbltask_assigned.taskid = ' . $this->db->escape($task_id), 'left');
-        $this->db->where('tbltask_assigned.taskid IS NULL', null, false);
-        $query = $this->db->get();
-        return $query->result_array();
-    }
 
     public function assign_staff_to_task($task_id, $staff_id, $assigned_from) {
         $data = [
@@ -2488,37 +1727,6 @@ $this->db->where('staff_id !=', 1); // Excluding staff with ID 1
         $this->db->insert(db_prefix() . 'task_assigned', $data);
         return $this->db->affected_rows() > 0;
     }
-
-    public function get_projects_with_task_counts() {
-        $this->db->select('tblprojects.*, COUNT(tbltasks.id) AS total_tasks, SUM(CASE WHEN tbltasks.status = 5 THEN 1 ELSE 0 END) AS completed_tasks');
-        $this->db->from(db_prefix() . 'tblprojects');
-        $this->db->join(db_prefix() . 'tbltasks', 'tblprojects.id = tbltasks.rel_id AND tbltasks.rel_type = "project"', 'left');
-        $this->db->group_by('tblprojects.id');
-        $query = $this->db->get();
-    
-        return $query->result_array();
-    } 
-
-    public function add_dummy_task($project_id, $task_name)
-    {
-        $data = [
-            'project_id' => $project_id,
-            'name' => $task_name,
-            'created_at' => date('Y-m-d H:i:s'),
-        ];
-
-        $this->db->insert(db_prefix() . '_dummy_tasks', $data);
-
-        return $this->db->insert_id();
-    }
-
-    public function get_dummy_tasks_by_project($project_id)
-    {
-        $this->db->where('project_id', $project_id);
-        $query = $this->db->get(db_prefix() . '_dummy_tasks');
-        return $query->result_array();
-    }
-
 
     public function get_tasks_by_staff_member($staff_id)
     {
@@ -2532,31 +1740,6 @@ $this->db->where('staff_id !=', 1); // Excluding staff with ID 1
         return $query->result();
     }
 
-
-    public function assign_task_to_dummy_task($taskId, $dummyTaskId)
-    {
-        $this->db->set('task_id', $taskId);
-        $this->db->where('id', $dummyTaskId);
-        return $this->db->update(db_prefix() . '_dummy_tasks');
-    }
-
-    public function fetch_task_details($taskId) {
-        $this->db->select('tbltasks.name as task_name, tblstaff.staffid as assigned_user, tbltasks.id as task_id, tbltasks.status as status')
-            ->from('tbltasks')
-            ->join('tbltask_assigned', 'tbltask_assigned.taskid = tbltasks.id', 'left')
-            ->join('tblstaff', 'tblstaff.staffid = tbltask_assigned.staffid', 'left')
-            ->where('tbltasks.id', $taskId)
-            ->limit(1);
-    
-        $query = $this->db->get();
-        return $query->row_array();
-    }    
-
-    public function delete_dummy_task($dummy_task_id)
-    {
-        $this->db->where('id', $dummy_task_id);
-        return $this->db->delete('tbl_dummy_tasks');
-    }
 
     public function get_staff_summary($staff_id, $date) {
         $this->db->where('staff_id', $staff_id);
@@ -2594,56 +1777,7 @@ $this->db->where('staff_id !=', 1); // Excluding staff with ID 1
           $this->db->insert('tbl_staff_summaries', $data);
         }
       }
-      
-
-    public function get_staff_summaries($date) {
-        // Fetch summaries from the database
-        $this->db->select('tbl_staff_summaries.staff_id, tbl_staff_summaries.summary, tblstaff.firstname, tblstaff.lastname');
-        $this->db->from('tbl_staff_summaries');
-        $this->db->join('tblstaff', 'tblstaff.staffid = tbl_staff_summaries.staff_id', 'left');
-        $this->db->where('tbl_staff_summaries.date', $date);
-        $query = $this->db->get();
     
-        // Convert the result set to an associative array
-        $summaries = array();
-        foreach ($query->result() as $row) {
-            $summaries[$row->staff_id] = array(
-                'staffid' => $row->staff_id,
-                'summary' => $row->summary,
-                'staff_name' => $row->firstname . ' ' . $row->lastname
-            );
-        }
-    
-        return $summaries;
-    }
-
-    public function get_all_staff_google_chat() {
-        $this->db->select('tbl_staff_google_chat.staff_id, tbl_staff_google_chat.google_chat_user_id, tblstaff.firstname, tblstaff.lastname, tblstaff.staffid');
-        $this->db->from('tblstaff');
-        $this->db->join('tbl_staff_google_chat', 'tblstaff.staffid = tbl_staff_google_chat.staff_id', 'left');
-        $this->db->where('tblstaff.active', 1);
-        $staff = $this->db->get()->result_array();
-        return $staff;
-    }
-    
-    public function update_or_insert_google_chat_id($staff_id, $google_chat_user_id) {
-        $data = array(
-           'staff_id' => $staff_id,
-           'google_chat_user_id' => $google_chat_user_id
-        );
-    
-        $this->db->where('staff_id', $staff_id);
-        $query = $this->db->get('tbl_staff_google_chat');
-    
-        if ($query->num_rows() > 0) {
-            // A record does exist, so update it.
-            $this->db->where('staff_id', $staff_id);
-            $this->db->update('tbl_staff_google_chat', $data);
-        } else {
-            // No record exists, so insert a new one.
-            $this->db->insert('tbl_staff_google_chat', $data);
-        }
-    }
 
     public function get_today_shift_timings() {
         $this->db->where('day', date('j')); // today's day
@@ -2884,22 +2018,6 @@ $this->db->where('staff_id !=', 1); // Excluding staff with ID 1
         return $this->db->get()->result_array();
     }
 
-    public function get_clients() {
-
-        $this->db->select('*');
-        $this->db->from('tblclients');
-        
-        return $this->db->get()->result_array();
-    }
-
-    public function get_clients_contacts($userid) {
-
-        $this->db->select('*');
-        $this->db->from('tblcontacts');
-        $this->db->where("userid", $userid);
-        
-        return $this->db->get()->result_array();
-    }
     
 
     public function check_staff_late($staff_id, $date){
@@ -2978,7 +2096,12 @@ $this->db->where('staff_id !=', 1); // Excluding staff with ID 1
     }
     
 
-    public function get_monthly_afks($staffId, $month, $year = '2023') {
+    public function get_monthly_afks($staffId, $month, $year = null) {
+
+        if($year == null){
+            $year = date('Y');
+        }
+
         // The table name
         $table_name = 'tbl_staff_status_entries';
         
@@ -3007,224 +2130,5 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
     }
     
 
-    public function flash_stats($date) {
-        // Initialize counters and staff name arrays for each status category
-        $counters = [
-            'leave' => 0,
-            'absent' => 0,
-            'present' => 0,
-            'late' => 0
-        ];
-    
-        $staffNames = [
-            'leave' => [],
-            'absent' => [],
-            'present' => [],
-            'late' => []
-        ];
-        
-        // Step 1: Select all active staff members with their names
-        $this->db->select('staffid, firstname');
-        $this->db->from('tblstaff');
-$this->db->where('staffid !=', 1);
-
-        $this->db->where('active', 1);
-        $query = $this->db->get();
-        $active_staff = $query->result_array();
-        
-        // Step 2: Loop through active staff members to check their statuses
-        foreach ($active_staff as $staff) {
-            $staff_id = $staff['staffid'];
-            $staff_name = $staff['firstname'];
-    
-            // Check if staff is on leave
-            if ($this->is_on_leave($staff_id, $date)) {
-                $counters['leave']++;
-                $staffNames['leave'][] = ['id' => $staff_id, 'name' => $staff_name];
-                continue;
-            }
-        
-            // Use the check_staff_late function to get the status
-            $result = $this->check_staff_late($staff_id, $date);
-            if (isset($result['status'])) {
-                $status = $result['status'];
-                $counters[$status]++;
-                // $staffNames[$status][] = $staff_name;
-                $staffNames[$status][] = ['id' => $staff_id, 'name' => $staff_name];
-
-            }
-        }
-        // return $counters;
-        return ['counters' => $counters, 'staffNames' => $staffNames];
-    }
-
-    
-    public function get_summary_ratio($date) {
-        // Get total number of active staff
-        $this->db->select('staffid as staff_id, firstname'); // Added staff_id
-        $this->db->from('tblstaff');
-$this->db->where('staffid !=', 1);  // This line excludes staff with ID=1
-        $this->db->where('active', 1);
-        $query_all_staff = $this->db->get();
-        
-        $all_staff_names = $query_all_staff->result_array();
-        $total_staff = count($all_staff_names);
-    
-        // Get the number of staff who have added summaries for the specific date
-        $this->db->distinct();
-        $this->db->select('tbl_staff_summaries.staff_id, tblstaff.firstname');
-        $this->db->from('tbl_staff_summaries');
-        $this->db->join('tblstaff', 'tblstaff.staffid = tbl_staff_summaries.staff_id', 'inner');
-        $this->db->where('date', $date);
-        $query_submitted = $this->db->get();
-        
-        $staff_with_summaries = $query_submitted->num_rows();
-        $staff_names_and_ids = $query_submitted->result_array();
-    
-        if ($total_staff == 0) {
-            return 0; // Prevent division by zero
-        }
-        
-        // Fetch images here and include them in the return value if necessary
-        
-        return [
-            'staff_with_summaries' => $staff_with_summaries, 
-            'total_staff' => $total_staff,
-            'staff_names_and_ids' => $staff_names_and_ids,
-            'all_staff_names' => $all_staff_names,
-            // Include images here if necessary
-        ];
-    }
-
-    public function get_summary_ratio_and_names($date) {
-        // Get total number of active staff
-        $this->db->select('staffid as staff_id, firstname'); // Added staff_id
-        $this->db->from('tblstaff');
-        $this->db->where('active', 1);
-        $query_all_staff = $this->db->get();
-        
-        $all_staff_names = $query_all_staff->result_array();
-        $total_staff = count($all_staff_names);
-    
-        // Get the number of staff who have added summaries for the specific date
-        $this->db->distinct();
-        $this->db->select('tbl_staff_summaries.staff_id, tblstaff.firstname');
-        $this->db->from('tbl_staff_summaries');
-        $this->db->join('tblstaff', 'tblstaff.staffid = tbl_staff_summaries.staff_id', 'inner');
-        $this->db->where('date', $date);
-        $query_submitted = $this->db->get();
-        
-        $staff_with_summaries = $query_submitted->num_rows();
-        $staff_names_and_ids = $query_submitted->result_array();
-    
-        if ($total_staff == 0) {
-            return 0; // Prevent division by zero
-        }
-        
-        // Fetch images here and include them in the return value if necessary
-        
-        return [
-            'staff_with_summaries' => $staff_with_summaries, 
-            'total_staff' => $total_staff,
-            'staff_names_and_ids' => $staff_names_and_ids,
-            'all_staff_names' => $all_staff_names,
-            // Include images here if necessary
-        ];
-    }
-
-
-    
-        // return ['staff_with_summaries' => $staff_with_summaries, 'total_staff' => $total_staff]; // Round to two decimal places
-    
-
-    // public function get_summary_ratio($date) {
-    //     // Get total number of active staff
-    //     $this->db->where('active', 1);
-    //     $total_staff = $this->db->count_all_results('tblstaff');
-        
-    //     // Get the IDs of staff who have added summaries for the specific date
-    //     $this->db->distinct();
-    //     $this->db->select('staff_id');
-    //     $this->db->where('date', $date);
-    //     $this->db->from('tbl_staff_summaries');
-    //     $query = $this->db->get();
-    //     $staff_ids_with_summaries = $query->result_array();  // This should give an array of staff_ids
-      
-    //     // Check if any summaries were submitted
-    //     if (empty($staff_ids_with_summaries)) {
-    //       return ['staff_with_summaries' => 0, 'staff_names_with_summaries' => [], 'total_staff' => $total_staff]; 
-    //     }
-      
-    //     // Fetch staff names based on those IDs
-    //     $this->db->where_in('id', array_column($staff_ids_with_summaries, 'staff_id'));
-    //     $this->db->from('tblstaff');
-    //     $query = $this->db->get();
-    //     $staff_names_with_summaries = $query->result_array();  // This should give an array of staff names
-      
-    //     if ($total_staff == 0) {
-    //         return 0; // Prevent division by zero
-    //     }
-        
-    //     return ['staff_with_summaries' => count($staff_ids_with_summaries), 'staff_names_with_summaries' => $staff_names_with_summaries, 'total_staff' => $total_staff]; 
-    //   }
-      
-
-    public function get_monthly_attendance_stats($month, $year) {
-        $num_days = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-        $attendance_stats = [
-            'present' => array_fill(1, $num_days, 0),
-            'absent' => array_fill(1, $num_days, 0),
-            'late' => array_fill(1, $num_days, 0),
-            'leave' => array_fill(1, $num_days, 0)
-        ];
-
-        $today = date("Y-m-d");
-    
-        for ($day = 1; $day <= $num_days; $day++) {
-            $date = "$year-$month-$day";
-            $active_staff = $this->db->select('staffid')->from('tblstaff')->where('active', 1)->where('staffid !=', 1)->get()->result_array();
-
-            if(strtotime($date) > strtotime($today)){
-                continue;
-            }
-            
-            foreach ($active_staff as $staff) {
-                $staff_id = $staff['staffid'];
-                if ($this->is_on_leave($staff_id, $date)) {
-                    $attendance_stats['leave'][$day]++;
-                } else {
-                    $status = $this->check_staff_late($staff_id, $date)['status'];
-                    $attendance_stats[$status][$day]++;
-                }
-            }
-        }
-        return $attendance_stats;
-    }
-    
-    public function get_task_stats_by_staff_date($staff_id, $date)
-    {
-        $tasks = $this->get_tasks_by_staff_member($staff_id);
-
-        $total_tasks = 0;
-        $completed_tasks = 0;
-
-        foreach ($tasks as $task) {
-            $taskDueConsideration = ($task->duedate) ? $task->duedate : $task->startdate;
-
-            if (
-                (strtotime($task->startdate) <= strtotime($date) && strtotime($taskDueConsideration) >= strtotime($date))
-                ||
-                (strtotime($task->startdate) <= strtotime($date) && $task->status != 5 && strtotime($taskDueConsideration) < strtotime($date))
-            )
-            {
-                $total_tasks++;
-                if ($task->status == 5) {
-                    $completed_tasks++;
-                }
-            }
-        }
-
-        return array('total_tasks' => $total_tasks, 'completed_tasks' => $completed_tasks);
-    }
 
 }

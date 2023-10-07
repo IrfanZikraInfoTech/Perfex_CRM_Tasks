@@ -38,11 +38,15 @@
 }
 .shift-time {
     background: linear-gradient(90deg, rgba(255, 105, 180, 0.2) 0%, rgba(255, 182, 193, 0.2) 100%)!important;
-    border-color: rgba(255, 105, 180, 0.2)!important;
+    border-color: rgba(255, 105, 180, 1)!important;
 }
 
 .liked-bg-color {
     background-color: red !important;
+}
+
+#visualization .vis-timeline{
+    border-radius:30px;
 }
 </style>
 
@@ -60,37 +64,35 @@
         </div>
     <div class="content">
         <div class="row">
-                <?php $this->load->view('admin/includes/alerts'); ?>
+                <?php //$this->load->view('admin/includes/alerts'); ?>
 
                 <?php hooks()->do_action('before_start_render_dashboard_content'); ?>
 
                 <div class="clearfix"></div> 
                 
-                <div class="col-md-12" data-container="middle-left-6">
+                <div class="col-md-12 my-4" data-container="middle-left-6">
                     <?php $this->load->view('admin/management/dashboard_widget' ); ?>
                     <?php render_dashboard_widgets('middle-left-6'); ?>
                 </div>
                
-                <div class="col-md-12" data-container="middle-left-6"> 
-                    <div class="flex  gap-x-4">
-                        <div class="bg-white shadow rounded-lg p-4 my-4 flex md:flex-row flex-col justify-between h-full w-3/4">
-                            <div id="visualization"  class="relative w-full " >
-                            </div>
-                        </div>
-                        <div class="myscrollbar  bg-white shadow rounded-lg p-6 my-4 w-1/4 h-[145px] mx-auto  overflow-y-auto">
-                            <h5 class="attendance text-xl font-semibold mb-2 text-center text-gray-700 border-b pb-2">Attendance Overview</h1>
+                <div class="col-md-12 my-4" data-container="middle-left-6"> 
+
+                    <div class="flex gap-x-4">
+                        
+                        <div class="myscrollbar bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all rounded-[50px] p-6 w-1/4 mx-auto  overflow-y-auto">
+                            <h5 class="attendance text-xl font-semibold mb-2 text-center text-gray-700 border-b pb-2">Attendance</h1>
                             <div class="mt-4 flex flex-col space-y-3">
 
                                 <!-- Attendance Status -->
                                 <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                                    <span class="text-gray-600">Attendance:</span>
+                                    <span class="text-gray-600">Status:</span>
                                     <span class="text-green-500 font-bold">Present</span>
-                                    <!-- You can change the color to red for 'Absent' and yellow for 'Late' -->
+
                                 </div>
 
                                 <!-- Punctuality Rate -->
                                 <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                                    <span class="text-gray-600">Punctuality Rate:</span>
+                                    <span class="text-gray-600">Rate:</span>
                                     <span class="font-semibold">95%</span>
                                 </div>
 
@@ -103,25 +105,31 @@
 
                             </div>
                         </div>
+
+                        <div class="bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all rounded-[50px] p-7 flex md:flex-row flex-col justify-between h-full w-3/4">
+                            <div id="visualization"  class="relative w-full rounded-[50px]" >
+                            </div>
+                        </div>
+
+
                     </div>
                 </div>
 
 
 
-                <!--Tasks/ Announcement -->
-                <div class="col-md-12" data-container="middle-left-6">
-                    <div class="flex lg:flex-row flex-col justify-between w-full bg-white rounded-xl overflow-hidden">
-                        <!-- Assigned Tasks -->
-                        <div class="lg:w-1/2 w-full transition-all hover:shadow-sm rounded overflow-hidden p-8 xl:pr-10 md:pl-10">
-                            <div class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold">Assigned Task</div>
-                            
-                            <div class="flex flex-col h-full">
-                                <div class="myscrollbar p-1 flex flex-col mt-4 gap-5 h-[520px] overflow-y-auto ">         
-                                    <div class="space-y-4 ">
-                                        <?php
-                                        $tasks = $this->team_management_model->get_tasks_by_staff_member($GLOBALS['current_user']->staffid);
-                                        $total_tasks = 0;
-                                        $completed_tasks = 0;
+
+            <div class="col-md-12 my-4 flex md:flex-row flex-col gap-10">
+                    <!-- Assigned Tasks -->
+                    <div class="lg:w-1/2 w-full transition-all rounded-[50px] overflow-hidden p-5 bg-white shadow-xl">
+
+                        <div class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">Assigned Task</div>
+                        
+                        <div class="flex flex-col h-full bg-gray-100 p-4 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar max-h-[300px]">
+                            <div class="p-1 flex flex-col mt-4 gap-2">         
+                                    <?php
+                                    $tasks = $this->team_management_model->get_tasks_by_staff_member($GLOBALS['current_user']->staffid);
+                                    $total_tasks = 0;
+                                    $completed_tasks = 0;
 
                                         $current_date = date('Y-m-d'); 
 
@@ -134,50 +142,31 @@
                                                 continue; 
                                             }
 
-                                            $total_tasks++;
-
-                                            if ($task->status == 5) {
-                                                $badgeColor = 'bg-green-500 text-white';
-                                                $taskStatusText = 'Completed';
-                                            } elseif ($start_time > $current_time) {
-                                                $badgeColor = 'bg-blue-500 text-white';
-                                                $taskStatusText = 'Not Started';
-                                            } elseif ($start_time == strtotime($current_date) && $due_time == strtotime($current_date)) {
-                                                $badgeColor = 'bg-yellow-400 text-black';
-                                                $taskStatusText = 'In Progress';
-                                            } elseif ($due_time < $current_time && $task->status != 5) {
-                                                $badgeColor = 'bg-red-500 text-white';
-                                                $taskStatusText = 'Not Completed';
-                                            } elseif ($start_time <= $current_time && $due_time >= $current_time) {
-                                                $badgeColor = 'bg-yellow-400 text-black';
-                                                $taskStatusText = 'In Progress';
-                                            }
-                                            echo '
-                                            <div class="flex justify-between items-center p-4 bg-gray-100 rounded-xl shadow hover:shadow-md transition-all duration-500">
-                                                <a onclick="init_task_modal(' . $task->id . '); return false" href="#" class="font-semibold text-gray-800">' . $task->name . '</a>
-                                                <span class="px-4 py-1 rounded-full text-sm font-medium ' . $badgeColor . ' whitespace-nowrap">' . $taskStatusText . '</span>
-                                            </div>
-                                            ';
-
-                                            if ($task->status == 5) {
-                                                $completed_tasks++;
-                                            }
-                                        }
                                         ?>
-                                    </div>
-                                </div>
+                                        <button class="task-block bg-white px-4 py-2 rounded-xl cursor-pointer border border-gray-200 border-solid transition-all hover:border-gray-400 hover:shadow-lg" data-task-id="<?= $task->id ?>" onclick="init_task_modal(<?= $task->id ?>)">
+                                            <div class="flex items-center justify-between">
+                                                <span class="font-semibold"><?= $task->name ?></span>
+                                                <span><?= format_task_status($task->status);  ?></span>
+                                            </div>
+                                        </button>
+
+                                        <?php
+
+                                    }
+                                    ?>
                             </div>
                         </div>
+                    </div>
 
                         <!-- Newsfeed Panel Section -->
-                        <div class="lg:w-1/2 w-full bg-lightgray-200 border-l border-gray-200 flex flex-col px-5 py-8">
+                        <div class="lg:w-1/2 w-full  border-l border-gray-200 flex flex-col p-5 bg-white rounded-[50px] shadow-lg">
                             <div class="panel-body p-0 m-0">
                                 <div class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5 ">Announcements</div>
-                                <div class="bg-gray-100 rounded-lg p-4 py-3 shadow-inner">
+                                <div class="bg-gray-100 p-4 py-3 shadow-inner rounded-[50px] overflow-y-scroll myscrollbar max-h-[300px]">
                                         
                                     <?php $count = 0;
                                     foreach($posts as $post):
-                                        if($count >= 3) break; 
+
                                         $isLiked = $this->newsfeed_model->user_liked_post($post["postid"]) ? "true" : "false";
                                         $totalLikes = count($this->newsfeed_model->get_post_likes($post["postid"]));
                                         $currentDateTime = new DateTime();
@@ -199,7 +188,7 @@
                                             $timeString = 'just now';
                                         }
                                     ?>
-                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="dashboard-posts bg-white rounded-xl m-4 p-4 pb-2 cursor-pointer hover:shadow-md transition" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this)">
+                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-gray-400" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this)">
                                             <div class="flex justify-between items-center">
                                                 <div class="font-bold text-xl"><?= $post["creator_name"] ?></div>
                                                 <div class="text-gray-500 text-sm italic"><?= $timeString ?></div>
@@ -219,59 +208,72 @@
                                         </div> 
                                     <?php $count++;
                                     endforeach;  
-                                    ?>
-                                </div>    
+    
+                                if($count < 1){
+                                    echo '<h2>No announcements!</h2>';
+                                }
+
+                                ?>
+                                    </div>    
                             </div>    
                         </div>    
                     </div>
-                </div>
+    
 
 
-                <!-- Summary -->
-                <div class="col-md-12"  data-container="middle-left-6">
-                    <div class="flex lg:flex-row flex-col justify-between w-full bg-white shadow-md rounded-lg mt-5">
-                        <div class="w-full transition-all hover:shadow-sm rounded overflow-hidden p-8 xl:pr-10 md:pl-10">
-                            <!-- Row for Summary heading and Date Picker -->
-                            <div class="flex justify-between items-center mb-4">
-                                <div class="uppercase tracking-wide text-xl text-gray-700 font-bold text-center w-full">Summary</div>
-                                <input type="date" id="summary_date" class="rounded p-2 mr-4" onchange="getOrSaveStaffSummary();">
-                            </div>
+            
+                <!-- Summary-->
+            <div class="col-md-12 my-4">
+                
+                <div class="p-4 w-full bg-white shadow-xl rounded-[40px]">
 
-                            <div class="flex mb-4">
-                                <!-- Left Box with dummy summary -->
-                                <div class="flex-grow p-4 h-[150px] border bg-gray-100/20">
-                                    <!-- <h4><b>DUMMY SUMMARY </b></h4> -->
-                                    <textarea class="w-full h-full shadow-inner p-3 bg-gray-100/20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none overflow-y-hidden" readonly >DUMMY SUMMARY: Today I worked on the QCA Newsletter Design, followed up with the team for the October 2023 plan for recurring marketing projects, and connected with Ansar to discuss the new scrum workflow.</textarea>
-                                </div>
-                                
-                                
-                                <!-- Right Box for writing summary -->
-                                <div class="flex-grow p-4 border">
-                                    <textarea id="summary-textarea" class="w-full h-full p-3 bg-gray-100/20 border border-gray-300 shadow-inner rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none" placeholder="Write your summary here..."></textarea>
-                                </div>
-                            </div>
 
-                            <div class="px-4 pb-4">
-                                <button onclick="getOrSaveStaffSummary(document.getElementById('summary-textarea').value)" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">Submit</button>
-                            </div>
+                        <!-- Row for Summary heading and Date Picker -->
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="uppercase tracking-wide text-xl text-gray-700 font-bold text-center w-full">Summary</div>
+                            <input type="date" id="summary_date" class="rounded p-2 mr-4" onchange="getOrSaveStaffSummary();">
                         </div>
-                    </div>
+
+                        <div class="flex flex-row bg-gray-100 min-h-[300px] rounded-[50px]">
+                            <!-- Left Box with dummy summary -->
+                            
+                            <div class="w-1/2 p-4">
+                                    <!-- <h4><b>DUMMY SUMMARY </b></h4> -->
+                                    <textarea class="w-full h-full transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-hidden text-lg border border-gray-200 border-solid hover:border-gray-400" readonly >DUMMY SUMMARY: Today I worked on the QCA Newsletter Design, followed up with the team for the October 2023 plan for recurring marketing projects, and connected with Ansar to discuss the new scrum workflow.</textarea>
+                            </div>
+                            
+                            
+                            <!-- Right Box for writing summary -->
+                            <div class="w-1/2 p-4 flex flex-col gap-3">
+                                <textarea id="summary-textarea" class="w-full flex-grow transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-hidden text-lg border border-gray-200 border-solid hover:border-gray-400" placeholder="Write your summary here..."></textarea>
+
+                                <div class="flex flex-row w-full justify-end">
+                                    <button onclick="getOrSaveStaffSummary(document.getElementById('summary-textarea').value)" class="w-full bg-blue-500/90 text-white font-semibold py-2 px-4 rounded-3xl shadow-sm hover:shadow-xl  transition-all border border-blue-200 border-solid hover:border-blue-700">Submit</button>
+                                </div>
+
+
+                            </div>
+
+                            
+
+                        </div>
+
                 </div>
+            </div>
 
 
-                <!-- Countries Clocks -->
-                <div class="col-md-12" data-container="middle-left-6">
-                    <div class="bg-white rounded-lg shadow-md p-4 my-4 flex md:flex-row flex-col justify-between">
-                        <!-- Clocks Container -->
-                        <div id="clocks" class="p-4 rounded-lg text-base md:text-lg grid grid-cols-1 md:grid-cols-2 gap-4 w-full"></div>
-                    </div>
-                </div> 
+            <!-- Countries Clocks -->
+            <div class="col-md-12 my-4"  data-container="middle-left-6">
+                <div class="bg-white shadow-lg rounded-[50px] p-4 my-4 flex md:flex-row flex-col justify-between">
+                    <div id="clocks" class="p-4 rounded-lg text-lg grid grid-cols-2 gap-4 w-full"></div>
+                </div>
+            </div>    
 
-                <!-- Upcoming Birthdays -->
-                <div class="col-md-12" data-container="bottom-right-4">
+            <!-- Upcoming Birthdays -->
+            <div class="col-md-12">
                     <?php if(isset($upcoming_birthdays) && !empty($upcoming_birthdays)): ?>
-                        <div class="upcoming-birthdays bg-white p-6 rounded-lg ">
-                            <h3 class="text-2xl mb-5 text-center font-bold text-gray-700">Upcoming Birthdays</h3>
+                        <div class="upcoming-birthdays bg-white p-6 rounded-[50px] shadow-lg">
+                            <h3 class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">Upcoming Birthdays</h3>
                             <div class="grid grid-cols-2 gap-6">
                                 <?php foreach($upcoming_birthdays as $staff): ?>
                                     <?php
@@ -287,9 +289,12 @@
                                         }
 
                                         $interval = $currentDate->diff($birthdayThisYear);
-                                        $daysRemaining = $interval->d;
+
+
+                                        $daysRemaining = $interval->days;
                                     ?>
-                                        <div class="staff-profile bg-gray-100 p-4 rounded-lg hover:shadow-xl transition-shadow duration-300 shadow-md flex justify-between items-center">
+                                        <div class="staff-profile bg-gray-100 p-4 rounded-[40px] shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all flex justify-between items-center">
+
                                         <?= staff_profile_image($staff['staffid'], ['border-4 border-gradient-to-r from-teal-400 to-blue-500 object-cover w-20 h-20 rounded-full staff-profile-image-thumb mr-4'], 'thumb'); ?>
                                         <div class="staff-details flex-grow flex flex-col">
                                             <span class="staff-name text-xl font-semibold text-gray-800 my-2"><?= $staff['full_name'] ?></span>
@@ -301,25 +306,29 @@
                             </div>
                         </div>
                     <?php endif; ?>
-                </div>
+            </div>
 
-                <!-- Calendar/ Todo -->
-            <div div class="col-md-12 bg-grey" data-container="middle-left-6">
-                <div class="flex gap-x-4">
-                    <div class="w-2/3 bg-white rounded shadow-lg p-4 my-4 flex md:flex-row flex-col justify-between" id="widget-<?php echo create_widget_id(); ?>" data-name="<?php echo _l('calendar'); ?>">
-                        <div class="clearfix"></div>
-                            <div class="panel_s">
-                                <div class="p-2">
-                                    <div class="dt-loader hide"></div>
-                                    <?php $this->load->view('admin/utilities/calendar_filters'); ?>
-                                    <div id="calendar"></div>
-                                </div>
-                            </div>
-                        <div class="clearfix"></div>
+            <!-- Calendar/Todo -->
+            <div class="col-md-12 mt-7">
+
+                <div class="flex flex-row w-full gap-10 rounded-lg">
+
+                    <!-- Calendar Section -->
+                    <div class="w-2/3 rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all">
+
+                        <div class="p-4 ">
+
+                                <div class="dt-loader hide"></div>
+                                <?php $this->load->view('admin/utilities/calendar_filters'); ?>
+                                <div id="calendar"></div>
+
+                        </div>
                     </div>
-                            
-                    <div class="w-1/3 bg-white rounded shadow-lg p-4 my-4 flex md:flex-row flex-col justify-between h-[650px]" id="widget-<?php echo create_widget_id(); ?>" data-name="<?php echo _l('home_my_todo_items'); ?>">
-                            <div class="panel_s todo-panel h-full p-3 w-full shadow-inner">
+
+                    <!-- To do Section -->
+                    <div class="w-1/3 flex md:flex-row flex-col rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all">
+
+                            <div class="panel_s todo-panel h-full p-5 w-full shadow-inner rounded-[50px]">
                                 <div class="tw-flex tw-justify-between tw-items-center">
                                     <p class="tw-font-medium tw-flex tw-items-center tw-mb-0 tw-space-x-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -348,95 +357,94 @@
                                     <i class="fa fa-warning"></i>
                                     <?php echo _l('home_latest_todos'); ?>
                                 </h4>
-                                                <ul class="list-unstyled todo unfinished-todos todos-sortable sortable">
-                                                    <?php foreach ($todos as $todo) { ?>
-                                                    <li>
-                                                        <?php echo form_hidden('todo_order', $todo['item_order']); ?>
-                                                        <?php echo form_hidden('finished', 0); ?>
-                                                        <div class="media tw-mt-2">
-                                                            <div class="media-left no-padding-right">
-                                                                <div class="dragger todo-dragger"></div>
-                                                                <div class="checkbox checkbox-default todo-checkbox">
-                                                                    <input type="checkbox" name="todo_id" value="<?php echo $todo['todoid']; ?>">
-                                                                    <label></label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="media-body">
-                                                                <p class="todo-description read-more no-padding-left"
-                                                                    data-todo-description="<?php echo $todo['todoid']; ?>">
-                                                                    <?php echo $todo['description']; ?>
-                                                                </p>
-                                                                <a href="#" onclick="delete_todo_item(this,<?php echo $todo['todoid']; ?>); return false;"
-                                                                    class="pull-right text-muted">
-                                                                    <i class="fa fa-remove"></i>
-                                                                </a>
-                                                                <a href="#" onclick="edit_todo_item(<?php echo $todo['todoid']; ?>); return false;"
-                                                                    class="pull-right text-muted mright5">
-                                                                    <i class="fa fa-pencil"></i>
-                                                                </a>
-                                                                <span class="todo-date tw-text-sm tw-text-neutral-500">
-                                                                    <?php echo $todo['dateadded']; ?>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <?php } ?>
-                                                    <li class="padding no-todos ui-state-disabled <?php if ($total_todos > 0) {echo 'hide';} ?>"><?php echo _l('home_no_latest_todos'); ?></li>
-                                                </ul>
-                                                <?php $total_finished_todos = count($todos_finished); ?>
-                                                <h4 class="todo-title text-success tw-mt-4 tw-text-lg tw-mb-2">
-                                                    <i class="fa fa-check"></i>
-                                                    <?php echo _l('home_latest_finished_todos'); ?>
-                                                </h4>
-                                                <ul class="list-unstyled todo finished-todos todos-sortable sortable">
-                                                    <?php foreach ($todos_finished as $todo_finished) { ?>
-                                                    <li>
-                                                        <?php echo form_hidden('todo_order', $todo_finished['item_order']); ?>
-                                                        <?php echo form_hidden('finished', 1); ?>
-                                                        <div class="media tw-mt-2">
-                                                            <div class="media-left no-padding-right">
-                                                                <div class="dragger todo-dragger"></div>
-                                                                <div class="checkbox checkbox-default todo-checkbox">
-                                                                    <input type="checkbox" value="<?php echo $todo_finished['todoid']; ?>" name="todo_id"
-                                                                        checked>
-                                                                    <label></label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="media-body">
-                                                                <p class="todo-description read-more line-throught no-padding-left">
-                                                                    <?php echo $todo_finished['description']; ?>
-                                                                </p>
-                                                                <a href="#"
-                                                                    onclick="delete_todo_item(this,<?php echo $todo_finished['todoid']; ?>); return false;"
-                                                                    class="pull-right text-muted"><i class="fa fa-remove"></i></a>
-                                                                <a href="#" onclick="edit_todo_item(<?php echo $todo_finished['todoid']; ?>); return false;"
-                                                                    class="pull-right text-muted mright5">
-                                                                    <i class="fa fa-pencil"></i>
-                                                                </a>
-                                                                <span class="todo-date todo-date-finished tw-text-sm tw-text-neutral-500">
-                                                                    <?php echo $todo_finished['datefinished']; ?>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <?php } ?>
-                                                    <li class="padding no-todos ui-state-disabled <?php if ($total_finished_todos > 0) {
-                                                        echo 'hide';
-                                                    } ?>"><?php echo _l('home_no_finished_todos_found'); ?></li>
-                                                </ul>
+                                <ul class="list-unstyled todo unfinished-todos todos-sortable sortable">
+                                    <?php foreach ($todos as $todo) { ?>
+                                    <li>
+                                        <?php echo form_hidden('todo_order', $todo['item_order']); ?>
+                                        <?php echo form_hidden('finished', 0); ?>
+                                        <div class="media tw-mt-2">
+                                            <div class="media-left no-padding-right">
+                                                <div class="dragger todo-dragger"></div>
+                                                <div class="checkbox checkbox-default todo-checkbox">
+                                                    <input type="checkbox" name="todo_id" value="<?php echo $todo['todoid']; ?>">
+                                                    <label></label>
+                                                </div>
+                                            </div>
+                                            <div class="media-body">
+                                                <p class="todo-description read-more no-padding-left"
+                                                    data-todo-description="<?php echo $todo['todoid']; ?>">
+                                                    <?php echo $todo['description']; ?>
+                                                </p>
+                                                <a href="#" onclick="delete_todo_item(this,<?php echo $todo['todoid']; ?>); return false;"
+                                                    class="pull-right text-muted">
+                                                    <i class="fa fa-remove"></i>
+                                                </a>
+                                                <a href="#" onclick="edit_todo_item(<?php echo $todo['todoid']; ?>); return false;"
+                                                    class="pull-right text-muted mright5">
+                                                    <i class="fa fa-pencil"></i>
+                                                </a>
+                                                <span class="todo-date tw-text-sm tw-text-neutral-500">
+                                                    <?php echo $todo['dateadded']; ?>
+                                                </span>
                                             </div>
                                         </div>
-                                            <?php $this->load->view('admin/todos/_todo.php'); ?>
-                                    </div>
+                                    </li>
+                                    <?php } ?>
+                                    <li class="padding no-todos ui-state-disabled <?php if ($total_todos > 0) {echo 'hide';} ?>"><?php echo _l('home_no_latest_todos'); ?></li>
+                                </ul>
+                                <?php $total_finished_todos = count($todos_finished); ?>
+                                <h4 class="todo-title text-success tw-mt-4 tw-text-lg tw-mb-2">
+                                    <i class="fa fa-check"></i>
+                                    <?php echo _l('home_latest_finished_todos'); ?>
+                                </h4>
+                                <ul class="list-unstyled todo finished-todos todos-sortable sortable">
+                                    <?php foreach ($todos_finished as $todo_finished) { ?>
+                                    <li>
+                                        <?php echo form_hidden('todo_order', $todo_finished['item_order']); ?>
+                                        <?php echo form_hidden('finished', 1); ?>
+                                        <div class="media tw-mt-2">
+                                            <div class="media-left no-padding-right">
+                                                <div class="dragger todo-dragger"></div>
+                                                <div class="checkbox checkbox-default todo-checkbox">
+                                                    <input type="checkbox" value="<?php echo $todo_finished['todoid']; ?>" name="todo_id"
+                                                        checked>
+                                                    <label></label>
+                                                </div>
+                                            </div>
+                                            <div class="media-body">
+                                                <p class="todo-description read-more line-throught no-padding-left">
+                                                    <?php echo $todo_finished['description']; ?>
+                                                </p>
+                                                <a href="#"
+                                                    onclick="delete_todo_item(this,<?php echo $todo_finished['todoid']; ?>); return false;"
+                                                    class="pull-right text-muted"><i class="fa fa-remove"></i></a>
+                                                <a href="#" onclick="edit_todo_item(<?php echo $todo_finished['todoid']; ?>); return false;"
+                                                    class="pull-right text-muted mright5">
+                                                    <i class="fa fa-pencil"></i>
+                                                </a>
+                                                <span class="todo-date todo-date-finished tw-text-sm tw-text-neutral-500">
+                                                    <?php echo $todo_finished['datefinished']; ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <?php } ?>
+                                    <li class="padding no-todos ui-state-disabled <?php if ($total_finished_todos > 0) {
+                                        echo 'hide';
+                                    } ?>"><?php echo _l('home_no_finished_todos_found'); ?></li>
+                                </ul>
                                 </div>
                             </div>
+                            <?php $this->load->view('admin/todos/_todo.php'); ?>
                     </div>
-            
                 </div>
             </div>
+
         </div>
     </div>
 </div>
+
+
 
 <!-- MODAL CODE -->
 <div id="postModal" class="hidden fixed inset-0 flex items-center justify-center z-50">
@@ -537,123 +545,21 @@ function closeModal() {
 }
 
 </script>
-<!-- 
-<script>
-    var dailyStats = <?php echo json_encode($daily_stats); ?>;
-    
-
-
-    function fetchDailyInfos(staff_id) {
-    let data = dailyStats;
-   
-    console.log(data);
-    console.log('Total clocked-in time:', data.total_clocked_in_time);
-    console.log('Total shift duration:', data.total_shift_duration);
-    
-    
-    const afk_entries = data.afk_and_offline.filter(entry => entry.status === 'AFK');
-    // const offline_entries = data.afk_and_offline.filter(entry => entry.status === 'Offline');
-
-    
-   
-  var items = new vis.DataSet();
-// var options = {
-//   zoomMin: 1000 * 60 * 60,  // One hour in milliseconds
-//   zoomMax: 1000 * 60 * 60 * 24  // One day in milliseconds
-// };
-var options = {
-  zoomMin: 1000 * 60 * 60,  // One hour in milliseconds
-  zoomMax: 1000 * 60 * 60 * 24,  // One day in milliseconds
-  format: {
-    minorLabels: function(date, scale, step) {
-      return moment(date).format('hh:mm A'); // Time in AM/PM
-    },
-    majorLabels: function(date, scale, step) {
-      return moment(date).format('MMM DD YYYY'); // Date in a good looking format
-    }
-  }
-};
-var container = document.getElementById('visualization');
-if (container) {
-  var timeline = new vis.Timeline(container, items, options);
-} else {
-  console.error("Timeline container not found");
-  return;
-}
-
-// Debug
-console.log("Data:", data);
-console.log("AFK Entries:", afk_entries);
-// console.log("Start Date:", startDate);
-console.log("End Date:", endDate);
-console.log("Items:", items);
-
-if (data.clock_ins_outs) {
-    const visJsData = [];
-    
-    data.clock_ins_outs.forEach(clock => {
-        const inTime = new Date(clock.clock_in).toISOString();
-        const outTime = new Date(clock.clock_out).toISOString();
-        
-        const item = {
-            content:' Clock in',
-            start: inTime,
-            end: outTime,
-            type: 'range',
-            className: 'clock-in-time',
-            group: 2 // Group 2 will contain all clock-ins
-        };
-
-        console.log("Item:", item);
-        visJsData.push(item);
-    });
-
-    console.log("VisJs Data:", visJsData);
-    
-    // Add to timeline
-    items.add(visJsData);
-}
-
-
-
-if (afk_entries) {
-  afk_entries.forEach(function (entry) {
-    // Convert '08:44 PM' format to ISO 8601
-    const today = new Date();
-    const startDateString = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.start_time}`;
-    const endDateString = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.end_time}`;
-    const startDate = new Date(startDateString).toISOString();
-    const endDate = new Date(endDateString).toISOString();
-
-    items.add({
-      content: 'AFK',
-      start: startDate,
-      end: endDate,
-      type: 'range',
-      className: 'afk-time',
-      group:1
-    });
-  });
-} 
-else {
-  console.warn("afk_entries is not available");
-}
-// Setting the focus
-if (startDate && endDate) {
-  timeline.setWindow(startDate, endDate);
-} else {
-  console.warn("Start and end dates not properly set");
-}
-
-}
-</script> -->
-
-
 
 <script>
-    var dailyStats = <?php echo json_encode($daily_stats); ?>;
 
-function fetchDailyInfos(staff_id) {
+    
+function getCurrentTimeInAsiaKolkata() {
+    const now = new Date();
+    const timeZone = 'Asia/Kolkata';
+    const localTimeString = now.toLocaleString('en-US', { timeZone });
+  
+    return new Date(localTimeString);
+}
+    
+var dailyStats = <?php echo json_encode($daily_stats); ?>;
+
+function fetchDailyInfos() {
     let data = dailyStats;
 
     const today = new Date();
@@ -665,26 +571,10 @@ function fetchDailyInfos(staff_id) {
 
     var items = new vis.DataSet();
     var options = {
-      zoomMin: 1000 * 60 * 60,
-      zoomMax: 1000 * 60 * 60 * 24,
-
-      format: {
-        minorLabels: function(date, scale, step) {
-          return moment(date).format('hh:mm A');
-        },
-        majorLabels: function(date, scale, step) {
-          return moment(date).format('MMM DD YYYY');
-        }
-      }
+        zoomMin: 1000 * 60 * 60, // one hour in milliseconds
+        zoomMax: 1000 * 60 * 60 * 24 * 31, // 31 days in milliseconds
+        height: "180px"
     };
-    var container = document.getElementById('visualization');
-    if (container) {
-      var timeline = new vis.Timeline(container, items, options);
-
-    } else {
-      console.error("Timeline container not found");
-      return;
-    }
 
     // Clock-in aur Clock-out times ko timeline mein add karte hain
     if (data.clock_ins_outs) {
@@ -711,34 +601,33 @@ function fetchDailyInfos(staff_id) {
         });
     }
     if (data.shift_timings && data.shift_timings.length > 0) {
-    data.shift_timings.forEach(shift => {
-        const shiftStart = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_start}`);
-        const shiftEnd = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_end}`);
+        data.shift_timings.forEach(shift => {
+            const shiftStart = new Date(`${shift.Year}-${shift.month}-${shift.day} ${shift.shift_start_time}`).toISOString();;
+            const shiftEnd = new Date(`${shift.Year}-${shift.month}-${shift.day} ${shift.shift_end_time}`).toISOString();;
 
-        items.add({
-            content: 'Shift',
-            start: shiftStart,
-            end: shiftEnd,
-            type: 'range',
-            className: 'shift-time',
-            group: 3  // Group 3 for shifts. You can adjust as needed.
+            console.log(shiftStart);
+            
+            items.add({
+                content: 'Shift',
+                start: shiftStart,
+                end: shiftEnd,
+                type: 'range',
+                className: 'shift-time',
+                group: 3  // Group 3 for shifts. You can adjust as needed.
+            });
+
         });
-
-        // Setting startDate and endDate based on shift timings
-        if (shiftStart < startDate) {
-            startDate = shiftStart;
-        }
-        if (shiftEnd > endDate) {
-            endDate = shiftEnd;
-        }
-    });
-}
+    }
 
     // AFK timings ko timeline mein add karte hain
     if (afk_entries) {
       afk_entries.forEach(function (entry) {
-        const startDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.start_time}`, "YYYY-MM-DD hh:mm A").toDate();
-        const endDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.end_time}`, "YYYY-MM-DD hh:mm A").toDate();
+
+        const start24HourTime = convertTo24Hour(entry.start_time);
+        const end24HourTime = convertTo24Hour(entry.end_time);
+
+        const startDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${start24HourTime}`).toISOString();;
+        const endDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${end24HourTime}`).toISOString();;
 
         items.add({
           content: 'AFK',
@@ -753,11 +642,31 @@ function fetchDailyInfos(staff_id) {
       console.warn("afk_entries is not available");
     }
 
+    var container = document.getElementById('visualization');
+    if (container) {
+      var timeline = new vis.Timeline(container, items, options);
+
+    } else {
+      console.error("Timeline container not found");
+      return;
+    }
+
     // Setting the timeline to focus on our startDate to endDate
     timeline.setWindow(startDate, endDate);
+    timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
 }
 
+// Convert 12-hour time format to 24-hour time format
+function convertTo24Hour(time) {
+    const [hourMin, period] = time.split(' ');
+    let [hour, minute] = hourMin.split(':');
+    hour = +hour;
+    if (period === "PM" && hour !== 12) hour += 12;
+    if (period === "AM" && hour === 12) hour -= 12;
+    return `${hour.toString().padStart(2, '0')}:${minute}`;
+}
 
+fetchDailyInfos();
 </script>
 <?php init_tail(); ?>
 <?php $this->load->view('admin/utilities/calendar_template'); ?>
