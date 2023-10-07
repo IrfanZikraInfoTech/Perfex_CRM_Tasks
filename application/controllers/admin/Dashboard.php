@@ -76,6 +76,8 @@ class Dashboard extends AdminController
         $data['dashboard'] = true;
 
         $data['user_dashboard_visibility'] = get_staff_meta(get_staff_user_id(), 'dashboard_widgets_visibility');
+        $data['upcoming_birthdays'] = $this->staff_model->get_upcoming_birthdays();
+        $data['posts'] = $this->newsfeed_model->load_newsfeed(0);
 
         if (!$data['user_dashboard_visibility']) {
             $data['user_dashboard_visibility'] = [];
@@ -93,6 +95,15 @@ class Dashboard extends AdminController
 
         $data['upcoming_birthdays'] = $this->staff_model->get_upcoming_birthdays();
 
+
+        // timeline 
+        $staff_id = get_staff_user_id(); // Yeh function current logged in user ki ID return karta hai.
+        $day = date("d");
+        $month = date("m");
+        $year = date("Y");
+        $daily_stats = $this->team_management_model->get_daily_stats($staff_id, $day, $month, $year);
+        $data['daily_stats'] = $daily_stats;
+// var_dump($daily_stats);
         $data = hooks()->apply_filters('before_dashboard_render', $data);
         $this->load->view('admin/dashboard/dashboard', $data);
     }

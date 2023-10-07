@@ -107,19 +107,105 @@
                                     </div>
                                 </div>
                                 <?php } ?>
-                                <?php $value = (isset($member) ? $member->firstname : ''); ?>
-                                <?php $attrs = (isset($member) ? [] : ['autofocus' => true]); ?>
-                                <?php echo render_input('firstname', 'staff_add_edit_firstname', $value, 'text', $attrs); ?>
-                                <?php $value = (isset($member) ? $member->lastname : ''); ?>
-                                <?php echo render_input('lastname', 'staff_add_edit_lastname', $value); ?>
-                                <?php $value = (isset($member) ? $member->email : ''); ?>
-                                <?php echo render_input('email', 'staff_add_edit_email', $value, 'email', ['autocomplete' => 'off']); ?>
-                                
-                                <div class="form-group">
-                                    <label for="date_of_birth" class="control-label">Date Of Birth</label>
-                                    <input type="date" class="form-control" name="date_of_birth" value="<?php if (isset($member)) { echo $member->date_of_birth; } ?>">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <?php $value = (isset($member) ? $member->firstname : ''); ?>
+                                        <?php $attrs = (isset($member) ? [] : ['autofocus' => true]); ?>
+                                        <?php echo render_input('firstname', 'staff_add_edit_firstname', $value, 'text', $attrs); ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?php $value = (isset($member) ? $member->lastname : ''); ?>
+                                        <?php echo render_input('lastname', 'staff_add_edit_lastname', $value); ?>
+                                    </div>
                                 </div>
 
+                                <?php $value = (isset($member) ? $member->email : ''); ?>
+                                <?php echo render_input('email', 'staff_add_edit_email', $value, 'email', ['autocomplete' => 'off']); ?>
+                                <div class="row">
+                                    <div class="col-md-6">                          
+                                        <div class="form-group">
+                                            <label for="date_of_birth" class="control-label">Date Of Birth</label>
+                                            <input type="date" class="form-control" name="date_of_birth" value="<?php if (isset($member)) { echo $member->date_of_birth; } ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                    <div class="form-group select-placeholder">
+                                        <label for="gender" class="control-label">Gender</label>
+                                        <select class="selectpicker"
+                                                data-live-search="true"
+                                                data-none-selected-text="<?php echo _l('system_default_string'); ?>" data-width="100%"
+                                                name="gender" id="gender">
+                                            <option value="Male" <?php if(isset($member) && $member->gender == 'Male') { echo 'selected'; } ?>>Male</option>
+                                            <option value="Female" <?php if(isset($member) && $member->gender == 'Female') { echo 'selected'; } ?>>Female</option>
+                                            <option value="Other" <?php if(isset($member) && $member->gender == 'Other') { echo 'selected'; } ?>>Other</option>
+                                        </select>
+                                    </div>
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group select-placeholde">
+                                            <label for="Marital_Status" class="control-label">Marital Status</label>
+                                            <select class="selectpicker"
+                                                data-live-search="true"
+                                                data-none-selected-text="<?php echo _l('system_default_string'); ?>" data-width="100%"
+                                                name="Marital_Status" id="Marital_Status">
+                                                <option value="Single" <?php if(isset($member) && $member->Marital_Status == 'Single') { echo 'selected'; } ?>>Single</option>
+                                                <option value="Married" <?php if(isset($member) && $member->Marital_Status == 'Married') { echo 'selected'; } ?>>Married</option>               
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                        <label for="Next_of_KIN" class="control-label">Next of KIN</label>
+                                        <input type="text" class="form-control" name="Next_of_KIN" value="<?php if (isset($member)) { echo $member->Next_of_KIN; } ?>">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="CNIC_Number" class="control-label">CNIC Number</label>
+                                    <input type="text" class="form-control" name="CNIC_Number" value="<?php if (isset($member)) { echo $member->CNIC_Number; } ?>">
+                                </div>
+                               
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="emergency_Contact_name" class="control-label">Emergency Contact Name</label>
+                                            <input type="text" class="form-control" name="emergency_Contact_name" value="<?php if (isset($member)) { echo $member->emergency_Contact_name; } ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="emergency_contact_number" class="control-label">Emergency Contact Number</label>
+                                            <input type="text" class="form-control" name="emergency_contact_number" value="<?php if (isset($member)) { echo $member->emergency_contact_number; } ?>">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="personal_email_address" class="control-label">Personal Email Address</label>
+                                    <input type="email" class="form-control" name="personal_email_address" value="<?php if (isset($member)) { echo $member->personal_email_address; } ?>">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="bank_name" class="control-label">Bank Name</label>
+                                            <input type="text" class="form-control" name="bank_name" value="<?php if (isset($member)) { echo $member->bank_name; } ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="bank_acc_no" class="control-label">Bank Account Number</label>
+                                            <input type="text" class="form-control" name="bank_acc_no" value="<?php if (isset($member)) { echo $member->bank_acc_no; } ?>">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="google_chat_id" class="control-label">Google Chat ID</label>
+                                    <input type="text" class="form-control" name="google_chat_id" value="<?php if (isset($member)) { echo $member->google_chat_id; } ?>">
+                                </div>
                                 <div class="form-group">
                                     <label for="Address" class="control-label">Address</label>
                                     <textarea class="form-control" name="Address" rows="4"><?php if (isset($member)) { echo $member->Address; } ?></textarea>
@@ -127,6 +213,47 @@
                                 <div class="form-group">
                                     <label for="staff_salary" class="control-label">Staff Salary</label>
                                     <input type="number" class="form-control" name="staff_salary" value="<?php if (isset($member)) { echo $member->staff_salary; } ?>">
+                                </div>
+                                <div class="form-group select-placeholder">
+                                    <label for="report_to">Staff Report to :</label>
+                                    <select class="selectpicker"
+                                        data-live-search="true"
+                                        data-none-selected-text="<?php echo _l('system_default_string'); ?>" data-width="100%"
+                                        name="report_to" id="report_to">
+                                        <?php foreach($staff_members as $staff): ?>
+                                            <option value="<?php echo $staff['staffid']; ?>" 
+                                                <?php 
+                                                if (isset($member) && $member->staffid == $staff['staffid']) {
+                                                    echo 'disabled';
+                                                }
+                                                if (isset($member) && $member->report_to == $staff['staffid']) {
+                                                    echo 'selected';
+                                                }
+                                                ?>>
+                                                <?php echo $staff['firstname'] . ' ' . $staff['lastname']; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group select-placeholder">
+                                    <?php if (count($departments) > 0) { ?>
+                                    <label for="departments"><?php echo _l('staff_add_edit_departments'); ?></label>
+                                    <select class="selectpicker" data-live-search="true" data-none-selected-text="<?php echo _l('system_default_string'); ?>" data-width="100%" name="departments[]" id="departments">
+                                        <?php foreach ($departments as $department) { ?>
+                                            <?php
+                                            $selected = '';
+                                            if (isset($member)) {
+                                                foreach ($staff_departments as $staff_department) {
+                                                    if ($staff_department['departmentid'] == $department['departmentid']) {
+                                                        $selected = ' selected';
+                                                    }
+                                                }
+                                            }
+                                            ?>
+                                            <option value="<?php echo $department['departmentid']; ?>"<?php echo $selected; ?>><?php echo $department['name']; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                    <?php } ?>
                                 </div>
                                 <div class="form-group">
                                     <label for="staff_title" class="control-label">Title</label>
@@ -169,6 +296,7 @@
                                   echo $member->skype;
                               } ?>">
                                 </div>
+                               
                                 <?php if (!is_language_disabled()) { ?>
                                 <div class="form-group select-placeholder">
                                     <label for="default_language"
@@ -213,33 +341,7 @@
                                     </select>
                                 </div>
 
-                                <div class="form-group">
-    <?php if (count($departments) > 0) { ?>
-    <label for="departments"><?php echo _l('staff_add_edit_departments'); ?></label>
-    <?php } ?>
-    <?php foreach ($departments as $department) { ?>
-    <div class="radio radio-primary">
-        <?php
-        $checked = '';
-        if (isset($member)) {
-            foreach ($staff_departments as $staff_department) {
-                if ($staff_department['departmentid'] == $department['departmentid']) {
-                    $checked = ' checked';
-                }
-            }
-        }
-        ?>
-        <!-- Changing from checkbox to radio -->
-        <input type="radio" id="dep_<?php echo $department['departmentid']; ?>"
-            name="departments[]" value="<?php echo $department['departmentid']; ?>"
-            <?php echo $checked; ?>>
-        <label for="dep_<?php echo $department['departmentid']; ?>"><?php echo $department['name']; ?></label>
-    </div>
-    <?php } ?>
-</div>
-
-
-
+                            
                                 <?php $rel_id = (isset($member) ? $member->staffid : false); ?>
                                 <?php echo render_custom_fields('staff', $rel_id); ?>
 

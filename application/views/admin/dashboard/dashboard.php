@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css"/>
 
 <style>
 .clamp-lines {
@@ -19,6 +20,25 @@
 
 .myscrollbar {
     -ms-overflow-style: none;
+}
+
+
+/* timeline  */
+.no-scroll::-webkit-scrollbar {
+  display: none;
+}
+.clock-in-time {
+    background: linear-gradient(90deg, rgba(54,162,235,0.2) 0%, rgba(74,182,255,0.2) 100%)!important;
+    border-color: rgba(54, 162, 235, 1)!important;
+}
+
+.afk-time {
+    background: linear-gradient(90deg, rgba(255,206,86,0.2) 0%, rgba(255,226,106,0.2) 100%)!important;
+    border-color: rgba(255, 206, 86, 1)!important;
+}
+.shift-time {
+    background: linear-gradient(90deg, rgba(255, 105, 180, 0.2) 0%, rgba(255, 182, 193, 0.2) 100%)!important;
+    border-color: rgba(255, 105, 180, 0.2)!important;
 }
 
 .liked-bg-color {
@@ -50,6 +70,42 @@
                     <?php $this->load->view('admin/management/dashboard_widget' ); ?>
                     <?php render_dashboard_widgets('middle-left-6'); ?>
                 </div>
+               
+                <div class="col-md-12" data-container="middle-left-6"> 
+                    <div class="flex  gap-x-4">
+                        <div class="bg-white shadow rounded-lg p-4 my-4 flex md:flex-row flex-col justify-between h-full w-3/4">
+                            <div id="visualization"  class="relative w-full " >
+                            </div>
+                        </div>
+                        <div class="myscrollbar  bg-white shadow rounded-lg p-6 my-4 w-1/4 h-[145px] mx-auto  overflow-y-auto">
+                            <h5 class="attendance text-xl font-semibold mb-2 text-center text-gray-700 border-b pb-2">Attendance Overview</h1>
+                            <div class="mt-4 flex flex-col space-y-3">
+
+                                <!-- Attendance Status -->
+                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                                    <span class="text-gray-600">Attendance:</span>
+                                    <span class="text-green-500 font-bold">Present</span>
+                                    <!-- You can change the color to red for 'Absent' and yellow for 'Late' -->
+                                </div>
+
+                                <!-- Punctuality Rate -->
+                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                                    <span class="text-gray-600">Punctuality Rate:</span>
+                                    <span class="font-semibold">95%</span>
+                                </div>
+
+                                <!-- Current Month -->
+                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                                    <span class="text-gray-600">Current Month:</span>
+                                    <span class="font-semibold">October</span>
+                                    <!-- Replace 'October' with the current month -->
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
 
                 <!--Tasks/ Announcement -->
@@ -404,7 +460,7 @@
         <button onclick="closeModal()" class="bg-red-500 hover:bg-red-700 text-white float-right font-semibold py-2 px-4 border border-red-600 hover:border-red-700 rounded transition ease-in-out duration-300">Close</button>
     </div>
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
 
 
 <script>
@@ -481,7 +537,228 @@ function closeModal() {
 }
 
 </script>
+<!-- 
+<script>
+    var dailyStats = <?php echo json_encode($daily_stats); ?>;
+    
 
+
+    function fetchDailyInfos(staff_id) {
+    let data = dailyStats;
+   
+    console.log(data);
+    console.log('Total clocked-in time:', data.total_clocked_in_time);
+    console.log('Total shift duration:', data.total_shift_duration);
+    
+    
+    const afk_entries = data.afk_and_offline.filter(entry => entry.status === 'AFK');
+    // const offline_entries = data.afk_and_offline.filter(entry => entry.status === 'Offline');
+
+    
+   
+  var items = new vis.DataSet();
+// var options = {
+//   zoomMin: 1000 * 60 * 60,  // One hour in milliseconds
+//   zoomMax: 1000 * 60 * 60 * 24  // One day in milliseconds
+// };
+var options = {
+  zoomMin: 1000 * 60 * 60,  // One hour in milliseconds
+  zoomMax: 1000 * 60 * 60 * 24,  // One day in milliseconds
+  format: {
+    minorLabels: function(date, scale, step) {
+      return moment(date).format('hh:mm A'); // Time in AM/PM
+    },
+    majorLabels: function(date, scale, step) {
+      return moment(date).format('MMM DD YYYY'); // Date in a good looking format
+    }
+  }
+};
+var container = document.getElementById('visualization');
+if (container) {
+  var timeline = new vis.Timeline(container, items, options);
+} else {
+  console.error("Timeline container not found");
+  return;
+}
+
+// Debug
+console.log("Data:", data);
+console.log("AFK Entries:", afk_entries);
+// console.log("Start Date:", startDate);
+console.log("End Date:", endDate);
+console.log("Items:", items);
+
+if (data.clock_ins_outs) {
+    const visJsData = [];
+    
+    data.clock_ins_outs.forEach(clock => {
+        const inTime = new Date(clock.clock_in).toISOString();
+        const outTime = new Date(clock.clock_out).toISOString();
+        
+        const item = {
+            content:' Clock in',
+            start: inTime,
+            end: outTime,
+            type: 'range',
+            className: 'clock-in-time',
+            group: 2 // Group 2 will contain all clock-ins
+        };
+
+        console.log("Item:", item);
+        visJsData.push(item);
+    });
+
+    console.log("VisJs Data:", visJsData);
+    
+    // Add to timeline
+    items.add(visJsData);
+}
+
+
+
+if (afk_entries) {
+  afk_entries.forEach(function (entry) {
+    // Convert '08:44 PM' format to ISO 8601
+    const today = new Date();
+    const startDateString = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.start_time}`;
+    const endDateString = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.end_time}`;
+    const startDate = new Date(startDateString).toISOString();
+    const endDate = new Date(endDateString).toISOString();
+
+    items.add({
+      content: 'AFK',
+      start: startDate,
+      end: endDate,
+      type: 'range',
+      className: 'afk-time',
+      group:1
+    });
+  });
+} 
+else {
+  console.warn("afk_entries is not available");
+}
+// Setting the focus
+if (startDate && endDate) {
+  timeline.setWindow(startDate, endDate);
+} else {
+  console.warn("Start and end dates not properly set");
+}
+
+}
+</script> -->
+
+
+
+<script>
+    var dailyStats = <?php echo json_encode($daily_stats); ?>;
+
+function fetchDailyInfos(staff_id) {
+    let data = dailyStats;
+
+    const today = new Date();
+    let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
+    let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
+    console.log(data);
+    // AFK entries filter
+    const afk_entries = data.afk_and_offline.filter(entry => entry.status === 'AFK');
+
+    var items = new vis.DataSet();
+    var options = {
+      zoomMin: 1000 * 60 * 60,
+      zoomMax: 1000 * 60 * 60 * 24,
+
+      format: {
+        minorLabels: function(date, scale, step) {
+          return moment(date).format('hh:mm A');
+        },
+        majorLabels: function(date, scale, step) {
+          return moment(date).format('MMM DD YYYY');
+        }
+      }
+    };
+    var container = document.getElementById('visualization');
+    if (container) {
+      var timeline = new vis.Timeline(container, items, options);
+
+    } else {
+      console.error("Timeline container not found");
+      return;
+    }
+
+    // Clock-in aur Clock-out times ko timeline mein add karte hain
+    if (data.clock_ins_outs) {
+        data.clock_ins_outs.forEach(clock => {
+            const inTime = new Date(clock.clock_in).toISOString();
+            const outTime = new Date(clock.clock_out).toISOString();
+
+            // Setting startDate and endDate based on clock-in and clock-out times
+            if (new Date(inTime) < startDate) {
+                startDate = new Date(inTime);
+            }
+            if (new Date(outTime) > endDate) {
+                endDate = new Date(outTime);
+            }
+
+            items.add({
+                content: 'Clock in',
+                start: inTime,
+                end: outTime,
+                type: 'range',
+                className: 'clock-in-time',
+                group: 2
+            });
+        });
+    }
+    if (data.shift_timings && data.shift_timings.length > 0) {
+    data.shift_timings.forEach(shift => {
+        const shiftStart = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_start}`);
+        const shiftEnd = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_end}`);
+
+        items.add({
+            content: 'Shift',
+            start: shiftStart,
+            end: shiftEnd,
+            type: 'range',
+            className: 'shift-time',
+            group: 3  // Group 3 for shifts. You can adjust as needed.
+        });
+
+        // Setting startDate and endDate based on shift timings
+        if (shiftStart < startDate) {
+            startDate = shiftStart;
+        }
+        if (shiftEnd > endDate) {
+            endDate = shiftEnd;
+        }
+    });
+}
+
+    // AFK timings ko timeline mein add karte hain
+    if (afk_entries) {
+      afk_entries.forEach(function (entry) {
+        const startDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.start_time}`, "YYYY-MM-DD hh:mm A").toDate();
+        const endDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.end_time}`, "YYYY-MM-DD hh:mm A").toDate();
+
+        items.add({
+          content: 'AFK',
+          start: startDateTime,
+          end: endDateTime,
+          type: 'range',
+          className: 'afk-time',
+          group: 1
+        });
+      });
+    } else {
+      console.warn("afk_entries is not available");
+    }
+
+    // Setting the timeline to focus on our startDate to endDate
+    timeline.setWindow(startDate, endDate);
+}
+
+
+</script>
 <?php init_tail(); ?>
 <?php $this->load->view('admin/utilities/calendar_template'); ?>
 <?php $this->load->view('admin/dashboard/dashboard_js'); ?>

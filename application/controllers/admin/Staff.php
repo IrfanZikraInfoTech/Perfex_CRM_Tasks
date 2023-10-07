@@ -25,6 +25,7 @@ class Staff extends AdminController
             access_denied('staff');
         }
         hooks()->do_action('staff_member_edit_view_profile', $id);
+        $data['staff_members'] = $this->staff_model->get();
 
         $this->load->model('departments_model');
         if ($this->input->post()) {

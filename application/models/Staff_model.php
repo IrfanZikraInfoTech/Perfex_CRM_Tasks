@@ -365,6 +365,7 @@ class Staff_model extends App_Model
         return $this->db->get(db_prefix() . 'staff')->result_array();
     }
 
+
     public function get_upcoming_birthdays() {
         $currentMonth = date('m'); //Current month
         $currentDay = date('d'); //Current day
@@ -400,7 +401,9 @@ class Staff_model extends App_Model
         // var_dump($result);
         return $result;
     }
-
+    
+    
+    
     /**
      * Get staff permissions
      * @param  mixed $id staff id

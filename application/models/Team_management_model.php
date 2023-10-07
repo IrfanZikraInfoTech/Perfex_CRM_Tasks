@@ -2560,9 +2560,13 @@ $this->db->where('staff_id !=', 1); // Excluding staff with ID 1
 
     public function get_staff_summary($staff_id, $date) {
         $this->db->where('staff_id', $staff_id);
+        if(!$date){
+            $date=date("Y-m-d");
+        }
         $this->db->where('date', $date);
         $query = $this->db->get('tbl_staff_summaries');
       
+
         return $query->row();
     }
       

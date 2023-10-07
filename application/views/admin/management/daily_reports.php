@@ -657,18 +657,7 @@ function openModal(staffId) {
 
 
 function fetchDailyInfo(staff_id) {
-    Swal.fire({
-        title: 'Processing...',
-        text: 'Fetching stats',
-        timerProgressBar: true,
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-
-
-const currentDate = new Date();
+   const currentDate = new Date();
 const month = <?= $thisMonth; ?>;
 const day = <?= $thisDay; ?>;
 const year = currentDate.getFullYear();

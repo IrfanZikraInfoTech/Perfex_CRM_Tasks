@@ -726,7 +726,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 setInterval(updateClocks, 1000);
                 getOrSaveStaffSummary();
 
-                initTimeline();
             }
         });
 
@@ -881,44 +880,7 @@ function createDotElement(hour, data, timeLabels) {
   
     return dotContainer;
 }
-    
-function initTimeline() {
 
-    const { timeLabels, dotData } = processShiftData(staffShifts);
-
-    const timelineContainer = document.createElement('div');
-    timelineContainer.classList.add('relative', 'w-full', 'h-1', 'bg-gray-200', 'rounded');
-
-    const timeLabelsContainer = document.createElement('div');
-    timeLabelsContainer.classList.add('flex', 'justify-between', 'mt-4');
-
-    timeLabels.forEach((hour) => {
-
-        //console.log(hour + " to " + (hour+2));
-        
-        for (let index = 0; index < 24; index++) {
-
-            if( ( index > hour && index < (hour + 2) ) || (index == hour)){
-                if(dotData[index]){
-                    const dot = createDotElement(index, dotData[index], timeLabels); // Update this line
-                    timelineContainer.appendChild(dot);
-                }
-                
-            }
-            
-        }
-        
-        
-
-        const label = createTimeLabelElement(hour);
-        timeLabelsContainer.appendChild(label);
-      
-    });
-
-    const wrapper = document.getElementById('timeline-wrapper');
-    wrapper.appendChild(timelineContainer);
-    wrapper.appendChild(timeLabelsContainer);
-}
 var isVisible = (function() {
     var stateKey, eventKey, keys = {
       hidden: "visibilitychange",
@@ -938,6 +900,8 @@ var isVisible = (function() {
     }
   })();
 
-  
+  $(document).ready(function() {
+        fetchDailyInfos();
+    });
 
 </script>

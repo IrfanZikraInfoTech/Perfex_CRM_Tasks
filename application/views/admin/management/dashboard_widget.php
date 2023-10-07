@@ -33,7 +33,11 @@ function adf($seconds) {
 }
 
 
+
 </style>
+
+
+
 
 <div class="bg-white shadow rounded-lg p-4 my-4 flex md:flex-row flex-col justify-between relative overflow-hidden">
 
@@ -96,4 +100,6 @@ function adf($seconds) {
         </div>
     </div>
 </div>
+
+   
 

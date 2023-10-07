@@ -28,6 +28,14 @@ class Team_management extends AdminController {
 
     public function individual_dashboard(){
         $data['staff_members'] = $this->team_management_model->get_all_staff();
+         // timeline 
+         $staff_id = get_staff_user_id(); // Yeh function current logged in user ki ID return karta hai.
+         $day = date("d");
+         $month = date("m");
+         $year = date("Y");
+         $daily_stats = $this->team_management_model->get_daily_stats($staff_id, $day, $month, $year);
+         $data['daily_stats'] = $daily_stats;
+        //  var_dump($daily_stats);
         $this->load->view('admin/management/Individual_Dashboard', $data);
     }
 
@@ -1500,14 +1508,18 @@ class Team_management extends AdminController {
         } else {
             // Get the summary
             $summary_record = $this->team_management_model->get_staff_summary($staff_id, $date);
+
             if ($summary_record) {
                 echo $summary_record->summary;
             } else {
                 echo '';
             }
         }
-    }
+        print_r($this->db->error());
+        print_r($summary_record);
 
+
+    }
     public function generate_daily_summary() {
         // Grab the POST data
         $date = $this->input->post('date');
