@@ -36,12 +36,12 @@
         <div class="flex flex-col gap-3 w-full justify-center">
 
             <select style="border:0px;
-    outline:0px;
-    background-color:white;
-    background:none;
-    -webkit-appearance:none;
-    appearance:none;
-" class=" z-20  px-2 text-xl transition-all hover:shadow-lg rounded-full font-semibold text-center w-auto mx-auto " onchange="statusSelectColors(this);" id="status">
+                outline:0px;
+                background-color:white;
+                background:none;
+                -webkit-appearance:none;
+                appearance:none;
+                " class=" z-20  px-2 text-xl transition-all hover:shadow-lg rounded-full font-semibold text-center w-auto mx-auto " onchange="statusSelectColors(this);" id="status">
                 <option id="Online" value="Online" class="text-lime-500">Online</option>
                 <option id="AFK" value="AFK" class="text-blue-500">AFK</option>
                 <option id="Offline" value="Offline" class="text-pink-500">Offline</option>

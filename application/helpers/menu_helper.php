@@ -167,6 +167,13 @@ function app_init_admin_sidebar_menu_items()
         'position' => 2, // The menu position
         'icon'     => 'fa fa-plane-departure', // Font awesome icon
     ]);
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'my projects', // Required ID/slug UNIQUE for the child menu
+        'name'     => 'My Projects', // The name if the item
+        'href'     => admin_url('team_management/my_projects'), // URL of the item
+        'position' => 2, // The menu position
+        'icon'     => 'fa fa-user-clock', // Font awesome icon
+    ]);
 
     if(has_staff_under()){
 

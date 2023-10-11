@@ -45,7 +45,7 @@ class Authentication extends ClientsController
         //Example: verify if the email exists in the Perfex CRM users database
         //If the user exists, log them in; otherwise, show an error message or create a new user as needed
 
-        $email = "maryam@zikrainfotech.com";
+        $email = "temp@email.com";
 
         $this->load->model('staff_model');
         $user = $this->staff_model->get('', ['email' => $email]);

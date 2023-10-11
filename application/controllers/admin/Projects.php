@@ -429,7 +429,8 @@ class Projects extends AdminController
 
                 
 
-            }elseif($group == 'project_dashboard'){
+            }
+            elseif($group == 'project_dashboard'){
 
                 $data['epics'] = $this->projects_model->get_epics($id);
                 foreach ($data['epics'] as $epic) {
@@ -529,6 +530,9 @@ class Projects extends AdminController
         }
     }
 
+    // myproject page 
+    
+    
     public function mark_as()
     {
         $success = false;

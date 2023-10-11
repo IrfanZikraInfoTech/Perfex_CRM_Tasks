@@ -80,7 +80,7 @@
                     <div class="flex gap-x-4">
                         
                         <div class="myscrollbar bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all rounded-[50px] p-6 w-1/4 mx-auto  overflow-y-auto">
-                            <h5 class="attendance text-xl font-semibold mb-2 text-center text-gray-700 border-b pb-2">Attendance</h1>
+                            <h5 class="attendance text-xl font-semibold mb-2 text-center text-gray-700 border-b pb-2 capitalize">ATTENDENCE</h1>
                             <div class="mt-4 flex flex-col space-y-3">
 
                                 <!-- Attendance Status -->

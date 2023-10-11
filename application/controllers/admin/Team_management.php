@@ -9,6 +9,8 @@ class Team_management extends AdminController {
         parent::__construct();
         $this->load->model('team_management_model');
         $this->load->model('staff_model');
+        $this->load->model('tasks_model');
+        $this->load->model('projects_model');
         $this->load->library('webhook_library', null, 'webhook_lib');
 
         //hooks()->add_action('task_assignee_added', 'notify_task_allocation');
@@ -18,7 +20,7 @@ class Team_management extends AdminController {
     public function index() {
         $this->individual_stats();
     }
-
+  
     public function individual_stats()
     {
         $data['staff_members'] = $this->team_management_model->get_all_staff();
@@ -26,10 +28,33 @@ class Team_management extends AdminController {
         $this->load->view('admin/management/individual_stats', $data);
     }
 
+    public function my_projects() {
+        $data['staff_members'] = $this->team_management_model->get_all_staff();
+    
+        $staff_id = get_staff_user_id();
+        $projects = $this->team_management_model->getProjectsByStaffId($staff_id);
+        $statuses = $this->projects_model->get_project_statuses();
+
+        foreach ($projects as &$project) {
+            $project['active_sprint'] = $this->team_management_model->getActiveSprintDetailsByProjectId($project['id']);
+           
+
+            // Fetch tasks assigned to the staff for this project
+            $project['assigned_tasks'] = $this->team_management_model->getTasksAssignedToStaffByProjectId($staff_id, $project['id']);
+        }
+        
+        //  var_dump($projects);
+        // var_dump($data);
+        
+        $data['staff_projects'] = $projects;
+        $this->load->view('admin/management/project', $data);
+    }
+    
+
     public function individual_dashboard(){
         $data['staff_members'] = $this->team_management_model->get_all_staff();
          // timeline 
-         $staff_id = get_staff_user_id(); // Yeh function current logged in user ki ID return karta hai.
+         $staff_id = get_staff_user_id();
          $day = date("d");
          $month = date("m");
          $year = date("Y");

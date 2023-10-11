@@ -14,6 +14,8 @@ function convertSecondsToRoundedTime($seconds)
 }
 
 ?>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css"/>
+
 <style>
     .row-options{
         display: none;
@@ -35,306 +37,497 @@ function convertSecondsToRoundedTime($seconds)
     background: linear-gradient(90deg, rgba(255, 105, 180, 0.2) 0%, rgba(255, 182, 193, 0.2) 100%)!important;
     border-color: rgba(255, 105, 180, 0.2)!important;
 }
+.myscrollbar::-webkit-scrollbar {
+    width: 0; 
+}
+
+.myscrollbar {
+    scrollbar-width: none;
+}
+
+.myscrollbar {
+    -ms-overflow-style: none;
+}
+
 </style>
-<div id="wrapper">
-    <div class="bg-gray-100 p-5 border-b border-gray-300 flex justify-between items-center">
-        <!-- Left side with icon and text -->
-        <div class="flex items-center">
-            <!-- Profile Image -->
-            <div class="h-24 w-24 bg-gray-300 rounded-full flex items-center justify-center text-2xl mr-4">
-                <span>?</span>
+<div id="wrapper" class="wrapper">
+    <div class="content flex flex-col gap-8">
+        <div class="w-full mb-4">
+             <h2 class="text-3xl font-bold text-center text-gray-500">Individual KPI Dashboard</h2>
+        </div>
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all">
+            <div class="flex items-center justify-between">
+                <!-- User Information Section -->
+                <div class="flex items-center w-2/3">
+                    <div class="w-32 h-32 relative mr-5">
+                        <?php echo staff_profile_image($GLOBALS['current_user']->staffid, ['w-full', 'h-full', 'rounded-full', 'object-cover'], 'thumb') ?>
+                    </div>
+
+                    <!-- Information Text -->
+                    <div>
+                        <h1 class="text-2xl font-bold mb-2 text-uppercase"><?php echo $GLOBALS['current_user']->firstname . ' ' . $GLOBALS['current_user']->lastname; ?></h1>
+                        <p class="text-lg">
+                            <span class="font-semibold">Position:</span> 
+                            <span class="font-medium"> <?php echo $GLOBALS['current_user']->staff_title; ?> </span>
+                        </p>
+                        <p class="text-lg">
+                            <span class="font-semibold">Department:</span> 
+                            <span class="font-medium"></span>
+                        </p>     
+                        <?php
+                        $report_to_id = $GLOBALS['current_user']->report_to;
+                        // echo "Report To ID: " . $report_to_id . "<br/>";
+
+                        $reporting_to_name = "";
+
+                        // Check if current user staffid is 1
+                        if ($GLOBALS['current_user']->staffid == 1) {
+                            $reporting_to_name = "None";
+                            // echo "Logged in as Staff ID: 1 - No reporting required.<br/>";
+                        } else {
+                            foreach ($staff_members as $staff) {
+                                // echo "Checking Staff ID: " . $staff->staffid . "<br/>"; // See every staff id checked
+                                if ($staff->staffid == $report_to_id) {
+                                    // echo "Matched with Staff ID: " . $staff->staffid . "<br/>"; // Should show when a match is found
+                                    $reporting_to_name = $staff->firstname . ' ' . $staff->lastname;
+                                    break;
+                                }
+                            }
+
+                            if (empty($reporting_to_name)) {
+                                echo "No match found!";
+                            }
+                        }
+                        ?>
+                        <p class="text-lg">
+                            <span class="font-semibold">REPORTING TO:</span> 
+                            <span class="font-medium"><?php echo $reporting_to_name; ?></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="flex flex-col w-1/3 bg-gray-100 p-4 py-3 shadow-inner rounded-[50px]  max-h-[300px]">
+                    <!-- Input boxes for FROM and TO -->
+                    <div class="flex flex-col space-y-2 mb-2 py-3 mx-3 w-90">
+                        <input type="text" id="from" class="w-full p-2 border rounded text-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="From">
+                        <input type="text" id="to" class="w-full p-2 border rounded text-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="To">
+                    </div>
+                    
+                    <!-- Search Button -->
+                    <div class="flex justify-end mr-2">
+                        <button class="px-4 py-2 bg-gray-100 border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+
             </div>
-            <!-- Information Text -->
-            <div>
-                <h1 class="text-xl font-bold mb-2">Individual KPI Dashboard</h1>
-                <p class="text-sm mb-1">MOHAMMAD ANSAR ULLAH ANAS</p>
-                <p class="text-sm mb-1">DIRECTOR</p>
-                <p class="text-sm mb-1">MANAGEMENT DEPARTMENT</p>
-                <p class="text-sm">REPORTING TO: GOD ALMIGHTY</p>
+        </div>
+        <!-- performance -->
+        <div class=" flex lg:flex-row flex-col justify-between relative gap-5">
+            <!-- Left side table -->
+            <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all overflow-hidden">
+                <h2 class="text-xl font-bold mb-4 text-center">Key Performance Indicators:</h2>
+                <div class="flex flex-col h-full bg-gray-100 p-6 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar max-h-[300px]">
+                    <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 shadow-inner rounded-[50px] transition-all p-6">
+
+                        <table class="w-full table text-lg">
+                            <thead>
+                            <tr>
+                                <th class="font-bold text-between ">KPI</th>
+                                <th class="font-bold text-right  ">SCORE</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="font-semibold">Punctuality Rate</td>
+                                    <td class="text-right">100%</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="font-semibold">Task Completion Rate</td>
+                                    <td class="text-right">50%</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="font-semibold">Task Efficiency Rate</td>
+                                    <td class="text-right">100%</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="font-semibold">Task Time Adherence Rate</td>
+                                    <td class="text-right">80%</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="font-semibold">Summary Adherence Rate</td>
+                                    <td class="text-right">100%</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="font-semibold">Shift Productivity Rate</td>
+                                    <td class="text-right">50%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+             <div class="xl:w-[40%] w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all flex flex-col items-center">
+                <h2 class="text-xl font-bold mb-4 text-center">Overall Performance Score:</h2>
+
+                <div class="relative w-44 h-44 rounded-full overflow-hidden mb-4" id="scoreCircle">
+                    <!-- Background color of the circle -->
+                    <div class="absolute top-0 left-0 w-full h-full bg-red-200"></div>
+                    <!-- Text inside the circle -->
+                    <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-2xl font-bold" id="scoreText">8/10</div>
+                </div>
+            </div>
+        </div>
+        <!--  timeline   -->
+        <div class="bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all rounded-[50px] p-7 flex md:flex-row flex-col justify-between h-full w-full">
+            <div id="visualization"  class="relative w-full rounded-[50px]" >
             </div>
         </div>
 
-        <!-- Right side with input boxes and button -->
-        <div class="flex items-center">
-            <!-- Input boxes for FROM and TO -->
-            <div class="flex flex-col mr-4">
-                <label class="text-sm mb-1">FROM</label>
-                <input type="text" class="border p-2 rounded text-sm mb-2" placeholder="FROM">
-                <label class="text-sm mb-1">TO</label>
-                <input type="text" class="border p-2 rounded text-sm" placeholder="TO">
+            <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all overflow-hidden">
+                <h2 class="text-xl font-bold mb-4 text-center text-uppercase ">Key Performance Indicators:</h2>
+            <!-- Insert the charts or graphs as per your design and library of choice here -->
+        
+            <div class="p-6 mt-6 space-y-4 bg-gray-100 min-h-[300px] rounded-[50px]">
+
+                <!-- Row 1 -->
+                <div class="flex justify-between mt-6">
+                    <div class="text-lg text-grey-600 font-semibold">
+                        <p>
+                        Task Compilition Rate And Task Efficiency Rate
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mb-4">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-gray-400">
+                        <span class="text-sm font-medium">TASK ASSIGNED</span>
+                        <span class="text-xl mt-2">100</span>
+                    </div>
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-gray-400">
+                        <span class="text-sm font-medium">TASK COMPLETED</span>
+                        <span class="text-xl mt-2">98</span>
+                    </div>
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-gray-400">
+                        <span class="text-sm font-medium">TASK COMPLETED PAST DUE</span>
+                        <span class="text-xl mt-2">15</span>
+                    </div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="flex justify-between mt-6">
+                    <div class="text-lg text-grey-600 font-semibold ">         
+                       <p>
+                       Task Time Adherence Rate
+                       </p>
+                    </div>
+                </div>
+
+               
+                <div class="grid grid-cols-2 p-3 mb-4  gap-4">
+                <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-gray-400">
+                        <span class="text-sm font-medium">ESTIMATED TIME ON THE TASKS ASSIGNED</span>
+                        <span class="text-xl mt-2">400 HRS</span>
+                    </div>
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-gray-400">
+                        <span class="text-sm font-medium">ACTUAL TIME ON THE TASKS ASSIGNED</span>
+                        <span class="text-xl mt-2">400 HRS</span>
+                    </div>
+                </div>
+         
+                <!-- Row 3-->
+                <div class="flex justify-between mt-6">
+                    <div class="text-lg text-grey-600 font-semibold ">    
+                      <p>
+                      Shift Productivity Rate
+                      </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 p-3 mb-4   gap-4">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-gray-400">
+                        <span class="text-sm font-medium">TOTAL LOGGED TIME</span>
+                        <span class="text-xl mt-2">100</span>
+                    </div>
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-gray-400">
+                        <span class="text-sm font-medium">TIME SPENT DOING TASKS</span>
+                        <span class="text-xl mt-2">100</span>
+                    </div>
+                </div>
+
+                <!-- Row 4-->
+                <div class="flex justify-between mt-6">
+                    <div class="text-lg text-grey-600 font-semibold"> 
+                        <p>
+                            Summary Adherence Rate
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-gray-400">
+                <span class="text-xl mt-2">SUMMARY 1... SUMMARY N</span>
+                </div>
             </div>
-            <!-- Export Button -->
-            <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-600">EXPORT</button>
+
         </div>
-    </div>
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all overflow-hidden">
+        <div class="p-6 mt-6 space-y-4 bg-gray-100 min-h-[300px] rounded-[50px]">       
+            <!-- All Tasks Table -->
+                <h2 class="text-xl font-bold mb-4 text-center text-uppercase">All Tasks</h2>
+                    <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 shadow-inner rounded-[50px] transition-all  p-6">
 
-    <div class="p-5 grid grid-cols-2 gap-4">
-        <!-- Left side table -->
-        <div class="p-4 bg-white rounded shadow">
-            <h2 class="text-lg font-bold mb-2">Key Performance Indicators:</h2>
-            <table class="w-full">
-                <tr>
-                    <th class="text-left">KPI</th>
-                    <th class="text-right">SCORE</th>
-                </tr>
-                <tr>
-                    <td>Punctuality Rate</td>
-                    <td class="text-right">100%</td>
-                </tr>
-                <tr>
-                    <td>Task Completion Rate</td>
-                    <td class="text-right">50%</td>
-                </tr>
-                <tr>
-                    <td>Task Efficiency Rate</td>
-                    <td class="text-right">100%</td>
-                </tr>
-                <tr>
-                    <td>Task Time Adheence Rate</td>
-                    <td class="text-right">80%</td>
-                </tr>
-                <tr>
-                    <td>Summary Adheence Rate</td>
-                    <td class="text-right">100%</td>
-                </tr>
-                <tr>
-                    <td>Shift Productivity Rate</td>
-                    <td class="text-right">50%</td>
-                </tr>
-            </table>
-        </div>
-
-        <!-- Right side circular progress -->
-        <div class="p-4 bg-white rounded shadow flex flex-col items-center">
-            <h2 class="text-lg font-bold mb-2">Overall Performance Score:</h2>
-            
-            <!-- Circular progress indicator (let's say score is 8/10) -->
-            <div class="relative w-24 h-24 rounded-full overflow-hidden" id="scoreCircle">
-                <div class="absolute top-0 left-0 w-full h-full bg-red-200"></div>
-                <div class="absolute top-0 left-0 w-full h-full"></div>
-                <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-2xl font-bold" id="scoreText">8/10</div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="p-5 bg-white rounded shadow mt-4">
-        <h2 class="text-lg font-bold mb-2 border-b pb-2">Task Completion Rate and Adherence Rate</h2>
-        <!-- Insert the charts or graphs as per your design and library of choice here -->
+                        <table class="w-full table  text-base">
+                            <thead>
+                            <tr>
+                                <th class="font-bold">ID</th>
+                                <th class="font-bold">TITLE</th>
+                                <th class="font-bold">ASSIGNED DATE</th>
+                                <th class="font-bold">DUE DATE</th>
+                                <th class="font-bold">COMPLETED DATE</th>
+                                <th class="font-bold">TOTAL TIME TAKEN</th>
+                                <th class="font-bold">NO. DAYS LATE</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="font-semibold">4287</td>
+                                <td class="font-semibold">Triweekly Departmental Sync</td>
+                                <td class="font-semibold">2023-09-21</td>
+                                <td class="font-semibold">2023-09-21</td>
+                                <td class="font-semibold">2023-09-21</td>
+                                <td class="font-semibold">0h 0m</td>
+                                <td class="font-semibold">0 days</td>
+                            </tr>
+                            <!-- ... Other rows ... -->
+                            </tbody>
+                        </table>
+                    </div>
+                <br>
     
-        <div class="p-6 space-y-4">
-            <!-- Row 1 -->
-            <div class="flex justify-between">
-                <div class="bg-300  p-4 rounded">
-                    <p>TASK COMPLETION RATE AND TASK EFFICIENCY RATE:</p>
-                </div>
-            </div>
 
-            <!-- Row 2 -->
-            <div class="grid grid-cols-3 gap-4">
-                <div class="bg-yellow-300 p-4 rounded">
-                    <strong>TASK ASSIGNED</strong>
-                    <p>100</p>
-                </div>
-                <div class="bg-yellow-300 p-4 rounded">
-                    <strong>TASK COMPLETED</strong>
-                    <p>98</p>
-                </div>
-                <div class="bg-yellow-300 p-4 rounded">
-                    <strong>TASK COMPLETED PAST DUE</strong>
-                    <p>15</p>
-                </div>
-            </div>
+        <!-- Task Timer Activity Table -->
+                <h2 class="text-xl font-bold mb-4  text-center text-uppercase">Task Timer Activity</h2>
+                    <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 shadow-inner rounded-[50px] transition-all  p-6">
 
-            <!-- Row 3 -->
-            <div class="bg-300 p-4 rounded">
-                <p>TASK TIME ADHERENCE RATE</p>
-            </div>
+                        <table class="w-full table  text-base">
+                            <thead>
+                                <tr>
+                                    <th class="font-bold">TASK</th>
+                                    <th class="font-bold">START TIME</th>
+                                    <th class="font-bold">END TIME</th>
+                                    <th class="font-bold">DURATION</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="hover:bg-gray-50 transition">
+                                <td class="font-semibold">NO DATA</td>
+                                </tr>
+                                <!-- ... Other rows ... -->
+                                </tbody>
+                        </table>
+                    </div>
+                <br>
 
-            <!-- Row 4 -->
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-yellow-300 p-4 rounded">
-                    <strong>ESTIMATED TIME ON THE TASKS ASSIGNED</strong>
-                    <p>400 HRS</p>
-                </div>
-                <div class="bg-yellow-300 p-4 rounded">
-                    <strong>ACTUAL TIME ON THE TASKS ASSIGNED</strong>
-                    <p>400 HRS</p>
-                </div>
-            </div>
+        <!-- AFK Time Table -->
+        <h2 class="text-xl font-bold mb-4  text-center text-uppercase">AFK Time</h2>
+                    <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 shadow-inner rounded-[50px] transition-all  p-6">
 
-            <!-- Row 5 -->
-            <div class="bg-300 p-4 rounded">
-                <p>SHIFT PRODUCTIVITY RATE</p>
-            </div>
-
-            <!-- Row 6 -->
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-yellow-300 p-4 rounded">
-                    <strong>TOTAL LOGGED TIME</strong>
-                    <p>100</p>
-                </div>
-                <div class="bg-yellow-300 p-4 rounded">
-                    <strong>TIME SPENT DOING TASKS</strong>
-                    <p>100</p>
-                </div>
-            </div>
-
-            <!-- Row 7 -->
-            <div class="bg-300 p-4 rounded">
-                <p>SUMMARY ADHERENCE RATE:</p>
-            </div>
-
-            <!-- Row 8 -->
-            <div class="bg-yellow-300 p-4 rounded">
-                <p>SUMMARY 1... SUMMARY N</p>
-            </div>
-        </div>
-
-    </div>
-    
-
-    
-    <div class="p-5 mt-4">
-        <!-- All Tasks Table -->
-        <h2 class="mb-4 font-medium text-lg">All Tasks</h2>
-        <table class="min-w-full bg-white rounded shadow mb-4">
+                        <table class="w-full table  text-base">
             <thead>
-            <tr>
-                <th class="px-4 py-2 border-b">ID</th>
-                <th class="px-4 py-2 border-b">TITLE</th>
-                <th class="px-4 py-2 border-b">ASSIGNED DATE</th>
-                <th class="px-4 py-2 border-b">DUE DATE</th>
-                <th class="px-4 py-2 border-b">COMPLETED DATE</th>
-                <th class="px-4 py-2 border-b">TOTAL TIME TAKEN</th>
-                <th class="px-4 py-2 border-b">NO. DAYS LATE</th>
-            </tr>
+                <tr>
+                <th class="font-bold"></th>
+                </tr>
             </thead>
             <tbody>
-            <tr>
-                <td class="px-4 py-2 border-b">4287</td>
-                <td class="px-4 py-2 border-b">Triweekly Departmental Sync</td>
-                <td class="px-4 py-2 border-b">2023-09-21</td>
-                <td class="px-4 py-2 border-b">2023-09-21</td>
-                <td class="px-4 py-2 border-b">2023-09-21</td>
-                <td class="px-4 py-2 border-b">0h 0m</td>
-                <td class="px-4 py-2 border-b">0 days</td>
-            </tr>
-            <!-- ... Other rows ... -->
+            <tr class="hover:bg-gray-50 transition">
+            <td class="font-semibold"></td>
+                </tr>
+                <!-- ... Other rows ... -->
             </tbody>
-    </table>
+        </table>
+                    </div>
+         <br>           
+         <h2 class="text-xl font-bold mb-4  text-center text-uppercase">Offline Time</h2>
+                    <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 shadow-inner rounded-[50px] transition-all  p-6">
 
-    <!-- Task Timer Activity Table -->
-    <h2 class="mb-4 font-medium text-lg">Task Timer Activity</h2>
-    <table class="min-w-full bg-white rounded shadow mb-4">
-        <!-- ... Similar structure as above, modify as required ... -->
-        <thead>
-            <tr>
-                <th class="px-4 py-2 border-b border-gray-300 text-left">TASK</th>
-                <th class="px-4 py-2 border-b border-gray-300 text-left">START TIME</th>
-                <th class="px-4 py-2 border-b border-gray-300 text-left">END TIME</th>
-                <th class="px-4 py-2 border-b border-gray-300 text-left">DURATION</th>
-            </tr>
+                        <table class="w-full table  text-base">
+                        <table class="w-full table  text-base">
+            <thead>
+                <tr>
+                <th class="font-bold"></th>
+                </tr>
             </thead>
             <tbody>
-            <tr>
-                <td class="px-4 py-2 border-b">NO DATA</td>
-            </tr>
-            <!-- ... Other rows ... -->
+            <tr class="hover:bg-gray-50 transition">
+            <td class="font-semibold"></td>
+                </tr>
+                <!-- ... Other rows ... -->
             </tbody>
-    </table>
-    
-    <!-- AFK Time Table -->
-    <h2 class="mb-4 font-medium text-lg">AFK Time</h2>
-    <table class="min-w-full bg-white rounded shadow mb-4">
-        <thead>
-            <tr>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-            </tr>
-            <!-- ... Other rows ... -->
-        </tbody>
-    </table>
-
-    <!-- Offline Time Table -->
-    <h2 class="mb-4 font-medium text-lg">Offline Time</h2>
-    <table class="min-w-full bg-white rounded shadow mb-4">
-        <thead>
-            <tr>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-                <th class="px-4 py-2 border-b"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-            </tr>
-            <!-- ... Other rows ... -->
-        </tbody>
-    </table>
+        </table>
+                    </div>
+         <br>           
 
 
-    <!-- Leave Table -->
-    <h2 class="mb-4 font-medium text-lg">Leave Status</h2>
-    <table class="min-w-full bg-white rounded shadow mb-4">
-        <!-- ... Similar structure as above, modify as required ... -->
-        <thead>
-            <tr>
-                <th class="px-4 py-2 border-b">NO</th>
-            </tr>
+        <!-- Leave Table -->
+        <h2 class="text-xl font-bold mb-4  text-center text-uppercase">Offline Time</h2>
+                    <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 shadow-inner rounded-[50px] transition-all">
+
+                        <table class="w-full table  text-base">
+                        <table class="w-full table  text-base">
+            <thead>
+                <tr>
+                <th class="font-bold"></th>
+                </tr>
             </thead>
             <tbody>
-            <!-- ... Other rows ... -->
+            <tr class="hover:bg-gray-50 transition">
+            <td class="font-semibold"></td>
+                </tr>
+                <!-- ... Other rows ... -->
             </tbody>
-    </table>
+        </table>
+                    </div>
+         <br>           
+
+        </div>
 
     </div>
 </div>
+</div></div>
+
 
 
 <?php init_tail(); ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
 
 <script>
-    function updateScoreCircle(value) {
-        const score = value / 10;
-        const percentage = score * 100;
-        const scoreCircle = document.getElementById('scoreCircle');
-        const scoreText = document.getElementById('scoreText');
-        
-        scoreCircle.children[1].style.background = `conic-gradient(orange 0% ${percentage}%, transparent ${percentage}% 100%)`;
-        scoreText.textContent = `${value}/10`;
+   
+   var dailyStats = <?php echo json_encode($daily_stats); ?>;
+
+function fetchDailyInfos() {
+    let data = dailyStats;
+
+    const today = new Date();
+    let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
+    let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
+    console.log(data);
+    // AFK entries filter
+    const afk_entries = data.afk_and_offline.filter(entry => entry.status === 'AFK');
+
+    var items = new vis.DataSet();
+    var options = {
+        zoomMin: 1000 * 60 * 60, // one hour in milliseconds
+        zoomMax: 1000 * 60 * 60 * 24 * 31, // 31 days in milliseconds
+        height: "180px"
+    };
+
+    // Clock-in aur Clock-out times ko timeline mein add karte hain
+    if (data.clock_ins_outs) {
+        data.clock_ins_outs.forEach(clock => {
+            const inTime = new Date(clock.clock_in).toISOString();
+            const outTime = new Date(clock.clock_out).toISOString();
+
+            // Setting startDate and endDate based on clock-in and clock-out times
+            if (new Date(inTime) < startDate) {
+                startDate = new Date(inTime);
+            }
+            if (new Date(outTime) > endDate) {
+                endDate = new Date(outTime);
+            }
+
+            items.add({
+                content: 'Clock in',
+                start: inTime,
+                end: outTime,
+                type: 'range',
+                className: 'clock-in-time',
+                group: 2
+            });
+        });
+    }
+    if (data.shift_timings && data.shift_timings.length > 0) {
+        data.shift_timings.forEach(shift => {
+            const shiftStart = new Date(`${shift.Year}-${shift.month}-${shift.day} ${shift.shift_start_time}`).toISOString();;
+            const shiftEnd = new Date(`${shift.Year}-${shift.month}-${shift.day} ${shift.shift_end_time}`).toISOString();;
+
+            console.log(shiftStart);
+            
+            items.add({
+                content: 'Shift',
+                start: shiftStart,
+                end: shiftEnd,
+                type: 'range',
+                className: 'shift-time',
+                group: 3  // Group 3 for shifts. You can adjust as needed.
+            });
+
+        });
     }
 
-    // Update the circle with the desired score. 
-    // Replace the number 0 with any other value between 0 and 10 to see the change.
-    updateScoreCircle(2);
+    // AFK timings ko timeline mein add karte hain
+    if (afk_entries) {
+      afk_entries.forEach(function (entry) {
+
+        const start24HourTime = convertTo24Hour(entry.start_time);
+        const end24HourTime = convertTo24Hour(entry.end_time);
+
+        const startDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${start24HourTime}`).toISOString();;
+        const endDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${end24HourTime}`).toISOString();;
+
+        items.add({
+          content: 'AFK',
+          start: startDateTime,
+          end: endDateTime,
+          type: 'range',
+          className: 'afk-time',
+          group: 1
+        });
+      });
+    } else {
+      console.warn("afk_entries is not available");
+    }
+
+    var container = document.getElementById('visualization');
+    if (container) {
+      var timeline = new vis.Timeline(container, items, options);
+
+    } else {
+      console.error("Timeline container not found");
+      return;
+    }
+
+    // Setting the timeline to focus on our startDate to endDate
+    timeline.setWindow(startDate, endDate);
+    timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
+}
+
+// Convert 12-hour time format to 24-hour time format
+function convertTo24Hour(time) {
+    const [hourMin, period] = time.split(' ');
+    let [hour, minute] = hourMin.split(':');
+    hour = +hour;
+    if (period === "PM" && hour !== 12) hour += 12;
+    if (period === "AM" && hour === 12) hour -= 12;
+    return `${hour.toString().padStart(2, '0')}:${minute}`;
+}
+
+fetchDailyInfos();
+
+
+
+
+function updateScoreCircle(value) {
+    const percentage = value * 10;
+    const scoreCircle = document.getElementById('scoreCircle');
+    const scoreText = document.getElementById('scoreText');
+
+    scoreCircle.style.background = `conic-gradient(orange 0% ${percentage}%, #f3f4f6 ${percentage}% 100%)`; // changed the transparent to a light gray for a subtle look
+    scoreText.textContent = `${value}/10`;
+}
+
+updateScoreCircle(2);
+
 </script>
 
 </body>

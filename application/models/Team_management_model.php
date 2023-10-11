@@ -5,6 +5,9 @@ class Team_management_model extends App_Model
     public function __construct()
     {
         parent::__construct();
+        // $this->load->model('tasks_model');
+        // $this->load->model('projects_model');
+
     }
 
     /**
@@ -208,6 +211,52 @@ class Team_management_model extends App_Model
          }
         return $query->result();
     }
+    
+        public function getProjectsByStaffId($staff_id) {
+            $query = $this->db->query('SELECT p.* FROM ' . db_prefix() . 'projects p JOIN ' . db_prefix() . 'project_members pm ON p.id = pm.project_id WHERE pm.staff_id = ?', array($staff_id));
+            // var_dump(result_array);
+            return $query->result_array();
+        }
+
+        public function getActiveSprintDetailsByProjectId($project_id) {
+            $CI =& get_instance();
+            $CI->load->model('projects_model');
+            $CI->load->model('tasks_model');
+        
+            $sprint = $CI->projects_model->is_active_sprint_exists($project_id)['sprint'];
+        
+            if ($sprint) {
+                $sprint->stories = $CI->projects_model->get_stories('sprint', $sprint->id);
+                foreach ($sprint->stories as &$story) {
+                    $story = $CI->tasks_model->get($story->id);
+                    $story->epic = $CI->projects_model->get_epic($story->epic_id);
+                }
+            }
+            return $sprint;
+        }
+
+        public function getTasksAssignedToStaffByProjectId($staff_id, $project_id) {
+            $query = $this->db->query('SELECT t.* FROM ' . db_prefix() . 'tasks t 
+                JOIN ' . db_prefix() . 'task_assigned ta ON t.id = ta.taskid 
+                WHERE ta.staffid = ? AND t.rel_id = ? AND t.rel_type = "project"', array($staff_id, $project_id));
+                // print_r($query);
+            return $query->result_array();
+     
+        }
+        
+
+        public function getTasksAssignedToStaff($project_id, $staff_id) {
+            $this->db->select('*');
+            $this->db->from(db_prefix() . 'tasks');
+            $this->db->join(db_prefix() . 'task_assigned', db_prefix() . 'tasks.id = ' . db_prefix() . 'task_assigned.taskid');
+            $this->db->where(db_prefix() . 'tasks.rel_id', $project_id);
+            $this->db->where(db_prefix() . 'task_assigned.staffid', $staff_id);
+            return $this->db->get()->result_array();
+        }
+        
+       
+        
+    
     
         
     public function get_all_timers(){
