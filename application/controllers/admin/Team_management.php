@@ -257,6 +257,7 @@ class Team_management extends AdminController {
     public function get_shift_timings($staff_id, $month) {
 
         $shifts = $this->team_management_model->get_shift_timings($staff_id, $month);
+        
 
         echo json_encode($shifts);
     }
@@ -1088,8 +1089,104 @@ class Team_management extends AdminController {
     }
       
 
+    public function kudos(){
+
+
+        $staff_id = $this->session->userdata('staff_user_id');
+        $kudos_sent_this_month = $this->team_management_model->kudos_count($staff_id);
+        $remaining_kudos = 5 - $kudos_sent_this_month;
     
 
+
+
+        $data['staff_members'] = $this->staff_model->get();
+        $data['kudos_data'] = $this->team_management_model->fetch_kudos();
+        $data['remaining_kudos'] = $remaining_kudos;
+        $data['top_givers'] = $this->team_management_model->get_top_kudos_givers();
+        $data['top_receivers'] = $this->team_management_model->get_top_kudos_receivers();
+
+        $staff_id_name= [];
+        foreach($data['staff_members'] as $staff) {
+            $staff_id_name[$staff['staffid']] = $staff['firstname'] . ' ' . $staff['lastname'];
+        }
+        $data['staff_id_name'] = $staff_id_name;
+
+        $this->load->view('admin/management/kudos', $data);
+    }
+
+    public function save_kudos_data() {
+
+        $principles = $this->input->post('principles');
+        $principles_str = implode(' , ', $principles);
+    
+        $staff_id = $this->session->userdata('staff_user_id');
+
+        $data = [
+            'kudosType' => $this->input->post('type'),
+            'to' => $this->input->post('to_'),
+            'principles' => $principles_str,
+            'remarks' => $this->input->post('remarks'),
+            'staff_id' => $staff_id
+
+        ];
+    
+        $response = $this->team_management_model->kudosdata($data);
+    
+        // Get additional data for the response:
+        $staff = $this->staff_model->get($staff_id);
+        $fullName = $staff->firstname . ' ' . $staff->lastname;
+        $image_url = staff_profile_image($staff_id, ['w-10 h-10 rounded-full'], 'thumb', []);
+        $to_name = $this->staff_model->get($this->input->post('to_'));
+        $to_fullName = $to_name->firstname . ' ' . $to_name->lastname;
+
+        preg_match('/src="([^"]+)"/', $image_url, $match);
+        $actual_image_url = $match[1];
+    
+        echo json_encode([
+            'success' => $response,
+            'name' => $fullName,
+            'principles' => $principles_str,
+            'remarks' => $this->input->post('remarks'),
+            'timestamp' => 'just now',
+            'kudosType' => $this->input->post('type'),
+            'to_name' => $to_fullName,
+            'image_url' => $actual_image_url
+        ]);
+    }
+
+    public function like_kudos() {
+        $kudos_id = $this->input->post('kudos_id');
+        $staff_id = $this->session->userdata('staff_user_id'); 
+    
+        $this->db->where('id', $kudos_id);
+        $kudos = $this->db->get('tblkudos')->row();
+    
+        if ($kudos) {
+            $likes = explode(',', $kudos->kudos_like);
+            if (!in_array($staff_id, $likes)) { // If not liked already
+                $likes[] = $staff_id;
+                $updated_likes = implode(',', $likes);
+                $this->db->where('id', $kudos_id);
+                $success = $this->db->update('tblkudos', ['kudos_like' => $updated_likes]);
+                $image_url = staff_profile_image($staff_id, ['w-6 h-6 rounded-full'], 'thumb', []); 
+                preg_match('/src="([^"]+)"/', $image_url, $match);
+                $actual_image_url = $match[1];
+                echo json_encode(['success' => $success, 'action' => 'liked', 'image_url' => $actual_image_url]);
+            } else if (($key = array_search($staff_id, $likes)) !== false) {
+                unset($likes[$key]);
+                $updated_likes = implode(',', $likes);
+                $this->db->where('id', $kudos_id);
+                $success = $this->db->update('tblkudos', ['kudos_like' => $updated_likes]);
+                $image_url = staff_profile_image($staff_id, ['w-6 h-6 rounded-full'], 'thumb', []);
+                preg_match('/src="([^"]+)"/', $image_url, $match);
+                $actual_image_url = $match[1];
+                echo json_encode(['success' => $success, 'action' => 'unliked', 'image_url' => $actual_image_url]);
+                return;
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Kudos not found']);
+        }
+    }
 }
 
 

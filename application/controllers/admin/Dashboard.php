@@ -95,15 +95,20 @@ class Dashboard extends AdminController
 
         $data['upcoming_birthdays'] = $this->staff_model->get_upcoming_birthdays();
 
+<<<<<<< Updated upstream
 
-        // timeline 
+=======
+>>>>>>> Stashed changes
         $staff_id = get_staff_user_id(); // Yeh function current logged in user ki ID return karta hai.
         $day = date("d");
         $month = date("m");
         $year = date("Y");
         $daily_stats = $this->team_management_model->get_daily_stats($staff_id, $day, $month, $year);
         $data['daily_stats'] = $daily_stats;
-// var_dump($daily_stats);
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         $data = hooks()->apply_filters('before_dashboard_render', $data);
 
         $data['total_time'] = $this->team_management_model->get_today_live_timer($staff_id);

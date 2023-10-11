@@ -546,6 +546,119 @@ function closeModal() {
 
 </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+
+<script>
+    var dailyStats = <?php echo json_encode($daily_stats); ?>;
+
+function fetchDailyInfos(staff_id) {
+    let data = dailyStats;
+
+    const today = new Date();
+    let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
+    let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
+    console.log(data);
+    // AFK entries filter
+    const afk_entries = data.afk_and_offline.filter(entry => entry.status === 'AFK');
+
+    var items = new vis.DataSet();
+    var options = {
+      zoomMin: 1000 * 60 * 60,
+      zoomMax: 1000 * 60 * 60 * 24,
+
+      format: {
+        minorLabels: function(date, scale, step) {
+          return moment(date).format('hh:mm A');
+        },
+        majorLabels: function(date, scale, step) {
+          return moment(date).format('MMM DD YYYY');
+        }
+      }
+    };
+    var container = document.getElementById('visualization');
+    if (container) {
+      var timeline = new vis.Timeline(container, items, options);
+
+    } else {
+      console.error("Timeline container not found");
+      return;
+    }
+
+    // Clock-in aur Clock-out times ko timeline mein add karte hain
+    if (data.clock_ins_outs) {
+        data.clock_ins_outs.forEach(clock => {
+            const inTime = new Date(clock.clock_in).toISOString();
+            const outTime = new Date(clock.clock_out).toISOString();
+
+            // Setting startDate and endDate based on clock-in and clock-out times
+            if (new Date(inTime) < startDate) {
+                startDate = new Date(inTime);
+            }
+            if (new Date(outTime) > endDate) {
+                endDate = new Date(outTime);
+            }
+
+            items.add({
+                content: 'Clock in',
+                start: inTime,
+                end: outTime,
+                type: 'range',
+                className: 'clock-in-time',
+                group: 2
+            });
+        });
+    }
+    if (data.shift_timings && data.shift_timings.length > 0) {
+    data.shift_timings.forEach(shift => {
+        const shiftStart = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_start}`);
+        const shiftEnd = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_end}`);
+
+        items.add({
+            content: 'Shift',
+            start: shiftStart,
+            end: shiftEnd,
+            type: 'range',
+            className: 'shift-time',
+            group: 3  // Group 3 for shifts. You can adjust as needed.
+        });
+
+        // Setting startDate and endDate based on shift timings
+        if (shiftStart < startDate) {
+            startDate = shiftStart;
+        }
+        if (shiftEnd > endDate) {
+            endDate = shiftEnd;
+        }
+    });
+}
+
+    // AFK timings ko timeline mein add karte hain
+    if (afk_entries) {
+      afk_entries.forEach(function (entry) {
+        const startDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.start_time}`, "YYYY-MM-DD hh:mm A").toDate();
+        const endDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.end_time}`, "YYYY-MM-DD hh:mm A").toDate();
+
+        items.add({
+          content: 'AFK',
+          start: startDateTime,
+          end: endDateTime,
+          type: 'range',
+          className: 'afk-time',
+          group: 1
+        });
+      });
+    } else {
+      console.warn("afk_entries is not available");
+    }
+
+    // Setting the timeline to focus on our startDate to endDate
+    timeline.setWindow(startDate, endDate);
+}
+
+
+</script>
+
+
 <script>
 
     

@@ -198,11 +198,15 @@ function app_init_admin_sidebar_menu_items()
             'position' => 2, // The menu position
             'icon'     => 'fa fa-user-clock', // Font awesome icon
         ]);
-
-
     }
 
-
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'kudos_system', // Required ID/slug UNIQUE for the child menu
+        'name'     => 'Kudos System', // The name if the item
+        'href'     => admin_url('team_management/kudos'), // URL of the item
+        'position' => 2, // The menu position
+        'icon'     => 'fa fa-user-clock', // Font awesome icon
+    ]);
 
     $CI->app_menu->add_sidebar_menu_item('projects', [
         'name'     => _l('projects'),

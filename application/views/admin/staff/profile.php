@@ -312,6 +312,8 @@
                             <input type="password" class="form-control" id="newpasswordr" name="newpasswordr">
                         </div>
                     </div>
+                </div>
+            </div>
 
                     <div class="panel-footer">
                         <div class="tw-flex tw-justify-between">
@@ -373,6 +375,7 @@
                         </button>
                     </div>
                 </div>
+                
                 <?php echo form_close(); ?>
             </div>
         </div>

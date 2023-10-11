@@ -2149,4 +2149,72 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
     
 
 
+    public function kudosdata($data) {
+        return $this->db->insert('tblkudos', [
+            'type' => $data['kudosType'],
+            'to_' => $data['to'],
+            'principles' => $data['principles'],
+            'remarks' => $data['remarks'],
+            'created_at' => date('Y-m-d H:i:s'),
+            'staff_id' => $data['staff_id']  // Insert the staff_id into the database
+        ]);
+    }
+
+    public function fetch_kudos() {
+        $this->db->select('tblkudos.*, staff.firstname, staff.lastname'); // Add the columns you need from the staff table
+        $this->db->from('tblkudos');
+        $this->db->join('staff', 'tblkudos.staff_id = staff.staffid', 'left'); // Joining the staff table
+    
+        // Order by 'created_at' column in descending order
+        $this->db->order_by('tblkudos.created_at', 'DESC');
+    
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+
+    public function get_new_kudos($latestTimestamp) {
+        $this->db->where('created_at >', $latestTimestamp);
+        $query = $this->db->get('tblkudos');
+        return $query->result_array();
+    }
+
+    public function likeKudos($kudos_id, $staff_id) {
+        // Here, you can update the 'kudos_like' column in 'tblkudos' table 
+        // based on your design whether you're saving multiple likes as comma-separated or in another way.
+        // This is just a simple logic and can vary based on your DB design.
+        $this->db->where('id', $kudos_id);
+        $this->db->update('tblkudos', ['kudos_like' => $staff_id]);
+        
+        return $this->db->affected_rows() > 0;
+    }
+
+    public function kudos_count($staff_id) {
+        $first_day_of_month = date('Y-m-01 00:00:00');
+        $last_day_of_month = date('Y-m-t 23:59:59');
+    
+        $this->db->from('tblkudos');
+        $this->db->where('staff_id', $staff_id);
+        $this->db->where('created_at >=', $first_day_of_month);
+        $this->db->where('created_at <=', $last_day_of_month);
+    
+        return $this->db->count_all_results();
+    }
+
+    public function get_top_kudos_givers() {
+        $this->db->select('staff_id, COUNT(staff_id) as total_kudos');
+        $this->db->from('tblkudos');
+        $this->db->group_by('staff_id');
+        $this->db->order_by('total_kudos', 'DESC');
+        return $this->db->get()->result_array();
+    }
+
+    public function get_top_kudos_receivers() {
+        $this->db->select('to_, COUNT(to_) as total_received');
+        $this->db->from('tblkudos');
+        $this->db->group_by('to_');
+        $this->db->order_by('total_received', 'DESC');
+        return $this->db->get()->result_array();
+    }
+
+    
 }

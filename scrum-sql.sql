@@ -68,3 +68,15 @@ ALTER TABLE tblstaff ADD  bank_name VARCHAR(255) NULL;
 ALTER TABLE tblstaff ADD  bank_acc_no VARCHAR(50) NULL;
 ALTER TABLE tblstaff ADD next_of_kin VARCHAR(255) NULL;
 ALTER TABLE tblstaff ADD google_chat_id VARCHAR(255) NULL;
+
+
+CREATE TABLE tblkudos (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    type ENUM('advice', 'kudos') NOT NULL,
+    to_ VARCHAR(255) NOT NULL,
+    principles TEXT NOT NULL,
+    remarks TEXT DEFAULT NULL,
+    created_at DATETIME NOT NULL,
+    staff_id INT(11) NOT NULL,
+    kudos_like TEXT NOT NULL
+);
