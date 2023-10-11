@@ -158,7 +158,13 @@
                                             $timeString = 'just now';
                                         }
                                         ?>
-                                        <div class="p-8 bg-white rounded-[30px] shadow-lg mb-5" data-type="<?php // ... ?>">
+                                        <div class="p-8 bg-white rounded-[30px] shadow-lg mb-5"   data-type="<?php 
+                                            if($kudos['staff_id'] == $this->session->userdata('staff_user_id')) {
+                                                echo 'given'; 
+                                            } else if(in_array($this->session->userdata('staff_user_id'), explode(',', $kudos['to_']))) {
+                                                echo 'received';
+                                            }
+                                            ?>">       
                                             <div class="flex items-center justify-between mb-2">
                                                 <div class="flex items-center space-x-3">
                                                     <div class="w-10 h-10 rounded-full bg-gray-300">
@@ -247,55 +253,55 @@
 ?>
 
 <script>
-$("#kudosform").on('submit', function(event){
-    event.preventDefault();
+    $("#kudosform").on('submit', function(event){
+        event.preventDefault();
 
-    var remainingKudos = parseInt($(".text-xl").text().split(':')[1].trim(), 10); // Extract the remaining kudos from the text
+        var remainingKudos = parseInt($(".text-xl").text().split(':')[1].trim(), 10); // Extract the remaining kudos from the text
 
-    if (remainingKudos <= 0) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Info',
-            text: 'You have no kudos left to give!'
-        });
-        return; // This will exit the function, preventing any further code from executing
-    }
-
-    var postData = {
-        type: $("#kudosType").val(),
-        to_: $("#to_").val(),
-        principles: $("#principles").val(),
-        remarks: $("#remarks").val()
-    };
-
-    $.ajax({
-        url: 'save_kudos_data',
-        method: 'POST',
-        dataType: 'json',
-        data: postData,
-        success: function(response) {
-            if (response.success) {
-                var currentKudos = parseInt($('#kudosCount').text(), 10);
-                $('#kudosCount').text(currentKudos - 1);
-                if (currentKudos === 1) { // Check if after decrementing it becomes 0
-                    $('#btnform').prop('disabled', true);
-                }
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Kudos saved successfully!'
-                });
-                addKudosToFeed(response);
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: response.message // Display the message returned from server
-                });
-            }
+        if (remainingKudos <= 0) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Info',
+                text: 'You have no kudos left to give!'
+            });
+            return; // This will exit the function, preventing any further code from executing
         }
+
+        var postData = {
+            type: $("#kudosType").val(),
+            to_: $("#to_").val(),
+            principles: $("#principles").val(),
+            remarks: $("#remarks").val()
+        };
+
+        $.ajax({
+            url: 'save_kudos_data',
+            method: 'POST',
+            dataType: 'json',
+            data: postData,
+            success: function(response) {
+                if (response.success) {
+                    var currentKudos = parseInt($('#kudosCount').text(), 10);
+                    $('#kudosCount').text(currentKudos - 1);
+                    if (currentKudos === 1) { // Check if after decrementing it becomes 0
+                        $('#btnform').prop('disabled', true);
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Kudos saved successfully!'
+                    });
+                    addKudosToFeed(response);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: response.message // Display the message returned from server
+                    });
+                }
+            }
+        });
     });
-});
 
     function addKudosToFeed(data) {
     let kudosBlock = `
@@ -340,47 +346,47 @@ $("#kudosform").on('submit', function(event){
     }
 
     $(document).on('click', '.like-btn', function() {
-    var kudosId = $(this).data('kudos-id');
-    var btn = $(this);
-    var icon = btn.find('.heart-icon');
-    var profileImagesDiv = btn.closest('div').next('.profile-images'); // closest profile images div to our like button
+        var kudosId = $(this).data('kudos-id');
+        var btn = $(this);
+        var icon = btn.find('.heart-icon');
+        var profileImagesDiv = btn.closest('div').next('.profile-images'); // closest profile images div to our like button
 
-    $.ajax({
-        url: 'like_kudos', 
-        method: 'POST',
-        dataType: 'json',
-        data: {kudos_id: kudosId},
-        success: function(response) {
-            if(response.success) {
-                if(response.action === 'liked') {
-                    icon.css({
-                        'fill': '#CF3333',
-                        'stroke': '#CF3333'
-                    });
-                    var newImageHtml = `<div class="w-6 h-6 rounded-full overflow-x-auto scrollbar-hide">
-                                            <img src="${response.image_url}" class="w-6 h-6 rounded-full">
-                                        </div>`;
-                    profileImagesDiv.append(newImageHtml);
-                } else if(response.action === 'unliked') {
-                    icon.css({
-                        'fill': 'none',
-                        'stroke': 'currentColor'
-                    });
-                    // Assuming each div inside profile-images corresponds to a staff's image
-                    profileImagesDiv.find('div').each(function() {
-                        var imageUrl = $(this).find('img').attr('src');
-                        if(imageUrl === response.image_url) {
-                            $(this).remove();
-                            return false; // Break out of the each loop once the image is removed
-                        }
-                    });
+        $.ajax({
+            url: 'like_kudos', 
+            method: 'POST',
+            dataType: 'json',
+            data: {kudos_id: kudosId},
+            success: function(response) {
+                if(response.success) {
+                    if(response.action === 'liked') {
+                        icon.css({
+                            'fill': '#CF3333',
+                            'stroke': '#CF3333'
+                        });
+                        var newImageHtml = `<div class="w-6 h-6 rounded-full overflow-x-auto scrollbar-hide">
+                                                <img src="${response.image_url}" class="w-6 h-6 rounded-full">
+                                            </div>`;
+                        profileImagesDiv.append(newImageHtml);
+                    } else if(response.action === 'unliked') {
+                        icon.css({
+                            'fill': 'none',
+                            'stroke': 'currentColor'
+                        });
+                        // Assuming each div inside profile-images corresponds to a staff's image
+                        profileImagesDiv.find('div').each(function() {
+                            var imageUrl = $(this).find('img').attr('src');
+                            if(imageUrl === response.image_url) {
+                                $(this).remove();
+                                return false; // Break out of the each loop once the image is removed
+                            }
+                        });
+                    }
+                } else {
+                    alert('Something went wrong!');
                 }
-            } else {
-                alert('Something went wrong!');
             }
-        }
+        });
     });
-});
 
 
     $(document).ready(function() {
