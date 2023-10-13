@@ -677,7 +677,7 @@ function getOrSaveStaffSummary(summary = null) {
     var date = document.getElementById("summary_date").value;
 
     $.ajax({
-        url: 'team_management/staff_summary',
+        url: admin_url + 'team_management/staff_summary',
         type: 'POST',
         data: { summary: summary, date, csrf_token_name: csrf_token },
         success: function(response) {

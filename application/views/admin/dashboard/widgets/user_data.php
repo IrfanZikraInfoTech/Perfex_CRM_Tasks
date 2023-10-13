@@ -7,7 +7,7 @@
             <div class="space-y-4">
 
                 <?php
-                $tasks = $this->team_management_model->get_tasks_by_staff_member($GLOBALS['current_user']->staffid);
+                $tasks = $this->tasks_model->get_user_tasks_assigned($GLOBALS['current_user']->staffid);
                 $total_tasks = 0;
                 $completed_tasks = 0;
 

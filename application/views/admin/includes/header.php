@@ -144,7 +144,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <?php do_action_deprecated('after_render_top_search', [], '3.0.0', 'admin_navbar_start'); ?>
                 <?php hooks()->do_action('admin_navbar_start'); ?>
-                <?php if (is_staff_member()) { ?>
+                <?php if (is_staff_member() && has_permission('team_management', '', 'admin')) { ?>
                 <li class="icon header-newsfeed">
                     <a href="#" class="open_newsfeed desktop" data-toggle="tooltip"
                         title="<?php echo _l('whats_on_your_mind'); ?>" data-placement="bottom">

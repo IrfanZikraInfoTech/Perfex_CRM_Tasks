@@ -442,12 +442,8 @@ class Projects extends AdminController
                         
                         $epic->estimated_time += $story->estimated_hours;
 
-                        $story->total_time_spent = 0;
-                        
-                        foreach ($story->timesheets as $timesheet) {
-                            $epic->total_time_spent += $timesheet['time_spent'];
-                            $story->total_time_spent += $timesheet['time_spent'];
-                        }
+                        $story->total_time_spent = $this->tasks_model->calc_task_total_time($story->id);
+
                     }
                 }
 
@@ -466,12 +462,7 @@ class Projects extends AdminController
 
                         $sprint->estimated_time += $story->estimated_hours;
 
-                        $story->total_time_spent = 0;
-
-                        foreach ($story->timesheets as $timesheet) {
-                            $sprint->total_time_spent += $timesheet['time_spent'];
-                            $story->total_time_spent += $timesheet['time_spent'];
-                        }
+                        $story->total_time_spent = $this->tasks_model->calc_task_total_time($story->id);
 
                         if ($story->status == 1) {
                             $sprint->not_started_count++;

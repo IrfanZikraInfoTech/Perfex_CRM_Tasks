@@ -144,9 +144,9 @@ function app_init_admin_sidebar_menu_items()
    
     
     $CI->app_menu->add_sidebar_children_item('team_management', [
-        'slug'     => 'individual_stats', // Required ID/slug UNIQUE for the child menu
+        'slug'     => 'team', // Required ID/slug UNIQUE for the child menu
         'name'     => 'Team', // The name if the item
-        'href'     => admin_url('team_management/individual_stats'), // URL of the item
+        'href'     => admin_url('team_management/team'), // URL of the item
         'position' => 2, // The menu position
         'icon'     => 'fa fa-user-friends', // Font awesome icon
     ]);
@@ -159,34 +159,37 @@ function app_init_admin_sidebar_menu_items()
         'icon'     => 'fa fa-user', // Font awesome icon
     ]);
     
+    if(get_staff_user_id() != 1){
+        $CI->app_menu->add_sidebar_children_item('team_management', [
+            'slug'     => 'applications', // Required ID/slug UNIQUE for the child menu
+            'name'     => 'My Applications', // The name if the item
+            'href'     => admin_url('team_management/applications'), // URL of the item
+            'position' => 2, // The menu position
+            'icon'     => 'fa fa-plane-departure', // Font awesome icon
+        ]);
+    }
     
-    $CI->app_menu->add_sidebar_children_item('team_management', [
-        'slug'     => 'applications', // Required ID/slug UNIQUE for the child menu
-        'name'     => 'My Applications', // The name if the item
-        'href'     => admin_url('team_management/applications'), // URL of the item
-        'position' => 2, // The menu position
-        'icon'     => 'fa fa-plane-departure', // Font awesome icon
-    ]);
-    $CI->app_menu->add_sidebar_children_item('team_management', [
-        'slug'     => 'my projects', // Required ID/slug UNIQUE for the child menu
-        'name'     => 'My Projects', // The name if the item
-        'href'     => admin_url('team_management/my_projects'), // URL of the item
-        'position' => 2, // The menu position
-        'icon'     => 'fa fa-user-clock', // Font awesome icon
-    ]);
 
     if(has_staff_under()){
-
-    
     
         $CI->app_menu->add_sidebar_children_item('team_management', [
-            'slug'     => 'applications_admin', // Required ID/slug UNIQUE for the child menu
+            'slug'     => 'all_applications', // Required ID/slug UNIQUE for the child menu
             'name'     => 'Staff Applications', // The name if the item
             'href'     => admin_url('team_management/all_applications'), // URL of the item
             'position' => 2, // The menu position
             'icon'     => 'fa fa-address-book', // Font awesome icon
         ]);
     }
+
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'management_projects', // Required ID/slug UNIQUE for the child menu
+        'name'     => 'Projects', // The name if the item
+        'href'     => admin_url('team_management/projects'), // URL of the item
+        'position' => 2, // The menu position
+        'icon'     => 'fa fa-user-clock', // Font awesome icon
+    ]);
+
+    
 
     if (has_permission('team_management', '', 'admin')) {
 
@@ -205,7 +208,7 @@ function app_init_admin_sidebar_menu_items()
         'name'     => 'Kudos System', // The name if the item
         'href'     => admin_url('team_management/kudos'), // URL of the item
         'position' => 2, // The menu position
-        'icon'     => 'fa fa-user-clock', // Font awesome icon
+        'icon'     => 'fa fa-thumbs-up', // Font awesome icon
     ]);
 
     $CI->app_menu->add_sidebar_menu_item('projects', [

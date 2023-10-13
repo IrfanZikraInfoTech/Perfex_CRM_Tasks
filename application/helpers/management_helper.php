@@ -47,7 +47,7 @@ function notify_task_allocation($data) {
     $last_assignee = end($assignees);
     $staff_id = $last_assignee['assigneeid'];
 
-    $tag = $CI->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
+    $tag = id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
 
 
     // Prepare message content
@@ -96,7 +96,7 @@ function notify_task_timer_started($data) {
     // Get staff details
     $staff = $CI->staff_model->get($staff_id);
 
-    $tag = $CI->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
+    $tag = id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
 
     // Prepare message content
     $message_content = "⏱️ *Task Timer Started*\n";
@@ -140,7 +140,7 @@ function notify_task_timer_stopped($data) {
         $project_name = "";
     }
 
-    $tag = $CI->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
+    $tag = id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
 
     // Prepare message content
     $message_content = "⏱️ *Task Timer Stopped*\n";
@@ -189,7 +189,7 @@ function notify_task_status_changed($data) {
         $total_task_time += $timer['end_time'] - $timer['start_time'];
     }
 
-    $tag = $CI->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
+    $tag = id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
 
     // Prepare message content
     $message_content = "📝 *Task Completed*\n";
@@ -227,7 +227,7 @@ function notify_task_comment_added($data) {
     // Get staff details
     $staff_id = $comment->staffid;
 
-    $tag = $CI->team_management_model->id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
+    $tag = id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
 
     // Prepare message content
     $message_content = "💬 *Task Comment Added*\n";
@@ -242,6 +242,21 @@ function notify_task_comment_added($data) {
     $CI->webhook_library->send_chat_webhook($message_content, "tasks-activity");
 }
 
+function id_to_name($id, $tableName, $idName, $nameName) {
+
+    $CI = &get_instance();
+
+    $CI->db->select($nameName);
+    $CI->db->from($tableName);
+    $CI->db->where($idName, $id);
+    $query = $CI->db->get();
+    if ($query->num_rows() > 0) {
+        $row = $query->row();
+        return $row->$nameName;
+    } else {
+        return 'Unknown';
+    }
+}
 
 
 function team_management_permissions() {

@@ -286,142 +286,127 @@ const statusSelect = document.getElementById('status');
 const liveTimer = document.getElementById('live-timer');
 
 function fetchStats() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', admin_url + 'team_management/fetch_stats/', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    xhr.setRequestHeader('X-CSRF-TOKEN', csrf_token);
-    xhr.onload = function() {
-    if (this.status === 200) {
+    $.ajax({
+        type: 'POST',
+        url: admin_url + 'team_management/fetch_stats/',
+        data: {
+            staff_id: "<?= $staff_id ?>"
+        },
+        dataType: 'json',
+        success: function(stats) {
+            liveTimer.textContent = formatTime(stats.total_time);
 
-        var stats = JSON.parse(this.responseText);
-        liveTimer.textContent = formatTime(stats.total_time);
-
-        if(stats.status == "Online"){
-            if (stats.clock_in_time) {
+            if(stats.status == "Online"){
+                if (stats.clock_in_time) {
+                    clockInBtn.disabled = true;
+                    clockInBtn.style.opacity = 0.7;
+                    clockOutBtn.disabled = false;
+                    clockOutBtn.style.opacity = 1;
+                    clockedIn = true;
+                    console.log(stats.clock_in_time);
+                    startTime = new Date(stats.clock_in_time);
+                    timerInterval = setInterval(updateLiveTimer, 1000);
+                }else{
+                    clockInBtn.disabled = false;
+                    clockInBtn.style.opacity = 1;
+                    clockOutBtn.disabled = true;
+                    clockOutBtn.style.opacity = 0.7;
+                    clearInterval(timerInterval);
+                    clockedIn = false;
+                }
+            }else{
                 clockInBtn.disabled = true;
                 clockInBtn.style.opacity = 0.7;
-                clockOutBtn.disabled = false;
-                clockOutBtn.style.opacity = 1;
-                clockedIn = true;
-                console.log(stats.clock_in_time);
-                startTime = new Date(stats.clock_in_time);
-                timerInterval = setInterval(updateLiveTimer, 1000);
-            }else{
-                clockInBtn.disabled = false;
-                clockInBtn.style.opacity = 1;
                 clockOutBtn.disabled = true;
                 clockOutBtn.style.opacity = 0.7;
                 clearInterval(timerInterval);
                 clockedIn = false;
+                
             }
-        }else{
-            clockInBtn.disabled = true;
-            clockInBtn.style.opacity = 0.7;
-            clockOutBtn.disabled = true;
-            clockOutBtn.style.opacity = 0.7;
-            clearInterval(timerInterval);
-            clockedIn = false;
+            if(stats.status == "Leave"){
+                document.getElementById('Online').disabled = true;
+                document.getElementById('AFK').disabled = true;
+                document.getElementById('Offline').disabled = true;
+                document.getElementById('Leave').disabled = false;
+            }else{
+                document.getElementById('Online').disabled = false;
+                document.getElementById('AFK').disabled = false;
+                document.getElementById('Offline').disabled = false;
+                document.getElementById('Leave').disabled = true;
+            }
             
+            statusSelect.value = stats.status;
+            statusSelectColors(statusSelect);
+            fetchStaffTimeEntries();
+        },
+        error: function() {
+            alert('Unable to fetch stats. Please try again.');
         }
-        if(stats.status == "Leave"){
-            document.getElementById('Online').disabled = true;
-            document.getElementById('AFK').disabled = true;
-            document.getElementById('Offline').disabled = true;
-            document.getElementById('Leave').disabled = false;
-        }else{
-            document.getElementById('Online').disabled = false;
-            document.getElementById('AFK').disabled = false;
-            document.getElementById('Offline').disabled = false;
-            document.getElementById('Leave').disabled = true;
-        }
-        
-        statusSelect.value = stats.status;
-        statusSelectColors(statusSelect);
-        fetchStaffTimeEntries();
-    } 
-    else {
-        alert('Unable to fetch stats. Please try again.');
-    }
-    
-    }
-    xhr.send(csrf_token_name + '=' + encodeURIComponent(csrf_token) + "&staff_id=<?= $staff_id ?>");
+    });
 }
 
-clockInBtn.addEventListener('click', () => {
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', admin_url + 'team_management/clock_in/');
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    xhr.setRequestHeader('X-CSRF-TOKEN', csrf_token);
-    xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            var response = JSON.parse(this.responseText);
+clockInBtn.click(function() {
+    $.ajax({
+        type: 'POST',
+        url: admin_url + 'team_management/clock_in/',
+        data: {
+            staff_id: "<?= $staff_id ?>"
+        },
+        dataType: 'json',
+        success: function(response) {
             if (response.success) {
                 clockedIn = true;
                 fetchStats();
-                clockInBtn.disabled = true;
+                clockInBtn.prop('disabled', true);
                 timerInterval = setInterval(updateLiveTimer, 1000);
             } else {
                 alert('Unable to clock in. Please try again.');
             }
         }
-    };
-    var requestData = csrf_token_name + '=' + encodeURIComponent(csrf_token) + "&staff_id=<?= $staff_id ?>";
-    xhr.send(requestData);
+    });
 });
 
-clockOutBtn.addEventListener('click', () => {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', admin_url + 'team_management/clock_out/');
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    xhr.setRequestHeader('X-CSRF-TOKEN', csrf_token);
-    xhr.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            var response = JSON.parse(this.responseText);
+clockOutBtn.click(function() {
+    $.ajax({
+        type: 'POST',
+        url: admin_url + 'team_management/clock_out/',
+        data: {
+            staff_id: "<?= $staff_id ?>",
+            force: true
+        },
+        dataType: 'json',
+        success: function(response) {
             if (response.success) {
                 fetchStats();
             } else {
                 alert('Unable to clock out. Please try again.');
             }
         }
-    };
-
-    // Include the CSRF token in the request data
-    var requestData = csrf_token_name + '=' + encodeURIComponent(csrf_token) + "&staff_id=<?= $staff_id ?>&force=true";
-    xhr.send(requestData);
+    });
 });
 
-let previousValue = statusSelect.value;
-statusSelect.addEventListener('change', (event) => {
+statusSelect.change(function(event) {
+    var statusText = statusSelect.val();
     
-    var statusText = statusSelect.value;
-    
-    if (statusSelect != previousValue) {
-        
-        //Backend Timers
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', admin_url + 'team_management/update_status');
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.setRequestHeader('X-CSRF-TOKEN', csrf_token);
-        xhr.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                var response = JSON.parse(this.responseText);
+    if (statusText != previousValue) {
+        $.ajax({
+            type: 'POST',
+            url: admin_url + 'team_management/update_status',
+            data: {
+                statusValue: statusText,
+                staff_id: "<?= $staff_id ?>"
+            },
+            dataType: 'json',
+            success: function(response) {
                 if (!response.success) {
                     alert('Unable to update status. Please try again.');
                 }
                 fetchStats();
             }
-        };
-
-        // Include the CSRF token and status in the request data
-        var requestData = csrf_token_name + '=' + encodeURIComponent(csrf_token) + '&statusValue=' + encodeURIComponent(statusText) + "&staff_id=<?= $staff_id ?>";
-        xhr.send(requestData);
+        });
     }
 });
+
 
 
 fetchStats();

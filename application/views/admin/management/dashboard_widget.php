@@ -1,7 +1,7 @@
 <div class=" flex lg:flex-row flex-col justify-between relative gap-5">
 
 
-    <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all">
+    <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all">
 
         <div class="flex items-center xl:flex-row flex-col lg:justify-start justify-center">
             <?php echo staff_profile_image($GLOBALS['current_user']->staffid, ['h-full', 'w-44' , 'object-cover', 'xl:mr-4' , 'xl:ml-0 mx-auto self-start' , 'staff-profile-image-thumb'], 'thumb') ?>
@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <div class="xl:w-[30%] w-full flex flex-row md:text-right shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all text-center md:mt-0 mt-5 justify-between bg-white rounded-[50px] p-6 relative">
+    <div class="xl:w-[30%] w-full flex flex-row md:text-right shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all text-center md:mt-0 mt-5 justify-between bg-white rounded-[50px] p-6 relative">
 
 
         <div class="h-[90%] inset-0 my-auto z-10 absolute opacity-40">

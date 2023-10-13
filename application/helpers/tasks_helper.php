@@ -613,3 +613,26 @@ function is_task_created_by_staff($taskId, $staffId = null)
 
     return $CI->db->count_all_results(db_prefix() . 'tasks') > 0 ? true : false;
 }
+
+function get_tasks_in_date_range($staff_id, $from, $to){
+    $CI = &get_instance();
+
+    $tasks = $CI->tasks_model->get_user_tasks_assigned($staff_id);
+    $filteredTasks = [];
+
+    // Convert dates to DateTime objects for comparison
+    $startDate = new DateTime($from);
+    $endDate = new DateTime($to);
+
+    // Filter tasks based on date range
+    foreach($tasks as $task){
+        $startConsideration = ($task->startdate) ? new DateTime($task->startdate) : new DateTime(date("Y-m-d", strtotime($task->dateadded)));
+        $dueConsideration = ($task->duedate) ? new DateTime($task->duedate) : $startConsideration;
+
+        if($startConsideration <= $endDate && $dueConsideration >= $startDate){
+            $filteredTasks[] = $task;
+        }
+    }
+
+    return $filteredTasks;
+}

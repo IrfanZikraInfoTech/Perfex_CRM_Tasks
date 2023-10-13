@@ -181,7 +181,7 @@ function get_staff_above($staff_id){
 
     }else{
 
-        $report_to = $CI->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'report_to');
+        $report_to = id_to_name($staff_id, 'tblstaff', 'staffid', 'report_to');
 
         $staff_ids_above[] = $report_to;
 
@@ -255,6 +255,8 @@ function has_staff_under(){
     $staff_id = get_staff_user_id();
 
     $staff = get_staff_under($staff_id);
+
+    // print_r($staff);
 
     if(count($staff) > 0){
         return true;

@@ -24,14 +24,18 @@ class Tasks_model extends App_Model
         $this->load->model('staff_model');
     }
 
-    // Not used?
-    public function get_user_tasks_assigned()
-    {
-        $this->db->where('id IN (SELECT taskid FROM ' . db_prefix() . 'task_assigned WHERE staffid = ' . get_staff_user_id() . ')');
-        $this->db->where('status !=', 5);
-        $this->db->order_by('duedate', 'asc');
 
-        return $this->db->get(db_prefix() . 'tasks')->result_array();
+    // Not used?
+    public function get_user_tasks_assigned($staff_id)
+    {
+        $this->db->select('tbltasks.*, GROUP_CONCAT(tbltask_assigned.staffid) as assignees');
+        $this->db->from('tbltasks');
+        $this->db->join('tbltask_assigned', 'tbltasks.id = tbltask_assigned.taskid');
+        $this->db->where('tbltask_assigned.staffid', $staff_id);
+        $this->db->group_by('tbltasks.id');
+        $query = $this->db->get();
+
+        return $query->result();
     }
 
     public function get_statuses()

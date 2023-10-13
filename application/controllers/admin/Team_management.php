@@ -18,50 +18,93 @@ class Team_management extends AdminController {
 
     
     public function index() {
-        $this->individual_stats();
+        $this->team();
     }
   
-    public function individual_stats()
+    public function team()
     {
-        $data['staff_members'] = $this->team_management_model->get_all_staff();
-
-        $this->load->view('admin/management/individual_stats', $data);
+        $data['departments'] = $this->team_management_model->get_all_departments();
+        
+        $this->load->view('admin/management/team', $data);
     }
 
-    public function my_projects() {
-        $data['staff_members'] = $this->team_management_model->get_all_staff();
-    
-        $staff_id = get_staff_user_id();
+    public function projects($staff_id = null) {
+
+        if($staff_id && !has_permission('team_management', '', 'admin')){
+            $staff_id = get_staff_user_id();
+        }
+
+        $staff_id = $staff_id ?? get_staff_user_id();
+
+        $data['staff_id'] = $staff_id;
+        
         $projects = $this->team_management_model->getProjectsByStaffId($staff_id);
-        $statuses = $this->projects_model->get_project_statuses();
 
         foreach ($projects as &$project) {
             $project['active_sprint'] = $this->team_management_model->getActiveSprintDetailsByProjectId($project['id']);
-           
-
-            // Fetch tasks assigned to the staff for this project
-            $project['assigned_tasks'] = $this->team_management_model->getTasksAssignedToStaffByProjectId($staff_id, $project['id']);
         }
-        
-        //  var_dump($projects);
-        // var_dump($data);
-        
+
         $data['staff_projects'] = $projects;
         $this->load->view('admin/management/project', $data);
     }
     
 
-    public function individual_dashboard(){
-        $data['staff_members'] = $this->team_management_model->get_all_staff();
-         // timeline 
-         $staff_id = get_staff_user_id();
-         $day = date("d");
-         $month = date("m");
-         $year = date("Y");
-         $daily_stats = $this->team_management_model->get_daily_stats($staff_id, $day, $month, $year);
-         $data['daily_stats'] = $daily_stats;
-        //  var_dump($daily_stats);
-        $this->load->view('admin/management/Individual_Dashboard', $data);
+    public function individual_dashboard($from = null, $to = null, $staff_id = null){
+
+        if($staff_id && !has_permission('team_management', '', 'admin')){
+            $staff_id = get_staff_user_id();
+        }
+
+        $from = $from ?? date("Y-m-d");
+        $to = $to ?? date("Y-m-d");
+
+
+        $staff_id = $staff_id ?? get_staff_user_id();
+        $staff = $this->staff_model->get($staff_id);
+
+        $data['staff'] = $staff;
+
+        $data['from'] = $from;
+        $data['to'] = $to;
+
+        $data['punctuality_rate'] = $this->kpi_punctuality_rate($staff_id, $from, $to);
+        $data['task_rates'] = $this->kpi_task_rates($staff_id, $from, $to);
+
+        $data['summary_adherence_rate'] = $this->kpi_summary_adherence_rate($staff_id, $from, $to);
+        
+        $data['afk_adherence_rate'] = $this->kpi_afk_adherence_rate($staff_id, $from, $to);
+        $data['shift_productivity_rate'] = $this->kpi_shift_productivity_rate($staff_id, $from, $to);
+        
+        if($from == $to){
+
+            $data['timer_activities'] = $this->team_management_model->get_task_timers_entires($staff_id, $from);
+
+            $data['afk_offline_entries'] = $this->team_management_model->get_afk_and_offline_entries($staff_id, $from);
+
+            $data['shift_timings'] = $this->team_management_model->get_shift_timings_of_date($from, $staff_id);
+
+            $data['clock_in_entries'] = $this->team_management_model->get_staff_time_entries($staff_id, $from);
+        }
+
+        $data['stories'] = get_tasks_in_date_range($staff_id, $from, $to);
+
+        foreach($data['stories'] as &$story){
+            $story->total_time_spent = $this->tasks_model->calc_task_total_time($story->id);
+            
+            if($story->rel_type=='project'){
+                $story->project_name = id_to_name($story->rel_id, 'tblprojects', 'id', 'name');
+            }
+
+            $dueDate = new DateTime($story->duedate);
+            $completedDate = $story->datefinished ? new DateTime($story->datefinished) : new DateTime();
+            $interval = $dueDate->diff($completedDate);
+            $story->late = ($completedDate > $dueDate) ? $interval->days . " days" : "On Time";
+            
+        }
+        
+        $data['ops'] = (0.2 * $data['task_rates']['completion_rate']) + (0.1 * $data['shift_productivity_rate']['percentage']) + (0.15 * $data['summary_adherence_rate']['percentage']) + (0.2 * $data['punctuality_rate']['on_time_percentage']) + (0.15 * $data['task_rates']['timer_adherence_rate']) + (0.1 * $data['afk_adherence_rate']['percentage']) + (0.1 * $data['task_rates']['efficiency_rate']);
+
+        $this->load->view('admin/management/individual_dashboard', $data);
     }
 
     public function applications()
@@ -93,13 +136,15 @@ class Team_management extends AdminController {
             //access_denied('You do not have permission to access this page.');
         }
 
-        $current_staff_id = $this->session->userdata('staff_user_id');
+        $current_staff_id = get_staff_user_id();
 
-        $staff_under = (!is_admin()) ? json_decode(json_encode($this->staff_model->get('', ['active' => 1, 'staffid !=' => 1, 'report_to' => $current_staff_id])), true) : json_decode(json_encode($this->staff_model->get()), true);
+        $staff_under = get_staff_under($current_staff_id);
 
         foreach($staff_under as &$staff){
-            $staff['id'] = $staff['staffid'];
-            $staff['name'] = $staff['firstname'] . ' ' . $staff['lastname'];
+            $staff_id = $staff;
+            $staff = [];
+            $staff['id'] = $staff_id;
+            $staff['name'] = id_to_name($staff['id'], 'tblstaff', 'staffid','firstname') . ' ' . id_to_name($staff['id'], 'tblstaff', 'staffid','lastname');
         }
 
         $data['staff_under'] = $staff_under;
@@ -108,9 +153,9 @@ class Team_management extends AdminController {
     }
 
     public function staff_shifts() {
-        $staff_id = $this->session->userdata('staff_user_id');
+        //$staff_id = $this->session->userdata('staff_user_id');
 
-        $data['members'] = $this->staff_model->get('', ['active' => 1, 'staffid !=' => 1, 'report_to' => $staff_id]);
+        $data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
 
         $this->load->view('admin/management/staff_shifts', $data);
     }
@@ -122,73 +167,11 @@ class Team_management extends AdminController {
         }
 
         $data['staff_id'] = $staff_id;
-        $data['staff_name'] = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'firstname');
+        $data['staff_name'] = id_to_name($staff_id, 'tblstaff', 'staffid', 'firstname');
         //$data['title'] = _l('control_room');
         $this->load->view('admin/management/control_room', $data);
     }
 
-    public function activity_log($staffId, $month)
-    {
-
-        $data['activities'] = $this->team_management_model->get_user_activities($staffId, $month);
-        $data['staff'] = $this->team_management_model->id_to_name($staffId, 'tblstaff', 'staffid', 'firstname');
-
-        $this->load->view('admin/management/activity_log', $data);
-    }
-
-    public function staff_stats($staffId, $month)
-    {
-        $data['staff_id'] = $staffId;
-        // state's data 
-        $data['monthly_stats'] = $this->team_management_model->get_monthly_stats($staffId, $month)['data'];
-       
-        $data['monthly_total_clocked_time'] = $this->team_management_model->get_monthly_stats($staffId, $month)['monthly_total_clocked_time'];
-        $data['monthly_shift_duration'] = $this->team_management_model->get_monthly_stats($staffId, $month)['monthly_shift_duration'];
-        $data['punctuality_rate'] = $this->team_management_model->get_monthly_stats($staffId, $month)['punctuality_rate'];
-        $data['month_this'] = $month;
-        $data['staff_id_this'] = $staffId;
-        $data['staff_name_this'] =  $this->team_management_model->id_to_name($staffId, 'tblstaff', 'staffid', 'firstname');
-
-        $data['days_data'] = $this->team_management_model->get_days_data($staffId, $month);
-
-        $data['mo_pen_paid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Paid Leave', 'Pending', $month)[0]['total_leaves'];
-        $data['mo_pen_unpaid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Unpaid Leave', 'Pending', $month)[0]['total_leaves'];
-        $data['mo_pen_gaz_no'] = $this->team_management_model->get_leaves_count($staffId, 'Gazetted Leave', 'Pending', $month)[0]['total_leaves'];
-
-        $data['mo_app_paid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Paid Leave', 'Approved', $month)[0]['total_leaves'];
-        $data['mo_app_unpaid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Unpaid Leave', 'Approved', $month)[0]['total_leaves'];
-        $data['mo_app_gaz_no'] = $this->team_management_model->get_leaves_count($staffId, 'Gazetted Leave', 'Approved', $month)[0]['total_leaves'];
-
-        $data['mo_dis_paid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Paid Leave', 'Disapproved', $month)[0]['total_leaves'];
-        $data['mo_dis_unpaid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Unpaid Leave', 'Disapproved', $month)[0]['total_leaves'];
-        $data['mo_dis_gaz_no'] = $this->team_management_model->get_leaves_count($staffId, 'Gazetted Leave', 'Disapproved, $month')[0]['total_leaves'];
-
-
-        $data['pen_paid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Paid Leave', 'Pending')[0]['total_leaves'];
-        $data['pen_unpaid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Unpaid Leave', 'Pending')[0]['total_leaves'];
-        $data['pen_gaz_no'] = $this->team_management_model->get_leaves_count($staffId, 'Gazetted Leave', 'Pending')[0]['total_leaves'];
-
-        $data['app_paid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Paid Leave', 'Approved')[0]['total_leaves'];
-        $data['app_unpaid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Unpaid Leave', 'Approved')[0]['total_leaves'];
-        $data['app_gaz_no'] = $this->team_management_model->get_leaves_count($staffId, 'Gazetted Leave', 'Approved')[0]['total_leaves'];
-
-        $data['dis_paid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Paid Leave', 'Disapproved')[0]['total_leaves'];
-        $data['dis_unpaid_no'] = $this->team_management_model->get_leaves_count($staffId, 'Unpaid Leave', 'Disapproved')[0]['total_leaves'];
-        $data['dis_gaz_no'] = $this->team_management_model->get_leaves_count($staffId, 'Gazetted Leave', 'Disapproved')[0]['total_leaves'];
-
-
-        $data['mo_all_applications'] = $this->team_management_model->get_applications_by_staff_id($staffId, $month);
-
-        $data['all_applications'] = $this->team_management_model->get_applications_by_staff_id($staffId);
-
-        $data['all_months_tasks'] = $this->team_management_model->get_monthly_tasks($staffId, $month);
-
-        $data['all_months_tasks_data'] = $this->team_management_model->get_monthly_tasks_data($staffId, $month);
-
-        $data['all_afk_data'] = $this->team_management_model->get_monthly_afks($staffId, $month);
-        
-        $this->load->view('admin/management/staff_stats', $data);
-    }
 
 
     public function fetch_staff_day_summaries()
@@ -211,11 +194,6 @@ class Team_management extends AdminController {
             echo json_encode(['success'=>false]);
         }
 
-    }
-
-    public function staff_google_chat() {
-        $data['staff'] = $this->team_management_model->get_all_staff_google_chat();
-        $this->load->view('admin/management/staff_google_chat_view', $data);
     }
 
     
@@ -392,14 +370,14 @@ class Team_management extends AdminController {
                 if ($this->team_management_model->is_on_leave($staff_id, date('Y-m-d H:i:s'))) {
                     // Log message that the user is on leave
 
-                    $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
+                    $tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
 
                     $message = sprintf("😴 *<users/%s>* is on leave today. 🌴", $tag);
 
                     $this->webhook_lib->send_chat_webhook($message, 'workingHours');
                 } else {
                     // Log shift timings
-                    $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
+                    $tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
 
                     $shift_number = $shift['shift_number'];
                     $start_time = $shift['shift_start_time'];
@@ -425,7 +403,7 @@ class Team_management extends AdminController {
             // format the date for readability
             $formatted_date = date('g:i A');
 
-            $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
+            $tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
 
             $message = sprintf("👋 <users/%s> is `Clocking In` 🕒 *at*: %s", $tag, $formatted_date);
          
@@ -453,7 +431,7 @@ class Team_management extends AdminController {
             // format the date for readability
             $formatted_date = date('g:i A');
 
-            $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
+            $tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
 
             $message = sprintf("🏃‍♂️ <users/%s> is `Clocking Out` 🕒 *at*: %s", $tag, $formatted_date);
          
@@ -487,7 +465,7 @@ class Team_management extends AdminController {
         // format the date for readability
         $formatted_date = date('g:i A');
 
-        $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
+        $tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
 
         // choose the right phrase depending on the status
         if ($status === 'AFK') {
@@ -572,33 +550,21 @@ class Team_management extends AdminController {
         if($api_key != $this->cronAPI()){
             return;
         }
+        $this->load->model('staff_model');
 
-        $staff_members = $this->team_management_model->get_all_staff();
+        $staff_members = $this->staff_model->get();
+        
     
         foreach ($staff_members as $staff) {
-            if ($this->team_management_model->is_on_leave($staff->staffid, date('Y-m-d H:i:s'))) {
-                $this->team_management_model->clock_out_and_set_leave_status($staff->staffid); 
+
+            if ($this->team_management_model->is_on_leave($staff['staffid'], date('Y-m-d H:i:s'))) {
+                $this->team_management_model->clock_out_and_set_leave_status($staff['staffid']); 
             }else{
-                if($this->team_management_model->get_stats($staff->staffid)->status == "Leave"){
-                    $this->team_management_model->update_status($staff->staffid, "Offline");
+                if($this->team_management_model->get_stats($staff['staffid'])->status == "Leave"){
+                    $this->team_management_model->update_status($staff['staffid'], "Offline");
                 }
             }
         }
-    }
-
-    public function fetch_daily_info() {
-        if (!$this->input->is_ajax_request()) {
-            redirect(admin_url());
-        }
-
-        $staff_id = $this->input->post('staff_id');
-        $day = $this->input->post('day');
-        $month = $this->input->post('month');
-        $year = $this->input->post('year');
-
-        $daily_stats = $this->team_management_model->get_daily_stats($staff_id, $day, $month, $year);
-
-        echo json_encode($daily_stats);
     }
 
     public function get_file_type()
@@ -658,7 +624,7 @@ class Team_management extends AdminController {
             $this->team_management_model->save_staff_summary($staff_id, $summary, $date);
     
             $formatted_date = date('g:i A');
-            $tag = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
+            $tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
             $message = sprintf("📝✨ <users/%s> just shared their daily summary 🕑 *at*: %s\n\n📋*Summary*:\n%s", $tag, $formatted_date, $summary);
             $this->webhook_lib->send_chat_webhook($message, "eos");
         
@@ -679,11 +645,11 @@ class Team_management extends AdminController {
             return;
         }
 
-        $staffId = $this->team_management_model->id_to_name($staffChatId, 'tblstaff', 'google_chat_id', 'staffid');
+        $staffId = id_to_name($staffChatId, 'tblstaff', 'google_chat_id', 'staffid');
     
         $today = date('Y-m-d');
 
-        $tasks = $this->team_management_model->get_tasks_by_staff_member($staffId);
+        $tasks = $this->tasks_model->get_user_tasks_assigned($staffId);
         $total_tasks = 0;
     
         foreach ($tasks as $task) {
@@ -746,7 +712,7 @@ class Team_management extends AdminController {
             'created_at' => date('Y-m-d H:i:s'), // Set the created_at column to the current timestamp
         );
 
-        $f_name = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'firstname');
+        $f_name = id_to_name($staff_id, 'tblstaff', 'staffid', 'firstname');
 
         $template = "
             <h2>New Application!!</h2>
@@ -763,7 +729,7 @@ class Team_management extends AdminController {
         $staff_above = get_staff_above($staff_id);
 
         foreach($staff_above as &$staff){
-            $staff = $this->team_management_model->id_to_name($staff, 'tblstaff', 'staffid', 'email');
+            $staff = id_to_name($staff, 'tblstaff', 'staffid', 'email');
         }
 
         $this->email->to($staff_above);
@@ -816,7 +782,7 @@ class Team_management extends AdminController {
         $id = $application_data["id"];
 
         $staff_id = $application_data["staff_id"];
-        $staff_name = $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'firstname') .' '. $this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'lastname');
+        $staff_name = id_to_name($staff_id, 'tblstaff', 'staffid', 'firstname') .' '. id_to_name($staff_id, 'tblstaff', 'staffid', 'lastname');
 
         $date = $application_data["created_at"];
         $duration = $application_data["start_date"] . ' - ' . $application_data["end_date"];
@@ -910,7 +876,7 @@ class Team_management extends AdminController {
             $this->email->set_newline(PHP_EOL);
             $this->email->from(get_option('smtp_email'), get_option('companyname'));
             $this->email->to(get_option('smtp_email'));
-            $this->email->to($this->team_management_model->id_to_name($staff_id, 'tblstaff', 'staffid', 'email'));
+            $this->email->to(id_to_name($staff_id, 'tblstaff', 'staffid', 'email'));
             $this->email->subject("Application Reviewed!!");
             $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
 
@@ -1014,7 +980,7 @@ class Team_management extends AdminController {
         }
 
         foreach ($applications as $application) {
-            $application->user_name = $this->team_management_model->id_to_name($application->staff_id, 'tblstaff', 'staffid', 'firstname');;
+            $application->user_name = id_to_name($application->staff_id, 'tblstaff', 'staffid', 'firstname');;
             $application->user_pfp = staff_profile_image($application->staff_id, ['object-cover', 'md:h-full' , 'md:w-10 inline' , 'staff-profile-image-thumb'], 'thumb');
 
             $paid = (int)$this->team_management_model->get_leaves_count($application->staff_id, 'Paid Leave', 'Approved')[0]['total_leaves'];
@@ -1051,37 +1017,280 @@ class Team_management extends AdminController {
         echo json_encode($response);
     }
 
-    public function staff_under($id){
-        print_r(get_staff_above($id));
+    public function check_late($staff_id){
+        print_r($this->team_management_model->check_staff_late($staff_id, date("Y-m-d")));
     }
-        
-    
-    // Function to compute factorial (used to calculate total possible pairs)
-    function factorial($n) {
-        $fact = 1;
-        for ($i = 2; $i <= $n; $i++) {
-            $fact *= $i;
+
+    public function kpi_punctuality_rate($staff_id, $from, $to = null){
+        if(!$to){
+            $to = $from;
         }
-        return $fact;
+    
+        // Initialize counters
+        $daysOnTime = 0;
+        $daysPresent = 0;
+        $totalDays = 0;
+    
+        // Convert dates to DateTime objects for iteration
+        $startDate = new DateTime($from);
+        $endDate = new DateTime($to);
+    
+        // Iterate through each date in the range
+        while($startDate <= $endDate){
+
+            $currentDate = $startDate->format("Y-m-d");
+
+            $onLeave = $this->team_management_model->is_on_leave($staff_id, $currentDate);
+
+            if(!$onLeave){
+                $totalDays++;
+
+                $statusData = $this->team_management_model->check_staff_late($staff_id, $currentDate);
+        
+                // Check if status is 'present' and increment counters accordingly
+                if(isset($statusData['status']) && $statusData['status'] == 'present'){
+                    $daysOnTime++;
+                }
+                
+                if (isset($statusData['status']) && $statusData['status'] != 'absent'){
+                    $daysPresent++;
+                }
+
+            }
+
+
+            $startDate->modify('+1 day');
+        }
+    
+        // Calculate punctuality rate
+        if($totalDays > 0) {
+            $punctualityRate = ($daysOnTime / $totalDays) * 100;
+            $attendanceRate = ($daysPresent / $totalDays) * 100;
+        } else {
+            $punctualityRate = 0; // To handle edge case where totalDays is 0
+            $attendanceRate = 0;
+        }
+
+        return ['total_days'=>$totalDays, 'days_on_time' => $daysOnTime, 'days_present' =>  $daysPresent, 'on_time_percentage'=> $punctualityRate, 'present_percentage'=> $attendanceRate];
     }
 
-  
-    public function test_late($staff_id, $date){
-        print_r($this->team_management_model->check_staff_late($staff_id, $date));
+    
+    public function kpi_task_rates($staff_id, $from, $to = null){
+        if(!$to){
+            $to = $from;
+        }
+    
+        // Initialize counters
+        $completedTasksWithinDue = 0;
+        $completedTasksPastDue = 0;
+
+        // Initialize counters for total estimated hours and total spent hours
+        $totalEstimatedHours = 0;
+        $totalSpentHours = 0;
+    
+        // Fetch tasks in date range using helper function
+        $tasks = get_tasks_in_date_range($staff_id, $from, $to);
+    
+        // Iterate through each task
+        foreach($tasks as $task){
+
+            // Completion KPIS
+            if(isset($task->datefinished) && $task->status == 5){
+
+                if(strtotime(date("Y-m-d", strtotime($task->datefinished))) <= strtotime($task->duedate) ){
+                    $completedTasksWithinDue++;
+                }else{
+                    $completedTasksPastDue++;
+                }
+
+            }
+
+            //Timer KPIS
+            $estimatedHours = $task->estimated_hours;
+            
+            // Get the total time spent on the task in seconds
+            $spentSeconds = $this->tasks_model->calc_task_total_time($task->id);
+            // Convert seconds to hours
+            $spentHours = $spentSeconds / 3600;
+    
+            $totalEstimatedHours += $estimatedHours;
+            $totalSpentHours += $spentHours;
+
+        }
+    
+        // Calculate task completion rate
+        $taskCount = count($tasks);
+        if($taskCount > 0) {
+            $taskCompletionRate = ($completedTasksWithinDue / $taskCount) * 100;
+            $taskEfficiencyRate = (1 - ($completedTasksPastDue / $taskCount)) * 100;
+        } else {
+            $taskCompletionRate = 0; // To handle edge case where taskCount is 0
+            $taskEfficiencyRate = 0;
+        }
+
+        // Calculate Task Time Adherence Rate
+        if($totalSpentHours > 0) {
+            $taskTimeAdherenceRate = ($totalEstimatedHours / $totalSpentHours) * 100;
+
+            if($taskTimeAdherenceRate > 100) $taskTimeAdherenceRate = 100;
+
+        } else {
+            $taskTimeAdherenceRate = 0; // To handle edge case where totalSpentHours is 0
+        }
+    
+        return ['completed_tasks_past_due'=>$completedTasksPastDue, 'completed_tasks_within_due' => $completedTasksWithinDue, 'total_tasks'=>$taskCount, 'completion_rate'=> $taskCompletionRate, 'efficiency_rate'=>$taskEfficiencyRate,'esimate_hours'=>$totalEstimatedHours , 'spent_hours'=>$totalSpentHours,'timer_adherence_rate'=>$taskTimeAdherenceRate];
     }
 
+    
+    public function kpi_summary_adherence_rate($staff_id, $from, $to = null){
+        if(!$to){
+            $to = $from;
+        }
+    
+        // Get summaries for the staff in the date range
+        $summaries = $this->team_management_model->get_staff_summaries_in_range($staff_id, $from, $to);
+    
+        $daysWithSummaries = 0;
+        foreach($summaries as &$summary){
+            if(!$this->team_management_model->is_on_leave($staff_id, $summary->date)){
+                $daysWithSummaries++;
+            }else{
+                unset($summary);
+            }
+        }
 
-    private function make_api_call($url) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
-        curl_close($ch);
-        $data = json_decode($response, true);
-
-        return $data;
+        // Convert dates to DateTime objects
+        $startDate = new DateTime($from);
+        $endDate = new DateTime($to);
+    
+        // Calculate total days in the range
+        $totalDays = $startDate->diff($endDate)->days + 1;
+    
+        $daysOnLeave = 0;
+        for ($date = clone $startDate; $date <= $endDate; $date->modify('+1 day')) {
+            if ($this->team_management_model->is_on_leave($staff_id, $date->format("Y-m-d"))) {
+                $daysOnLeave++;
+            }
+        }
+    
+        // Calculate Summary Adherence Rate
+        $workingDays = $totalDays - $daysOnLeave;
+        $SAR = ($workingDays > 0) ? ($daysWithSummaries / $workingDays) * 100 : 0;
+    
+        return [
+            'days_with_summaries' => $daysWithSummaries,
+            'working_days' => $workingDays,
+            'percentage' => $SAR,
+            'summaries' => $summaries
+        ];
     }
+    
 
+    public function kpi_afk_adherence_rate($staff_id, $from, $to = null){
+        if(!$to){
+            $to = $from;
+        }
+    
+        // Initialize counters for total allowed and actual AFK time
+        $totalAllowedAfkTime = 0;
+        $totalActualAfkTime = 0;
+    
+        // Convert dates to DateTime objects for iteration
+        $startDate = new DateTime($from);
+        $endDate = new DateTime($to);
+    
+        // Iterate through each date in the range
+        while($startDate <= $endDate){
+            $currentDate = $startDate->format("Y-m-d");
+    
+            // Fetch shift timings for the day
+            $shiftTiming = $this->team_management_model->get_day_shift_total($staff_id, $currentDate);
+    
+            // Determine allowed AFK time based on shift timing and sum it up
+            if($shiftTiming > (4 * 3600)) { // 4 hours in seconds
+                $totalAllowedAfkTime += (30 * 60); // 30 minutes in seconds
+            } else {
+                $totalAllowedAfkTime += (15 * 60); // 15 minutes in seconds
+            }
+    
+            // Fetch actual AFK time for the day and sum it up
+            $totalActualAfkTime += $this->team_management_model->get_total_afk_time($staff_id, $currentDate);
+    
+            $startDate->modify('+1 day');
+        }
+    
+        // Calculate AFK Adherence Rate
+        if($totalActualAfkTime > 0) {
+            $afkAdherenceRate = ($totalAllowedAfkTime / $totalActualAfkTime) * 100;
+            if($afkAdherenceRate > 100) $afkAdherenceRate = 100;
+        } else {
+            $afkAdherenceRate = 100; // If no actual AFK time, adherence is considered optimal
+        }
+
+        $totalAllowedAfkTime /= 3600;
+        $totalActualAfkTime /= 3600;
+    
+        return [
+            'allowed_afk_time' => $totalAllowedAfkTime,
+            'actual_afk_time' => $totalActualAfkTime,
+            'percentage' => $afkAdherenceRate
+        ];
+    }
+    
+    public function kpi_shift_productivity_rate($staff_id, $from, $to = null){
+        if(!$to){
+            $to = $from;
+        }
+    
+        // Initialize counters for total task time and logged time
+        $totalTaskTime = 0;
+        $totalLoggedTime = 0;
+    
+        // Grace period is 30 minutes in seconds for each day
+        $gracePeriodPerDay = 30 * 60;
+    
+        // Convert dates to DateTime objects for iteration
+        $startDate = new DateTime($from);
+        $endDate = new DateTime($to);
+    
+        // Iterate through each date in the range
+        while($startDate <= $endDate){
+            $currentDate = $startDate->format("Y-m-d");
+            
+            // Extract day, month, and year from the current date for the task time method
+            $day = $startDate->format("d");
+            $month = $startDate->format("m");
+            $year = $startDate->format("Y");
+    
+            // Fetch total task time for the day and sum it up
+            $totalTaskTime += $this->team_management_model->get_total_task_time_for_day($staff_id, $day, $month, $year);
+    
+            // Fetch total logged time for the day and sum it up
+            $totalLoggedTime += $this->team_management_model->get_total_logged_time_of_date($staff_id, $currentDate);
+    
+            $startDate->modify('+1 day');
+        }
+    
+        // Subtract grace period from total logged time
+        $adjustedLoggedTime = $totalLoggedTime - ($gracePeriodPerDay * ($endDate->diff($startDate)->days + 1)); // Including both start and end date
+    
+        // Calculate Shift Productivity Rate
+        if($adjustedLoggedTime > 0) {
+            $shiftProductivityRate = ($totalTaskTime / $adjustedLoggedTime) * 100;
+        } else {
+            $shiftProductivityRate = 0; // To handle edge case where adjustedLoggedTime is 0
+        }
+
+        $totalTaskTime /= 3600;
+        $totalLoggedTime /= 3600;
+    
+        return [
+            'total_task_time' => $totalTaskTime,
+            'total_logged_time' => $totalLoggedTime,
+            'percentage' => $shiftProductivityRate
+        ];
+    }
+    
 
     private function cronAPI()
     {
@@ -1125,32 +1334,15 @@ class Team_management extends AdminController {
             'kudosType' => $this->input->post('type'),
             'to' => $this->input->post('to_'),
             'principles' => $principles_str,
-            'remarks' => $this->input->post('remarks'),
+            'remarks' => $_POST['remarks'],
             'staff_id' => $staff_id
 
         ];
     
         $response = $this->team_management_model->kudosdata($data);
     
-        // Get additional data for the response:
-        $staff = $this->staff_model->get($staff_id);
-        $fullName = $staff->firstname . ' ' . $staff->lastname;
-        $image_url = staff_profile_image($staff_id, ['w-10 h-10 rounded-full'], 'thumb', []);
-        $to_name = $this->staff_model->get($this->input->post('to_'));
-        $to_fullName = $to_name->firstname . ' ' . $to_name->lastname;
-
-        preg_match('/src="([^"]+)"/', $image_url, $match);
-        $actual_image_url = $match[1];
-    
         echo json_encode([
             'success' => $response,
-            'name' => $fullName,
-            'principles' => $principles_str,
-            'remarks' => $this->input->post('remarks'),
-            'timestamp' => 'just now',
-            'kudosType' => $this->input->post('type'),
-            'to_name' => $to_fullName,
-            'image_url' => $actual_image_url
         ]);
     }
 

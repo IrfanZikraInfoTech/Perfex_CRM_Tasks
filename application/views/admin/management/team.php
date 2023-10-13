@@ -33,13 +33,10 @@ function convertSecondsToRoundedTime($seconds)
     </div>
 
     <div class="flex flex-col gap-4">
-        <?php $departments = $this->team_management_model->get_all_departments();
 
-        ?>
-        
         <?php  foreach ($departments as $department): ?>
 
-            <div class="rounded-[40px] bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all">
+            <div class="rounded-[40px] bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all">
 
             <h2 class="text-xl pl-7 uppercase font-bold text-gray-800 text-center py-4"><?php echo $department->name; ?></h2>
             
@@ -50,7 +47,7 @@ function convertSecondsToRoundedTime($seconds)
                     <div class="p-5 rounded-[40px] bg-gray-100 flex flex-row flex-wrap gap-10">
                     <?php  foreach ($staff_members as $staff): ?>
                         <!-- Your staff card code starts here -->
-                        <div class="flex flex-col bg-white xl:w-1/4 2xl:w-1/5 lg:w-1/3 md:w-[40%] w-full rounded-[30px] overflow-hidden transition-all duration-500 ease-in-out hover:scale-[0.97] shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400">
+                        <div class="flex flex-col bg-white xl:w-1/4 2xl:w-1/5 lg:w-1/3 md:w-[40%] w-full rounded-[30px] overflow-hidden transition-all duration-500 ease-in-out hover:scale-[0.97] shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400">
                             <div class="flex justify-center items-center p-4 bg-gray-200">
                                 <?php echo staff_profile_image($staff->staffid, ['h-48', 'w-48', 'rounded-full', 'object-cover'], 'thumb'); ?>
                             </div>
@@ -78,9 +75,8 @@ function convertSecondsToRoundedTime($seconds)
                                     <div class="mt-1 text-gray-800"><?php echo convertSecondsToRoundedTime($staff->currentTaskTime); ?></div>
                                 </div>
                                 <?php if(has_permission('team_management', '', 'admin')){ ?>
-                                <div class="mt-6 grid grid-cols-2 gap-2">
-                                    <a target="_blank" href="<?= admin_url();?>team_management/staff_stats/<?= $staff->staffid.'/'.date('n') ?>" class="text-center py-2 px-3 text-white rounded bg-blue-500 hover:bg-blue-600 hover:text-gray-100">View Stats</a>
-                                    <a target="_blank" href="<?= admin_url();?>team_management/control_room/<?= $staff->staffid ?>" class="text-center py-2 px-3 text-white rounded bg-green-500 hover:bg-green-600 hover:text-gray-100">Control Room</a>
+                                <div class="mt-6 grid grid-cols-1 gap-2">
+                                    <a target="_blank" href="<?= admin_url();?>team_management/control_room/<?= $staff->staffid ?>" class="text-center py-2 px-3 text-white rounded-3xl bg-sky-400 hover:bg-sky-500 hover:text-gray-100 transition-all">Control Room</a>
                                 </div>
                                 <?php }?>
                             </div>

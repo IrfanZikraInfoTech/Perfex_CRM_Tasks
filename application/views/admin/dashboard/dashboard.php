@@ -77,9 +77,9 @@
                
                 <div class="col-md-12 my-4" data-container="middle-left-6"> 
 
-                    <div class="flex gap-x-4">
+                    <div class="flex lg:flex-row flex-col gap-4">
                         
-                        <div class="myscrollbar bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all rounded-[50px] p-6 w-1/4 mx-auto  overflow-y-auto">
+                        <div class="myscrollbar bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all rounded-[50px] p-6 lg:w-1/4 w-full mx-auto  overflow-y-auto">
                             <h5 class="attendance text-xl font-semibold mb-2 text-center text-gray-700 border-b pb-2 capitalize">ATTENDENCE</h1>
                             <div class="mt-4 flex flex-col space-y-3">
 
@@ -106,7 +106,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all rounded-[50px] p-7 flex md:flex-row flex-col justify-between h-full w-3/4">
+                        <div class="bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all rounded-[50px] p-7 flex md:flex-row flex-col justify-between h-full lg:w-3/4 w-full">
                             <div id="visualization"  class="relative w-full rounded-[50px]" >
                             </div>
                         </div>
@@ -118,16 +118,16 @@
 
 
 
-            <div class="col-md-12 my-4 flex md:flex-row flex-col gap-10">
+            <div class="col-md-12 my-4 flex lg:flex-row flex-col gap-10">
                     <!-- Assigned Tasks -->
                     <div class="lg:w-1/2 w-full transition-all rounded-[50px] overflow-hidden p-5 bg-white shadow-xl">
 
                         <div class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">Assigned Task</div>
                         
-                        <div class="flex flex-col h-full bg-gray-100 p-4 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar max-h-[300px]">
+                        <div class="flex flex-col h-full bg-sky-100 p-4 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar max-h-[300px]">
                             <div class="p-1 flex flex-col mt-4 gap-2">         
                                     <?php
-                                    $tasks = $this->team_management_model->get_tasks_by_staff_member($GLOBALS['current_user']->staffid);
+                                    $tasks = $this->tasks_model->get_user_tasks_assigned($GLOBALS['current_user']->staffid);
                                     $total_tasks = 0;
                                     $completed_tasks = 0;
 
@@ -143,7 +143,7 @@
                                             }
 
                                         ?>
-                                        <button class="task-block bg-white px-4 py-2 rounded-xl cursor-pointer border border-gray-200 border-solid transition-all hover:border-gray-400 hover:shadow-lg" data-task-id="<?= $task->id ?>" onclick="init_task_modal(<?= $task->id ?>)">
+                                        <button class="task-block bg-white px-4 py-2 rounded-xl cursor-pointer border border-gray-200 border-solid transition-all hover:border-yellow-400 hover:shadow-lg" data-task-id="<?= $task->id ?>" onclick="init_task_modal(<?= $task->id ?>)">
                                             <div class="flex items-center justify-between">
                                                 <span class="font-semibold"><?= $task->name ?></span>
                                                 <span><?= format_task_status($task->status);  ?></span>
@@ -162,7 +162,7 @@
                         <div class="lg:w-1/2 w-full  border-l border-gray-200 flex flex-col p-5 bg-white rounded-[50px] shadow-lg">
                             <div class="panel-body p-0 m-0">
                                 <div class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5 ">Announcements</div>
-                                <div class="bg-gray-100 p-4 py-3 shadow-inner rounded-[50px] overflow-y-scroll myscrollbar max-h-[300px]">
+                                <div class="bg-sky-100 p-4 py-3 shadow-inner rounded-[50px] overflow-y-scroll myscrollbar max-h-[300px]">
                                         
                                     <?php $count = 0;
                                     foreach($posts as $post):
@@ -188,7 +188,7 @@
                                             $timeString = 'just now';
                                         }
                                     ?>
-                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-gray-400" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this)">
+                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-yellow-400" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this)">
                                             <div class="flex justify-between items-center">
                                                 <div class="font-bold text-xl"><?= $post["creator_name"] ?></div>
                                                 <div class="text-gray-500 text-sm italic"><?= $timeString ?></div>
@@ -234,18 +234,18 @@
                             <input type="date" id="summary_date" class="rounded p-2 mr-4" onchange="getOrSaveStaffSummary();">
                         </div>
 
-                        <div class="flex flex-row bg-gray-100 min-h-[300px] rounded-[50px]">
+                        <div class="flex flex-row bg-sky-100 min-h-[300px] rounded-[50px]">
                             <!-- Left Box with dummy summary -->
                             
                             <div class="w-1/2 p-4">
                                     <!-- <h4><b>DUMMY SUMMARY </b></h4> -->
-                                    <textarea class="w-full h-full transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-hidden text-lg border border-gray-200 border-solid hover:border-gray-400" readonly >DUMMY SUMMARY: Today I worked on the QCA Newsletter Design, followed up with the team for the October 2023 plan for recurring marketing projects, and connected with Ansar to discuss the new scrum workflow.</textarea>
+                                    <textarea class="w-full h-full transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-hidden text-lg border border-gray-200 border-solid hover:border-yellow-400" readonly >DUMMY SUMMARY: Today I worked on the QCA Newsletter Design, followed up with the team for the October 2023 plan for recurring marketing projects, and connected with Ansar to discuss the new scrum workflow.</textarea>
                             </div>
                             
                             
                             <!-- Right Box for writing summary -->
                             <div class="w-1/2 p-4 flex flex-col gap-3">
-                                <textarea id="summary-textarea" class="w-full flex-grow transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-hidden text-lg border border-gray-200 border-solid hover:border-gray-400" placeholder="Write your summary here..."></textarea>
+                                <textarea id="summary-textarea" class="w-full flex-grow transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-hidden text-lg border border-gray-200 border-solid hover:border-yellow-400" placeholder="Write your summary here..."></textarea>
 
                                 <div class="flex flex-row w-full justify-end">
                                     <button onclick="getOrSaveStaffSummary(document.getElementById('summary-textarea').value)" class="w-full bg-blue-500/90 text-white font-semibold py-2 px-4 rounded-3xl shadow-sm hover:shadow-xl  transition-all border border-blue-200 border-solid hover:border-blue-700">Submit</button>
@@ -293,7 +293,7 @@
 
                                         $daysRemaining = $interval->days;
                                     ?>
-                                        <div class="staff-profile bg-gray-100 p-4 rounded-[40px] shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all flex justify-between items-center">
+                                        <div class="staff-profile bg-sky-100 p-4 rounded-[40px] shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all flex justify-between items-center">
 
                                         <?= staff_profile_image($staff['staffid'], ['border-4 border-gradient-to-r from-teal-400 to-blue-500 object-cover w-20 h-20 rounded-full staff-profile-image-thumb mr-4'], 'thumb'); ?>
                                         <div class="staff-details flex-grow flex flex-col">
@@ -314,7 +314,7 @@
                 <div class="flex flex-row w-full gap-10 rounded-lg">
 
                     <!-- Calendar Section -->
-                    <div class="w-2/3 rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all">
+                    <div class="w-2/3 rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all">
 
                         <div class="p-4 ">
 
@@ -326,7 +326,7 @@
                     </div>
 
                     <!-- To do Section -->
-                    <div class="w-1/3 flex md:flex-row flex-col rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all">
+                    <div class="w-1/3 flex md:flex-row flex-col rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all">
 
                             <div class="panel_s todo-panel h-full p-5 w-full shadow-inner rounded-[50px]">
                                 <div class="tw-flex tw-justify-between tw-items-center">
@@ -670,116 +670,86 @@ function getCurrentTimeInAsiaKolkata() {
     return new Date(localTimeString);
 }
     
-var dailyStats = <?php echo json_encode($daily_stats); ?>;
+var shift_timings = <?php echo json_encode($shift_timings); ?>;
+var afk_offline_entries = <?php echo json_encode($afk_offline_entries); ?>;
+var clock_in_entries = <?php echo json_encode($clock_in_entries); ?>;
 
-function fetchDailyInfos() {
-    let data = dailyStats;
 
-    const today = new Date();
-    let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
-    let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
-    console.log(data);
-    // AFK entries filter
-    const afk_entries = data.afk_and_offline.filter(entry => entry.status === 'AFK');
+const today = new Date();
+let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
+let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
 
-    var items = new vis.DataSet();
-    var options = {
-        zoomMin: 1000 * 60 * 60, // one hour in milliseconds
-        zoomMax: 1000 * 60 * 60 * 24 * 31, // 31 days in milliseconds
-        height: "180px"
-    };
+var items = new vis.DataSet();
+var options = {
+    zoomMin: 1000 * 60 * 60, // one hour in milliseconds
+    zoomMax: 1000 * 60 * 60 * 24 * 31, // 31 days in milliseconds
+    height: "180px"
+};
 
-    // Clock-in aur Clock-out times ko timeline mein add karte hain
-    if (data.clock_ins_outs) {
-        data.clock_ins_outs.forEach(clock => {
-            const inTime = new Date(clock.clock_in).toISOString();
-            const outTime = new Date(clock.clock_out).toISOString();
-
-            // Setting startDate and endDate based on clock-in and clock-out times
-            if (new Date(inTime) < startDate) {
-                startDate = new Date(inTime);
-            }
-            if (new Date(outTime) > endDate) {
-                endDate = new Date(outTime);
-            }
-
-            items.add({
-                content: 'Clock in',
-                start: inTime,
-                end: outTime,
-                type: 'range',
-                className: 'clock-in-time',
-                group: 2
-            });
-        });
+clock_in_entries.forEach(clock => {
+    const inTime = new Date(clock.clock_in).toISOString();
+    const outTime = new Date(clock.clock_out).toISOString();
+    // Setting startDate and endDate based on clock-in and clock-out times
+    if (new Date(inTime) < startDate) {
+        startDate = new Date(inTime);
     }
-    if (data.shift_timings && data.shift_timings.length > 0) {
-        data.shift_timings.forEach(shift => {
-            const shiftStart = new Date(`${shift.Year}-${shift.month}-${shift.day} ${shift.shift_start_time}`).toISOString();;
-            const shiftEnd = new Date(`${shift.Year}-${shift.month}-${shift.day} ${shift.shift_end_time}`).toISOString();;
+    if (new Date(outTime) > endDate) {
+        endDate = new Date(outTime);
+    }
+    items.add({
+        content: 'Clock in',
+        start: inTime,
+        end: outTime,
+        type: 'range',
+        className: 'clock-in-time',
+        group: 2
+    });
+});
 
-            console.log(shiftStart);
-            
-            items.add({
-                content: 'Shift',
-                start: shiftStart,
-                end: shiftEnd,
-                type: 'range',
-                className: 'shift-time',
-                group: 3  // Group 3 for shifts. You can adjust as needed.
-            });
+for(let shiftKey in shift_timings) {
+    let shift = shift_timings[shiftKey];
+    let shiftStart = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${shift.start}`).toISOString();
+    let shiftEnd = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${shift.end}`).toISOString();
 
-        });
+    // If shift ends before it starts, add one day to the end date
+    if(shift.end < shift.start) {
+        let endDateTime = new Date(shiftEnd);
+        endDateTime.setDate(endDateTime.getDate() + 1);
+        shiftEnd = endDateTime.toISOString();
     }
 
-    // AFK timings ko timeline mein add karte hain
-    if (afk_entries) {
-      afk_entries.forEach(function (entry) {
-
-        const start24HourTime = convertTo24Hour(entry.start_time);
-        const end24HourTime = convertTo24Hour(entry.end_time);
-
-        const startDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${start24HourTime}`).toISOString();;
-        const endDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${end24HourTime}`).toISOString();;
-
-        items.add({
-          content: 'AFK',
-          start: startDateTime,
-          end: endDateTime,
-          type: 'range',
-          className: 'afk-time',
-          group: 1
-        });
-      });
-    } else {
-      console.warn("afk_entries is not available");
-    }
-
-    var container = document.getElementById('visualization');
-    if (container) {
-      var timeline = new vis.Timeline(container, items, options);
-
-    } else {
-      console.error("Timeline container not found");
-      return;
-    }
-
-    // Setting the timeline to focus on our startDate to endDate
-    timeline.setWindow(startDate, endDate);
-    timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
+    items.add({
+        content: 'Shift',
+        start: shiftStart,
+        end: shiftEnd,
+        type: 'range',
+        className: 'shift-time',
+        group: 3  // Group 3 for shifts. You can adjust as needed.
+    });
 }
 
-// Convert 12-hour time format to 24-hour time format
-function convertTo24Hour(time) {
-    const [hourMin, period] = time.split(' ');
-    let [hour, minute] = hourMin.split(':');
-    hour = +hour;
-    if (period === "PM" && hour !== 12) hour += 12;
-    if (period === "AM" && hour === 12) hour -= 12;
-    return `${hour.toString().padStart(2, '0')}:${minute}`;
-}
+afk_offline_entries.forEach(function (entry) {
+  const start24HourTime = entry.start_time;
+  const end24HourTime = entry.end_time;
+  const startDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${start24HourTime}`).toISOString();;
+  const endDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${end24HourTime}`).toISOString();;
+  items.add({
+    content: entry.status,
+    start: startDateTime,
+    end: endDateTime,
+    type: 'range',
+    className: 'afk-time',
+    group: 1
+  });
+});
 
-fetchDailyInfos();
+var container = document.getElementById('visualization');
+var timeline = new vis.Timeline(container, items, options);
+
+// Setting the timeline to focus on our startDate to endDate
+timeline.setWindow(startDate, endDate);
+timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
+
 </script>
 <?php init_tail(); ?>
 <?php $this->load->view('admin/utilities/calendar_template'); ?>

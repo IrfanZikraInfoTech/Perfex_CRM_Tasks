@@ -66,6 +66,8 @@
 		<?php $attrs = (get_option('companyname') != '' ? array() : array('autofocus'=>true)); ?>
 		<?php echo render_input('settings[companyname]','settings_general_company_name',get_option('companyname'),'text',$attrs); ?>
 		<hr />
+		<?php echo render_input('settings[company_principles]','Company Principles (Comma separated)',get_option('company_principles')); ?>
+		<hr />
 		<?php echo render_input('settings[main_domain]','settings_general_company_main_domain',get_option('main_domain')); ?>
 		<hr />
 		<?php render_yes_no_option('rtl_support_admin','settings_rtl_support_admin'); ?>
@@ -79,5 +81,7 @@
 		<?php echo render_input('settings[unpaid_leaves]','Unpaid Leaves',get_option('unpaid_leaves'), 'number'); ?>
 
 		<?php echo render_input('settings[gaz_leaves]','Gazetted Leaves',get_option('gaz_leaves'), 'number'); ?>
+
+		
 	</div>
 </div>

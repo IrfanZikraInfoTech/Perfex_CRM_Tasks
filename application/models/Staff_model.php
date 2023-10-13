@@ -356,11 +356,17 @@ class Staff_model extends App_Model
 
             if ($staff) {
                 $staff->permissions = $this->get_staff_permissions($id);
+                $staff->department_id = id_to_name($id, 'tblstaff_departments', 'staffid', 'departmentid');
+
+                $staff->department_name = id_to_name($staff->department_id, 'tbldepartments', 'departmentid', 'name');
+
             }
 
             return $staff;
         }
         $this->db->order_by('firstname', 'desc');
+
+        
 
         return $this->db->get(db_prefix() . 'staff')->result_array();
     }

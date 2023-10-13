@@ -95,37 +95,30 @@ class Dashboard extends AdminController
 
         $data['upcoming_birthdays'] = $this->staff_model->get_upcoming_birthdays();
 
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
         $staff_id = get_staff_user_id(); // Yeh function current logged in user ki ID return karta hai.
-        $day = date("d");
-        $month = date("m");
-        $year = date("Y");
-        $daily_stats = $this->team_management_model->get_daily_stats($staff_id, $day, $month, $year);
-        $data['daily_stats'] = $daily_stats;
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
         $data = hooks()->apply_filters('before_dashboard_render', $data);
 
         $data['total_time'] = $this->team_management_model->get_today_live_timer($staff_id);
 
+        $date = date("Y-m-d");
 
-        $shift_timings = $this->team_management_model->get_shift_timings_of_date(date("Y-m-d"), $staff_id);
+        $shift_timings = $this->team_management_model->get_shift_timings_of_date($date, $staff_id);
+        
+        
         $shift_secs = 0;
-
         if(isset($shift_timings['first_shift']['end']) && isset($shift_timings['first_shift']['start'])){
             $shift_secs += strtotime($shift_timings['first_shift']['end']) - strtotime($shift_timings['first_shift']['start']);
         }
-
         if(isset($shift_timings['second_shift']['end']) && isset($shift_timings['second_shift']['start'])){
             $shift_secs += strtotime($shift_timings['second_shift']['end']) - strtotime($shift_timings['second_shift']['start']);
         }
 
         $data['shift_seconds'] = $shift_secs;
+
+        $data['shift_timings'] = $shift_timings;
+        $data['afk_offline_entries'] = $this->team_management_model->get_afk_and_offline_entries($staff_id, $date);
+        $data['clock_in_entries'] = $this->team_management_model->get_staff_time_entries($staff_id, $date);
         
         $this->load->view('admin/dashboard/dashboard', $data);
     }

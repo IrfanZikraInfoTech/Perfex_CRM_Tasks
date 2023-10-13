@@ -14,7 +14,7 @@
                         foreach($staff_under as $staff){
                             ?>
 
-                        <button onclick="staffDetails(<?= $staff['id'] ?>, '<?= htmlspecialchars($staff['firstname']) ?>')" title="<?= $staff['firstname'] ?>" data-toggle="tooltip" data-placement="top">
+                        <button onclick="staffDetails(<?= $staff['id'] ?>, '<?= htmlspecialchars($staff['name']) ?>')" title="<?= $staff['name'] ?>" data-toggle="tooltip" data-placement="top">
                             <?= staff_profile_image($staff['id'], ['border-2 border-solid object-cover w-12 h-12 staff-profile-image-thumb'], 'thumb'); ?>
                         </button>
 
