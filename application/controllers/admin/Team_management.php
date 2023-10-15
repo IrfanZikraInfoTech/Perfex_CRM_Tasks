@@ -7,6 +7,7 @@ class Team_management extends AdminController {
 
     public function __construct() {
         parent::__construct();
+        
         $this->load->model('team_management_model');
         $this->load->model('staff_model');
         $this->load->model('tasks_model');
@@ -236,7 +237,6 @@ class Team_management extends AdminController {
 
         $shifts = $this->team_management_model->get_shift_timings($staff_id, $month);
         
-
         echo json_encode($shifts);
     }
     
@@ -1300,13 +1300,9 @@ class Team_management extends AdminController {
 
     public function kudos(){
 
-
         $staff_id = $this->session->userdata('staff_user_id');
         $kudos_sent_this_month = $this->team_management_model->kudos_count($staff_id);
         $remaining_kudos = 5 - $kudos_sent_this_month;
-    
-
-
 
         $data['staff_members'] = $this->staff_model->get();
         $data['kudos_data'] = $this->team_management_model->fetch_kudos();
@@ -1379,7 +1375,49 @@ class Team_management extends AdminController {
             echo json_encode(['success' => false, 'message' => 'Kudos not found']);
         }
     }
-}
 
+    public function mark_as_seen() {
+        $kudos_id = $this->input->post('kudos_id');
+        $staff_id = $this->session->userdata('staff_user_id'); 
+    
+        $this->db->where('id', $kudos_id);
+        $kudos = $this->db->get('tblkudos')->row();
+    
+        if ($kudos) {
+            $seen_users = explode(',', $kudos->seen_by);
+            if (!in_array($staff_id, $seen_users)) { // If not marked as seen already
+                $seen_users[] = $staff_id;
+                $updated_seen_users = implode(',', $seen_users);
+                $this->db->where('id', $kudos_id);
+                $success = $this->db->update('tblkudos', ['seen_by' => $updated_seen_users]);
+    
+                // Fetch the staff profile image URL
+                $image_url = staff_profile_image($staff_id, ['w-6 h-6 rounded-full'], 'thumb', []); 
+                preg_match('/src="([^"]+)"/', $image_url, $match);
+                $actual_image_url = $match[1];
+    
+                echo json_encode(['success' => $success, 'action' => 'marked as seen', 'image_url' => $actual_image_url]);
+            } else {
+                // User already marked it as seen
+                echo json_encode(['success' => true, 'message' => 'Already marked as seen']);
+                return;
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Kudos not found']);
+        }
+    }
+    
+    
+    public function set_shifts($id){
+        
+        $staff_id = $this->session->userdata('staff_user_id');
+
+        $data['staff'] = $this->staff_model->get($id);
+
+        $this->load->view('admin/management/set_shifts',$data);
+
+    }
+
+}
 
 ?>

@@ -1383,9 +1383,6 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
     }
 
     public function likeKudos($kudos_id, $staff_id) {
-        // Here, you can update the 'kudos_like' column in 'tblkudos' table 
-        // based on your design whether you're saving multiple likes as comma-separated or in another way.
-        // This is just a simple logic and can vary based on your DB design.
         $this->db->where('id', $kudos_id);
         $this->db->update('tblkudos', ['kudos_like' => $staff_id]);
         
@@ -1419,6 +1416,14 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
         $this->db->order_by('total_received', 'DESC');
         return $this->db->get()->result_array();
     }
+
+    public function seenkudos($kudos_id, $staff_id) {
+        $this->db->where('id', $kudos_id);
+        $this->db->update('tblkudos', ['seen_by' => $staff_id]);
+        
+        return $this->db->affected_rows() > 0;
+    }
+
 
     
 }

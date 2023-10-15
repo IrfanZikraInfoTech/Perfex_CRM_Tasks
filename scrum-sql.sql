@@ -80,3 +80,7 @@ CREATE TABLE tblkudos (
     staff_id INT(11) NOT NULL,
     kudos_like TEXT NOT NULL
 );
+
+ALTER TABLE tblkudos ADD seen_by TEXT;
+ALTER TABLE tblnewsfeed_posts ADD seen_by TEXT;
+

@@ -501,4 +501,18 @@ class Newsfeed_model extends App_Model
 
         return $this->db->get(db_prefix() . 'newsfeed_post_comments')->result_array();
     }
+
+    
+    public function markAsSeen($postId, $userId) {
+        $post = $this->db->where('postid', $postId)->get('tblnewsfeed_posts')->row();
+    
+        $seenBy = explode(',', $post->seen_by);
+        if (!in_array($userId, $seenBy)) {
+            $seenBy[] = $userId;
+        }
+    
+        return $this->db->where('postid', $postId)->update('tblnewsfeed_posts', ['seen_by' => implode(',', $seenBy)]);
+    }
+    
+
 }

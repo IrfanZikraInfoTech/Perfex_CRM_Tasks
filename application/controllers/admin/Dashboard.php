@@ -114,6 +114,7 @@ class Dashboard extends AdminController
             $shift_secs += strtotime($shift_timings['second_shift']['end']) - strtotime($shift_timings['second_shift']['start']);
         }
 
+        
         $data['shift_seconds'] = $shift_secs;
 
         $data['shift_timings'] = $shift_timings;
@@ -158,5 +159,28 @@ class Dashboard extends AdminController
             echo json_encode(['liked' => $result]);
         }
     }
+
+    public function markPostAsSeen() {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $postId = $this->input->post('postId');
+        $currentUserId = get_staff_user_id(); // Assuming you have a method to get logged-in user's ID.
+
+        // Load your model (if not already loaded)
+        $this->load->model('newsfeed_model');
+
+        // Mark post as seen and get the result
+        $result = $this->newsfeed_model->markAsSeen($postId, $currentUserId);
+
+        if($result) {
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to update database.']);
+        }
+    }
+
+
 
 }

@@ -48,6 +48,9 @@
 #visualization .vis-timeline{
     border-radius:30px;
 }
+.not-seen {
+    background-color: #CCE5F1;
+}
 </style>
 
 <div id="wrapper">
@@ -165,12 +168,14 @@
                                 <div class="bg-sky-100 p-4 py-3 shadow-inner rounded-[50px] overflow-y-scroll myscrollbar max-h-[300px]">
                                         
                                     <?php $count = 0;
+                                    $currentUserId = get_staff_user_id(); // Get the current user ID
                                     foreach($posts as $post):
-
                                         $isLiked = $this->newsfeed_model->user_liked_post($post["postid"]) ? "true" : "false";
                                         $totalLikes = count($this->newsfeed_model->get_post_likes($post["postid"]));
                                         $currentDateTime = new DateTime();
                                         $postDateTime = new DateTime($post["datecreated"]);
+                                        $hasUserSeenPost = in_array($currentUserId, explode(',', $post["seen_by"])); // Check if user ID exists in seen_by column
+                                        $postClass = $hasUserSeenPost ? "" : "not-seen"; // Assign the class based on if the user has seen the post or not
                                         $interval = $currentDateTime->diff($postDateTime);
                                         
                                         $timeString = '';
@@ -188,7 +193,7 @@
                                             $timeString = 'just now';
                                         }
                                     ?>
-                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-yellow-400" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this)">
+                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-yellow-400  <?= $postClass ?>" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this)">
                                             <div class="flex justify-between items-center">
                                                 <div class="font-bold text-xl"><?= $post["creator_name"] ?></div>
                                                 <div class="text-gray-500 text-sm italic"><?= $timeString ?></div>
@@ -206,14 +211,14 @@
                                                 </button>
                                             </div> -->
                                         </div> 
-                                    <?php $count++;
-                                    endforeach;  
+                                        <?php $count++;
+                                        endforeach;  
     
-                                if($count < 1){
-                                    echo '<h2>No announcements!</h2>';
-                                }
+                                        if($count < 1){
+                                            echo '<h2>No announcements!</h2>';
+                                        }
 
-                                ?>
+                                        ?>
                                     </div>    
                             </div>    
                         </div>    
@@ -460,10 +465,14 @@
         
         <div class="text-md mb-3 text-gray-200" id="modalContent"></div>
         
-        <button id="likeButton" class="text-lg btnlike flex items-center mb-2 p-2 rounded-full focus:outline-none" data-postid="<?= $post["postid"] ?>" onclick="likes(this)">
-            <i class="heartIcon fas fa-heart text-gray-500 mr-2"></i> 
-            <span id="likeCount" class="ml-2 text-gray-500"></span>
-        </button>
+        <div class="flex justify-between items-center">
+            <button id="likeButton" class="text-lg btnlike flex items-center mb-2 p-2 rounded-full focus:outline-none" data-postid="<?= $post["postid"] ?>" onclick="likes(this)">
+                <i class="heartIcon fas fa-heart text-gray-500 mr-2"></i> 
+                <span id="likeCount" class="ml-2 text-gray-500 text-md"></span>
+            </button>
+            
+            
+        </div>
 
         <button onclick="closeModal()" class="bg-red-500 hover:bg-red-700 text-white float-right font-semibold py-2 px-4 border border-red-600 hover:border-red-700 rounded transition ease-in-out duration-300">Close</button>
     </div>
@@ -527,6 +536,7 @@ function openPostModal(postElement) {
         heartIcon.classList.add('text-gray-500');
     }
     likeButton.setAttribute('data-postid', postId);
+    markPostAsSeen(postId);
 
     var totalLikes = postElement.getAttribute('data-total-likes');
     var likeCount = modal.querySelector('#likeCount');
@@ -544,6 +554,27 @@ function closeModal() {
     document.getElementById('postModal').classList.add('hidden');
 }
 
+function markPostAsSeen(postId) {
+    $.ajax({
+        type: "POST",
+        url: "dashboard/markPostAsSeen",
+        dataType: 'json',
+        data: { 
+            postId: postId,
+            <?php echo $this->security->get_csrf_token_name(); ?>: '<?php echo $this->security->get_csrf_hash(); ?>'
+        },
+        success: function(response) {
+            if (response.status === 'success') {
+                // Remove the not-seen class from the post when marked as seen
+                $('[data-postid="' + postId + '"]').removeClass('not-seen');
+            } else {
+                console.error('Failed to mark post as seen.');
+            }
+        }
+    });
+}
+
+
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
@@ -551,81 +582,64 @@ function closeModal() {
 <script>
     var dailyStats = <?php echo json_encode($daily_stats); ?>;
 
-function fetchDailyInfos(staff_id) {
-    let data = dailyStats;
+    function fetchDailyInfos(staff_id) {
+        let data = dailyStats;
 
-    const today = new Date();
-    let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
-    let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
-    console.log(data);
-    // AFK entries filter
-    const afk_entries = data.afk_and_offline.filter(entry => entry.status === 'AFK');
+        const today = new Date();
+        let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
+        let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
+        console.log(data);
+        // AFK entries filter
+        const afk_entries = data.afk_and_offline.filter(entry => entry.status === 'AFK');
 
-    var items = new vis.DataSet();
-    var options = {
-      zoomMin: 1000 * 60 * 60,
-      zoomMax: 1000 * 60 * 60 * 24,
+        var items = new vis.DataSet();
+        var options = {
+        zoomMin: 1000 * 60 * 60,
+        zoomMax: 1000 * 60 * 60 * 24,
 
-      format: {
-        minorLabels: function(date, scale, step) {
-          return moment(date).format('hh:mm A');
-        },
-        majorLabels: function(date, scale, step) {
-          return moment(date).format('MMM DD YYYY');
+        format: {
+            minorLabels: function(date, scale, step) {
+            return moment(date).format('hh:mm A');
+            },
+            majorLabels: function(date, scale, step) {
+            return moment(date).format('MMM DD YYYY');
+            }
         }
-      }
-    };
-    var container = document.getElementById('visualization');
-    if (container) {
-      var timeline = new vis.Timeline(container, items, options);
+        };
+        var container = document.getElementById('visualization');
+        if (container) {
+        var timeline = new vis.Timeline(container, items, options);
 
-    } else {
-      console.error("Timeline container not found");
-      return;
-    }
+        } else {
+        console.error("Timeline container not found");
+        return;
+        }
 
-    // Clock-in aur Clock-out times ko timeline mein add karte hain
-    if (data.clock_ins_outs) {
-        data.clock_ins_outs.forEach(clock => {
-            const inTime = new Date(clock.clock_in).toISOString();
-            const outTime = new Date(clock.clock_out).toISOString();
+        // Clock-in aur Clock-out times ko timeline mein add karte hain
+        if (data.clock_ins_outs) {
+            data.clock_ins_outs.forEach(clock => {
+                const inTime = new Date(clock.clock_in).toISOString();
+                const outTime = new Date(clock.clock_out).toISOString();
 
-            // Setting startDate and endDate based on clock-in and clock-out times
-            if (new Date(inTime) < startDate) {
-                startDate = new Date(inTime);
-            }
-            if (new Date(outTime) > endDate) {
-                endDate = new Date(outTime);
-            }
+                // Setting startDate and endDate based on clock-in and clock-out times
+                if (new Date(inTime) < startDate) {
+                    startDate = new Date(inTime);
+                }
+                if (new Date(outTime) > endDate) {
+                    endDate = new Date(outTime);
+                }
 
-            items.add({
-                content: 'Clock in',
-                start: inTime,
-                end: outTime,
-                type: 'range',
-                className: 'clock-in-time',
-                group: 2
+                items.add({
+                    content: 'Clock in',
+                    start: inTime,
+                    end: outTime,
+                    type: 'range',
+                    className: 'clock-in-time',
+                    group: 2
+                });
             });
-        });
-    }
-    if (data.shift_timings && data.shift_timings.length > 0) {
-    data.shift_timings.forEach(shift => {
-        const shiftStart = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_start}`);
-        const shiftEnd = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_end}`);
-
-        items.add({
-            content: 'Shift',
-            start: shiftStart,
-            end: shiftEnd,
-            type: 'range',
-            className: 'shift-time',
-            group: 3  // Group 3 for shifts. You can adjust as needed.
-        });
-
-        // Setting startDate and endDate based on shift timings
-        if (shiftStart < startDate) {
-            startDate = shiftStart;
         }
+<<<<<<< Updated upstream
         if (shiftEnd > endDate) {
             endDate = shiftEnd;
         }
@@ -749,8 +763,253 @@ var timeline = new vis.Timeline(container, items, options);
 // Setting the timeline to focus on our startDate to endDate
 timeline.setWindow(startDate, endDate);
 timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
+=======
+        if (data.shift_timings && data.shift_timings.length > 0) {
+        data.shift_timings.forEach(shift => {
+            const shiftStart = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_start}`);
+            const shiftEnd = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_end}`);
+
+            items.add({
+                content: 'Shift',
+                start: shiftStart,
+                end: shiftEnd,
+                type: 'range',
+                className: 'shift-time',
+                group: 3  // Group 3 for shifts. You can adjust as needed.
+            });
+
+            // Setting startDate and endDate based on shift timings
+            if (shiftStart < startDate) {
+                startDate = shiftStart;
+            }
+            if (shiftEnd > endDate) {
+                endDate = shiftEnd;
+            }
+        });
+    }
+
+        // AFK timings ko timeline mein add karte hain
+        if (afk_entries) {
+        afk_entries.forEach(function (entry) {
+            const startDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.start_time}`, "YYYY-MM-DD hh:mm A").toDate();
+            const endDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.end_time}`, "YYYY-MM-DD hh:mm A").toDate();
+
+            items.add({
+            content: 'AFK',
+            start: startDateTime,
+            end: endDateTime,
+            type: 'range',
+            className: 'afk-time',
+            group: 1
+            });
+        });
+        } else {
+        console.warn("afk_entries is not available");
+        }
+
+        // Setting the timeline to focus on our startDate to endDate
+        timeline.setWindow(startDate, endDate);
+    }
+
+>>>>>>> Stashed changes
 
 </script>
+
+
+<script>
+
+    
+function getCurrentTimeInAsiaKolkata() {
+    const now = new Date();
+    const timeZone = 'Asia/Kolkata';
+    const localTimeString = now.toLocaleString('en-US', { timeZone });
+  
+    return new Date(localTimeString);
+}
+    
+var shift_timings = <?php echo json_encode($shift_timings); ?>;
+var afk_offline_entries = <?php echo json_encode($afk_offline_entries); ?>;
+var clock_in_entries = <?php echo json_encode($clock_in_entries); ?>;
+
+    function fetchDailyInfos() {
+        let data = dailyStats;
+
+        const today = new Date();
+        let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
+        let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
+        console.log(data);
+        // AFK entries filter
+        const afk_entries = data.afk_and_offline.filter(entry => entry.status === 'AFK');
+const today = new Date();
+let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
+let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
+
+        var items = new vis.DataSet();
+        var options = {
+            zoomMin: 1000 * 60 * 60, // one hour in milliseconds
+            zoomMax: 1000 * 60 * 60 * 24 * 31, // 31 days in milliseconds
+            height: "180px"
+        };
+var items = new vis.DataSet();
+var options = {
+    zoomMin: 1000 * 60 * 60, // one hour in milliseconds
+    zoomMax: 1000 * 60 * 60 * 24 * 31, // 31 days in milliseconds
+    height: "180px"
+};
+
+        // Clock-in aur Clock-out times ko timeline mein add karte hain
+        if (data.clock_ins_outs) {
+            data.clock_ins_outs.forEach(clock => {
+                const inTime = new Date(clock.clock_in).toISOString();
+                const outTime = new Date(clock.clock_out).toISOString();
+
+                // Setting startDate and endDate based on clock-in and clock-out times
+                if (new Date(inTime) < startDate) {
+                    startDate = new Date(inTime);
+                }
+                if (new Date(outTime) > endDate) {
+                    endDate = new Date(outTime);
+                }
+
+                items.add({
+                    content: 'Clock in',
+                    start: inTime,
+                    end: outTime,
+                    type: 'range',
+                    className: 'clock-in-time',
+                    group: 2
+                });
+            });
+        }
+        if (data.shift_timings && data.shift_timings.length > 0) {
+            data.shift_timings.forEach(shift => {
+                const shiftStart = new Date(`${shift.Year}-${shift.month}-${shift.day} ${shift.shift_start_time}`).toISOString();;
+                const shiftEnd = new Date(`${shift.Year}-${shift.month}-${shift.day} ${shift.shift_end_time}`).toISOString();;
+clock_in_entries.forEach(clock => {
+    const inTime = new Date(clock.clock_in).toISOString();
+    const outTime = new Date(clock.clock_out).toISOString();
+    // Setting startDate and endDate based on clock-in and clock-out times
+    if (new Date(inTime) < startDate) {
+        startDate = new Date(inTime);
+    }
+    if (new Date(outTime) > endDate) {
+        endDate = new Date(outTime);
+    }
+    items.add({
+        content: 'Clock in',
+        start: inTime,
+        end: outTime,
+        type: 'range',
+        className: 'clock-in-time',
+        group: 2
+    });
+});
+
+for(let shiftKey in shift_timings) {
+    let shift = shift_timings[shiftKey];
+    let shiftStart = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${shift.start}`).toISOString();
+    let shiftEnd = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${shift.end}`).toISOString();
+
+                console.log(shiftStart);
+                
+                items.add({
+                    content: 'Shift',
+                    start: shiftStart,
+                    end: shiftEnd,
+                    type: 'range',
+                    className: 'shift-time',
+                    group: 3  // Group 3 for shifts. You can adjust as needed.
+                });
+
+            });
+        }
+    // If shift ends before it starts, add one day to the end date
+    if(shift.end < shift.start) {
+        let endDateTime = new Date(shiftEnd);
+        endDateTime.setDate(endDateTime.getDate() + 1);
+        shiftEnd = endDateTime.toISOString();
+    }
+
+    items.add({
+        content: 'Shift',
+        start: shiftStart,
+        end: shiftEnd,
+        type: 'range',
+        className: 'shift-time',
+        group: 3  // Group 3 for shifts. You can adjust as needed.
+    });
+}
+
+        // AFK timings ko timeline mein add karte hain
+        if (afk_entries) {
+        afk_entries.forEach(function (entry) {
+
+            const start24HourTime = convertTo24Hour(entry.start_time);
+            const end24HourTime = convertTo24Hour(entry.end_time);
+
+            const startDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${start24HourTime}`).toISOString();;
+            const endDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${end24HourTime}`).toISOString();;
+
+            items.add({
+            content: 'AFK',
+            start: startDateTime,
+            end: endDateTime,
+            type: 'range',
+            className: 'afk-time',
+            group: 1
+            });
+        });
+        } else {
+        console.warn("afk_entries is not available");
+        }
+afk_offline_entries.forEach(function (entry) {
+  const start24HourTime = entry.start_time;
+  const end24HourTime = entry.end_time;
+  const startDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${start24HourTime}`).toISOString();;
+  const endDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${end24HourTime}`).toISOString();;
+  items.add({
+    content: entry.status,
+    start: startDateTime,
+    end: endDateTime,
+    type: 'range',
+    className: 'afk-time',
+    group: 1
+  });
+});
+
+        var container = document.getElementById('visualization');
+        if (container) {
+        var timeline = new vis.Timeline(container, items, options);
+var container = document.getElementById('visualization');
+var timeline = new vis.Timeline(container, items, options);
+
+        } else {
+        console.error("Timeline container not found");
+        return;
+        }
+
+        // Setting the timeline to focus on our startDate to endDate
+        timeline.setWindow(startDate, endDate);
+        timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
+    }
+
+    // Convert 12-hour time format to 24-hour time format
+    function convertTo24Hour(time) {
+        const [hourMin, period] = time.split(' ');
+        let [hour, minute] = hourMin.split(':');
+        hour = +hour;
+        if (period === "PM" && hour !== 12) hour += 12;
+        if (period === "AM" && hour === 12) hour -= 12;
+        return `${hour.toString().padStart(2, '0')}:${minute}`;
+    }
+
+    fetchDailyInfos();
+// Setting the timeline to focus on our startDate to endDate
+timeline.setWindow(startDate, endDate);
+timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
+
+</script>
+
 <?php init_tail(); ?>
 <?php $this->load->view('admin/utilities/calendar_template'); ?>
 <?php $this->load->view('admin/dashboard/dashboard_js'); ?>
