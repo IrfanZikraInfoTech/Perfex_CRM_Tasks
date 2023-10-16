@@ -392,11 +392,50 @@ class Team_management extends AdminController {
     }
 
     public function staff_shifts() {
-        //$staff_id = $this->session->userdata('staff_user_id');
-
         $data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
 
         $this->load->view('admin/management/staff_shifts', $data);
+    }
+
+    public function add_global_leave() {
+
+        $start_date = $this->input->post('start_date');
+        $end_date = $this->input->post('end_date');
+        $reason = $this->input->post('reason');
+        
+        $data = array(
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'reason' => $reason
+        );
+    
+        // Save the global leave data
+        $result = $this->team_management_model->addGlobalLeave($data);
+        
+        if($result) {
+            // Auto approve global leaves
+            $this->team_management_model->auto_approve_global_leaves();
+    
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false]);
+        }
+    }
+    
+    public function fetch_global_leaves() {
+        $this->load->model('team_management_model');
+        $leaves = $this->team_management_model->getGlobalLeaves();
+        echo json_encode($leaves);
+    }
+    public function delete_global_leave() {
+        $leaveId = $this->input->post('id');
+        if ($leaveId) {
+            $this->load->model('team_management_model');
+            $result = $this->team_management_model->deleteGlobalLeave($leaveId);
+            echo json_encode(['success' => $result]);
+        } else {
+            echo json_encode(['success' => false]);
+        }
     }
 
     public function control_room($staff_id) {
@@ -439,36 +478,34 @@ class Team_management extends AdminController {
     //Methods
 
 
-    public function save_shift_timings() {
+    public function save_shifts() {
 
-        //if (!has_permission('team_management', '', 'admin')) {
-        //    access_denied('Your custom permission message');
-        //}
+        $originalDate = $this->input->post('date');
+        $dateObject = DateTime::createFromFormat('m/d/Y', $originalDate); 
+        if ($dateObject === false) {
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid date format'));
+            return;
+        }
+        // Format the date into Y-m-d format
+        $date = $dateObject->format('Y-m-d');
 
+
+        $repeat = $this->input->post('repeat');
+        $shift_1_start = $this->input->post('s1s');
+        $shift_1_end = $this->input->post('s1e');
+        $shift_2_start = $this->input->post('s2s');
+        $shift_2_end = $this->input->post('s2e');
         $staff_id = $this->input->post('staff_id');
-        $month = $this->input->post('month');
 
-        $shifts = [];
+        // Convert $date to a DateTime object to handle it easily
+        $dateObj = new DateTime($date);
 
-        for ($i=1; $i <= 31; $i++) { 
-            $shifts[$i][1]['start'] = $this->input->post('start_shift1_day_'.$i);
-            $shifts[$i][1]['end'] = $this->input->post('end_shift1_day_'.$i);
+        $result = $this->team_management_model->save_staff_shifts($staff_id, $dateObj, $repeat, $shift_1_start, $shift_1_end, $shift_2_start, $shift_2_end);
 
-            $shifts[$i][2]['start'] = $this->input->post('start_shift2_day_'.$i);
-            $shifts[$i][2]['end'] = $this->input->post('end_shift2_day_'.$i);
-
-            $shifts[$i][3]['start'] = $this->input->post('start_shift3_day_'.$i);
-            $shifts[$i][3]['end'] = $this->input->post('end_shift3_day_'.$i);
-        }
-
-
-        $result = $this->team_management_model->save_shift_timings($staff_id, $month, $shifts);
-
-        if ($result) {
-            echo json_encode(['success' => true]);
-        } else {
-            echo json_encode(['success' => false]);
-        }
+        // Return the result as JSON
+        $this->output
+             ->set_content_type('application/json')
+             ->set_output(json_encode($result));
     }
 
     public function get_shift_timings($staff_id, $month) {
@@ -1355,14 +1392,17 @@ class Team_management extends AdminController {
     }
 
     
-    public function set_shifts($id){
+    public function set_shifts($id, $month){
         
         $staff_id = $this->session->userdata('staff_user_id');
 
         $data['staff'] = $this->staff_model->get($id);
 
-        $this->load->view('admin/management/set_shifts',$data);
+        $data['shifts'] = $this->team_management_model->get_shift_timings($staff_id, $month);
 
+        $data['month'] = $month;
+
+        $this->load->view('admin/management/set_shifts',$data);
     }
 
 }

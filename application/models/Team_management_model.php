@@ -495,32 +495,89 @@ class Team_management_model extends App_Model
 
 
 
-    public function save_shift_timings($staff_id, $month, $shift_timings) {
-        // Delete existing shift timings for the staff member and month
-        $this->db->where('staff_id', $staff_id)->where('month', $month)->delete(''.db_prefix().'_staff_shifts');
-    
-        // Insert new shift timings
-        foreach ($shift_timings as $day => $shifts) {
-            foreach ($shifts as $shift_number => $shift_time) {
+    public function save_staff_shifts($staff_id, $dateObj, $repeat, $shift_1_start, $shift_1_end, $shift_2_start, $shift_2_end) {
+        // Depending on $repeat, calculate the array of dates for which the shifts need to be set
+        $dates = $this->calculate_dates($dateObj, $repeat);
 
-                if((($shift_time['start']) && ($shift_time['end'])) || $shift_number != 3){
+        // Prepare data for insertion
+        $shiftsData = [];
+        foreach ($dates as $date) {
+            // If records for this date already exist, delete them
+            $this->db->delete('tbl_staff_shifts', ['staff_id' => $staff_id, 'Year' => $date->format('Y'), 'month' => $date->format('m'), 'day' => $date->format('d')]);
 
-                    $this->db->insert(''.db_prefix().'_staff_shifts', [
-                        'staff_id' => $staff_id,
-                        'Year' => date("Y"),
-                        'month' => $month,
-                        'day' => $day,
-                        'shift_number' => $shift_number,
-                        'shift_start_time' => ($shift_time['start']) ? $shift_time['start'] : null,
-                        'shift_end_time' => ($shift_time['end']) ? $shift_time['end'] : null,
-                    ]);
-
-                }
-                
+            // Prepare the new records
+            if (!empty($shift_1_start) && !empty($shift_1_end)) {
+                $shiftsData[] = [
+                    'staff_id' => $staff_id,
+                    'Year' => $date->format('Y'),
+                    'month' => $date->format('m'),
+                    'day' => $date->format('d'),
+                    'shift_number' => 1,
+                    'shift_start_time' => $shift_1_start,
+                    'shift_end_time' => $shift_1_end,
+                ];
+            }
+            if (!empty($shift_2_start) && !empty($shift_2_end)) {
+                $shiftsData[] = [
+                    'staff_id' => $staff_id,
+                    'Year' => $date->format('Y'),
+                    'month' => $date->format('m'),
+                    'day' => $date->format('d'),
+                    'shift_number' => 2,
+                    'shift_start_time' => $shift_2_start,
+                    'shift_end_time' => $shift_2_end,
+                ];
             }
         }
-        
-        return $this->db->affected_rows() > 0;
+
+        // Insert the new shift records
+        if (!empty($shiftsData)) {
+            $this->db->insert_batch('tbl_staff_shifts', $shiftsData);
+        }
+        return ['status' => 'success', 'message' => 'Shifts saved successfully.'];
+    }
+
+    private function calculate_dates($dateObj, $repeat) {
+        $dates = [];
+
+        switch ($repeat) {
+            case 'allFollowing':
+                // Example: All following dates of the month
+                $currentMonth = $dateObj->format('m');
+                while ($currentMonth === $dateObj->format('m')) {
+                    $dates[] = clone $dateObj;
+                    $dateObj->modify('+1 day');
+                }
+                break;
+            case 'allSameWeekday':
+                // Example: All the same weekdays of the month
+                $currentMonth = $dateObj->format('m');
+                $weekday = $dateObj->format('l');
+                while ($currentMonth === $dateObj->format('m')) {
+                    if ($dateObj->format('l') === $weekday) {
+                        $dates[] = clone $dateObj;
+                    }
+                    $dateObj->modify('+1 day');
+                }
+                break;
+            case 'allDaysMonth':
+                $start = clone $dateObj;
+                $start->modify('first day of this month');
+                $end = clone $dateObj;
+                $end->modify('last day of this month');
+
+                while ($start <= $end) {
+                    $dates[] = clone $start;
+                    $start->modify('+1 day');
+                }
+                break;
+            default:
+                // No repeat, just the single date
+                $dates[] = $dateObj;
+                break;
+        }
+
+        return $dates;
     }
     
     public function get_shift_timings($staff_id, $month) {
@@ -1638,6 +1695,52 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
         return $this->db->affected_rows() > 0;
     }
 
+    public function addGlobalLeave($data) {
+        return $this->db->insert('tbl_global_leaves', $data);  
+    }
+
+    public function auto_approve_global_leaves() {
+        // Fetch all global leaves which are not yet approved.
+        $global_leaves = $this->db->get_where('tbl_global_leaves', ['status' => 'pending'])->result_array();
+    
+        foreach ($global_leaves as $leave) {
+            // Get all staff members.
+            $staff_members = $this->db->get('tblstaff')->result_array();
+    
+            foreach ($staff_members as $staff) {
+                // Insert leave for each staff member.
+                $leave_data = array(
+                    'global_leave_id' => $leave['id'],
+                    'staff_id' => $staff['staffid'],
+                    'start_date' => $leave['start_date'],
+                    'end_date' => $leave['end_date'],
+                    'shift' => 'all',  
+                    'reason' => $leave['reason'],
+                    'created_at' => $leave['created_at'],                   
+                    
+                );
+                $this->db->insert('tbl_staff_leaves', $leave_data);
+            }
+    
+            // Update the global leave status to 'Approved'.
+            $this->db->where('id', $leave['id']);
+            $this->db->update('tbl_global_leaves', ['status' => 'Approved']);
+        }
+    }
+
+    public function getGlobalLeaves() {
+        return $this->db->get('tbl_global_leaves')->result_array();
+    }
+
+    public function deleteGlobalLeave($leaveId) {
+        // Delete all records from tbl_staff_leaves where global_leave_id matches the given id
+        $this->db->where('global_leave_id', $leaveId);
+        $this->db->delete('tbl_staff_leaves');
+    
+        // Then, delete the singular record from tbl_global_leaves
+        $this->db->where('id', $leaveId);
+        return $this->db->delete('tbl_global_leaves');  // Returns true on success, false on failure
+    }
 
     
 }
