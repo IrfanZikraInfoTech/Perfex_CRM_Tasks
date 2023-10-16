@@ -841,9 +841,9 @@ class Team_management_model extends App_Model
         //return true;
         $shift_timings = $this->get_shift_timings_of_date($date, $staff_id);
 
-        if (empty($shift_timings) || ($shift_timings['first_shift']['start'] == "00:00:00" && $shift_timings['second_shift']['start'] == "00:00:00")) {
-            return true;
-        }else{
+        // if (empty($shift_timings) || ($shift_timings['first_shift']['start'] == "00:00:00" && $shift_timings['second_shift']['start'] == "00:00:00")) {
+        //     return true;
+        // }else{
     
         $this->db->select('*');
         $this->db->from(db_prefix() . '_staff_leaves');
@@ -872,8 +872,8 @@ class Team_management_model extends App_Model
             }
         }
         
-        return false;
-        }
+        // return false;
+        // }
     }
     
     public function is_clocked_in($staff_id) {
@@ -1672,6 +1672,21 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
         return $this->db->count_all_results();
     }
 
+    public function unseen_kudos_count($staff_id) {
+        $first_day_of_month = date('Y-m-01 00:00:00');
+        $last_day_of_month = date('Y-m-t 23:59:59');
+    
+        $this->db->from('tblkudos');
+        $this->db->where('created_at >=', $first_day_of_month);
+        $this->db->where('created_at <=', $last_day_of_month);
+
+        $this->db->where("NOT FIND_IN_SET('".$staff_id."', seen_by)"); // staff_id is neither the 
+        
+        return $this->db->count_all_results();
+    }
+    
+    
+
     public function get_top_kudos_givers() {
         $this->db->select('staff_id, COUNT(staff_id) as total_kudos');
         $this->db->from('tblkudos');
@@ -1742,5 +1757,28 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
         return $this->db->delete('tbl_global_leaves');  // Returns true on success, false on failure
     }
 
+    public function get_staff_hierarchy($report_to = null, $depth = 0, $maxDepth = 9) {
+        if ($depth > $maxDepth) return [];  // Limiting recursion depth
+    
+        $this->db->select('firstname, lastname, staffid, report_to, staff_title');
+        $this->db->from('tblstaff');
+    
+        if ($report_to === null) {
+            $this->db->where('staffid', 1);  // Assuming 'staffid' is an integer
+        } else {
+            $this->db->where('report_to', $report_to);
+            $this->db->where('staffid !=', 1);  // Correct syntax here
+        }        
+    
+        $query = $this->db->get();
+        $result = $query->result();
+    
+        foreach ($result as &$staff) {
+            $staff->profile = staff_profile_image($staff->staffid, ['border-2 border-solid object-cover w-12 h-12 staff-profile-image-thumb !mx-auto'], 'thumb');;
+            $staff->subordinates = $this->get_staff_hierarchy($staff->staffid, $depth + 1);
+        }
+    
+        return $result;
+    }
     
 }

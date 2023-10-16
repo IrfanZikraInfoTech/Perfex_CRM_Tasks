@@ -2,6 +2,11 @@
 <?php init_head(); 
 
 ?>
+<style>
+.google-visualization-orgchart-table{
+    margin: auto;
+}
+</style>
 <div id="wrapper">
 
    <div class="content flex flex-col gap-10">
@@ -11,14 +16,13 @@
 
        
         <div class="w-full">
-    <div class="w-full mb-4">
-        <h2 class="text-3xl font-bold text-center">Team</h2>
-        <?php if(has_permission('team_management', '', 'admin')){ ?>
-            <div class="flex justify-center mt-5 mb-10">
-                <!-- Your existing code -->
+        <div class="w-full mb-4">
+            <h2 class="text-3xl font-bold text-center">Team</h2>
+            <div class="my-4 p-4 rounded-[50px] border border-solid border-gray-100 hover:border-yellow-400 bg-gray-200">
+                <div class="w-flex justify-center w-full overflow-x-auto" id="chart_div"></div>
             </div>
-        <?php } ?>
-    </div>
+
+        </div>
 
     <div class="flex flex-col gap-4">
 
@@ -111,7 +115,103 @@
             });
         }
     });  
+
+   
 </script>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+  var hierarchyData = <?php echo json_encode($hierarchy); ?>;
+
+  google.charts.load('current', {packages:["orgchart"]});
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Name');
+    data.addColumn('string', 'Manager');
+
+    // Function to add data to the chart
+    function addData(node, parentId) {
+        var name = '<div class="flex flex-col w-max !justify-center !mx-auto">'+node.profile+'<div>' + node.firstname + ' ' + node.lastname + '</div><div class="font-bold">' + (node.staff_title || '') + '</div></div>';
+        var id = node.staffid.toString();
+        data.addRow([{
+            v: id,
+            f: name
+        }, parentId]);
+
+        if (node.subordinates) {
+            for (var i = 0; i < node.subordinates.length; i++) {
+                addData(node.subordinates[i], id); // recursive call for subordinates
+            }
+        }
+    }
+
+    // Assuming hierarchyData is an array of top-level nodes
+    for (var i = 0; i < hierarchyData.length; i++) {
+        addData(hierarchyData[i], null);
+    }
+
+    // Create the chart.
+    var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
+    // Draw the chart, setting the allowHtml option to true for the tooltips.
+    chart.draw(data, {'allowHtml':true, nodeClass: '!text-lg !rounded-[30px] !px-10 !py-2 bg-white transition-all hover:bg-sky-100 !border-none', width: '100%'});
+    }
+
+
+
+    const container = document.querySelector('#chart_div');
+                
+                let startY;
+                let startX;
+                let scrollLeft;
+                let scrollTop;
+                let isDown;
+                
+                container.addEventListener('mousedown',e => mouseIsDown(e));  
+                container.addEventListener('mouseup',e => mouseUp(e))
+                container.addEventListener('mouseleave',e=>mouseLeave(e));
+                container.addEventListener('mousemove',e=>mouseMove(e));
+                
+                
+                function mouseIsDown(e){
+                  isDown = true;
+                  startY = e.pageY - container.offsetTop;
+                  startX = e.pageX - container.offsetLeft;
+                  scrollLeft = container.scrollLeft;
+                  scrollTop = container.scrollTop; 
+                
+                }
+                function mouseUp(e){
+                  isDown = false;
+                }
+                function mouseLeave(e){
+                  isDown = false;
+                }
+                function mouseMove(e){
+                  if(isDown){
+                    
+                    
+                
+                    e.preventDefault();
+                
+                
+                
+                    //Move vertcally
+                    const y = e.pageY - container.offsetTop;
+                    const walkY = y - startY;
+                    container.scrollTop = scrollTop - walkY;
+                
+                    //Move Horizontally
+                    const x = e.pageX - container.offsetLeft;
+                    const walkX = x - startX;
+                    container.scrollLeft = scrollLeft - walkX;
+                
+                  }
+                }
+</script>
+
 
 </body>
 </html>

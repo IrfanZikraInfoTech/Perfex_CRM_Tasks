@@ -27,7 +27,8 @@ class Team_management extends AdminController {
     public function team()
     {
         $data['departments'] = $this->team_management_model->get_all_departments();
-        
+        $data['hierarchy'] = $this->team_management_model->get_staff_hierarchy();
+
         $this->load->view('admin/management/team', $data);
     }
 

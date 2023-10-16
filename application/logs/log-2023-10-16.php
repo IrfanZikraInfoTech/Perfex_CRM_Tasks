@@ -99,3 +99,34 @@ ERROR - 2023-10-16 12:03:15 --> Severity: Warning --> Array to string conversion
 ERROR - 2023-10-16 12:03:29 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
 ERROR - 2023-10-16 12:03:47 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
 ERROR - 2023-10-16 12:09:02 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:20:51 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:21:01 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:22:07 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:22:29 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 16:52:37 --> 404 Page Not Found: admin/Team_management/kpi_bord
+ERROR - 2023-10-16 20:22:45 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:23:25 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:30:28 --> Severity: error --> Exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '\'1\'\''' at line 8 C:\xampp\htdocs\sync-crm\system\database\drivers\mysqli\mysqli_driver.php 307
+ERROR - 2023-10-16 20:32:22 --> Severity: error --> Exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '1'(,|$)'' at line 5 C:\xampp\htdocs\sync-crm\system\database\drivers\mysqli\mysqli_driver.php 307
+ERROR - 2023-10-16 20:32:54 --> Severity: error --> Exception: count(): Argument #1 ($value) must be of type Countable|array, int given C:\xampp\htdocs\sync-crm\application\helpers\admin_helper.php 288
+ERROR - 2023-10-16 20:33:14 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:33:21 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:34:05 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:34:33 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:34:38 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:36:27 --> Severity: error --> Exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''' at line 6 C:\xampp\htdocs\sync-crm\system\database\drivers\mysqli\mysqli_driver.php 307
+ERROR - 2023-10-16 20:37:12 --> Severity: error --> Exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '\'1\'\''' at line 8 C:\xampp\htdocs\sync-crm\system\database\drivers\mysqli\mysqli_driver.php 307
+ERROR - 2023-10-16 20:37:35 --> Severity: error --> Exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '1\''' at line 8 C:\xampp\htdocs\sync-crm\system\database\drivers\mysqli\mysqli_driver.php 307
+ERROR - 2023-10-16 20:37:52 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:37:54 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:40:08 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:40:15 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 20:40:16 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 21:01:57 --> Severity: error --> Exception: Too few arguments to function App_scripts::add(), 1 passed in C:\xampp\htdocs\sync-crm\application\helpers\assets_helper.php on line 75 and at least 2 expected C:\xampp\htdocs\sync-crm\application\libraries\assets\App_scripts.php 9
+ERROR - 2023-10-16 21:21:10 --> Severity: error --> Exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '1' at line 3 C:\xampp\htdocs\sync-crm\system\database\drivers\mysqli\mysqli_driver.php 307
+ERROR - 2023-10-16 21:21:44 --> Severity: error --> Exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '1' at line 3 C:\xampp\htdocs\sync-crm\system\database\drivers\mysqli\mysqli_driver.php 307
+ERROR - 2023-10-16 21:23:29 --> Severity: error --> Exception: Unknown column 'title' in 'field list' C:\xampp\htdocs\sync-crm\system\database\drivers\mysqli\mysqli_driver.php 307
+ERROR - 2023-10-16 21:39:59 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 21:40:27 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 21:40:43 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72
+ERROR - 2023-10-16 21:40:45 --> Severity: Warning --> Array to string conversion C:\xampp\htdocs\sync-crm\application\views\admin\management\kudos.php 72

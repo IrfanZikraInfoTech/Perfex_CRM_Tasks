@@ -72,6 +72,10 @@ function _init_admin_assets()
     // CSS
     add_favicon_link_asset();
 
+    $CI->app_scripts->add('tree-js', 'assets/plugins/tree/tree-maker.js');
+    $CI->app_css->add('tree-css', 'assets/plugins/tree/main.css');
+
+
     $CI->app_css->add('reset-css', 'assets/css/reset.min.css');
     $CI->app_css->add('inter-font', 'https://rsms.me/inter/inter.css', 'admin', ['reset-css']);
     $CI->app_css->add('vendor-css', 'assets/builds/vendor-admin.css', 'admin', ['reset-css']);

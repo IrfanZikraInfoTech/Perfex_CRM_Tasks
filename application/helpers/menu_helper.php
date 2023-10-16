@@ -175,7 +175,7 @@ function app_init_admin_sidebar_menu_items()
     if(has_staff_under()){
 
         $applicationsCounter = get_pending_applications_counter();
-
+        $applicationsCounter = ($applicationsCounter > 9) ? '9+' : $applicationsCounter;
         $applicationsHTML = ($applicationsCounter) ? '<div class="flex flex-row justify-between"><div>Applications</div><div class="px-1 rounded-full bg-white text-black">'.$applicationsCounter.'</div></div>' : 'Applications';
     
         $CI->app_menu->add_sidebar_children_item('team_management', [
@@ -196,7 +196,8 @@ function app_init_admin_sidebar_menu_items()
         'icon'     => 'fa fa-user-clock', // Font awesome icon
     ]);
 
-    $kudosCounter = 2;
+    $kudosCounter = get_unseen_kudos_counter();
+    $kudosCounter = ($kudosCounter > 9) ? '9+' : $kudosCounter;
     $kudosHTML = ($kudosCounter) ? '<div class="flex flex-row justify-between"><div>Kudos System</div><div class="px-1 rounded-full bg-white text-black">'.$kudosCounter.'</div></div>' : 'Kudos System';
 
     $CI->app_menu->add_sidebar_children_item('team_management', [
@@ -218,6 +219,26 @@ function app_init_admin_sidebar_menu_items()
             'href'     => admin_url('team_management/staff_shifts'), // URL of the item
             'position' => 2, // The menu position
             'icon'     => 'fa fa-user-clock', // Font awesome icon
+        ]);
+    }
+
+    if (has_permission('team_management', '', 'admin')) {
+
+        
+        $CI->app_menu->add_sidebar_children_item('team_management', [
+            'slug'     => 'attendance_board', // Required ID/slug UNIQUE for the child menu
+            'name'     => 'Attendance', // The name if the item
+            'href'     => admin_url('team_management/attendance_board'), // URL of the item
+            'position' => 0, // The menu position
+            'icon'     => 'fa fa-calendar', // Font awesome icon
+        ]);
+ 
+        $CI->app_menu->add_sidebar_children_item('team_management', [
+            'slug'     => 'kpi_board', // Required ID/slug UNIQUE for the child menu
+            'name'     => 'KPI Board', // The name if the item
+            'href'     => admin_url('team_management/kpi_board'), // URL of the item
+            'position' => 2, // The menu position
+            'icon'     => 'fa fa-chart-bar', // Font awesome icon
         ]);
     }
 

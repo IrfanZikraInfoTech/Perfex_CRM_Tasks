@@ -277,6 +277,17 @@ function get_pending_applications_counter() {
     return count($applications);
 }
 
+function get_unseen_kudos_counter() {
+    $CI = &get_instance();
+    $CI->load->model('team_management_model');
+
+    $staff_id = get_staff_user_id();
+
+    $count = $CI->team_management_model->unseen_kudos_count($staff_id);
+
+    return ($count);
+}
+
 /**
  * @since  2.3.3
  * Check whether a role has specific permission applied
