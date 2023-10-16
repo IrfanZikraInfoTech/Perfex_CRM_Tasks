@@ -265,6 +265,18 @@ function has_staff_under(){
     }
 }
 
+function get_pending_applications_counter() {
+    $CI = &get_instance();
+    $CI->load->model('team_management_model');
+
+    $staff_id = get_staff_user_id();
+
+    $staff_under = get_staff_under($staff_id);
+    $applications = $CI->team_management_model->get_all_applications('pending', $staff_under);
+
+    return count($applications);
+}
+
 /**
  * @since  2.3.3
  * Check whether a role has specific permission applied

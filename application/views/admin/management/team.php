@@ -1,18 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); 
 
-function convertSecondsToRoundedTime($seconds)
-{
-    $hours = floor($seconds / 3600);
-    $minutes = round(($seconds % 3600) / 60);
-
-    if ($hours > 0) {
-        return "{$hours}h {$minutes}m";
-    } else {
-        return "{$minutes}m";
-    }
-}
-
 ?>
 <div id="wrapper">
 

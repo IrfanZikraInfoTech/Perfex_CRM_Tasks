@@ -395,7 +395,7 @@ function interpolateColor($from, $to, $percent) {
         </div>
         <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all overflow-hidden">
 
-        <div class="p-6 mt-6 bg-sky-100 min-h-[300px] rounded-[50px]"> 
+        <div class="p-6 mt-6 bg-sky-100 rounded-[50px]"> 
 
             <h2 class="text-xl font-bold mb-4 text-center text-uppercase">All Tasks</h2>
             <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 hover:border-yellow-400 shadow-inner rounded-[50px] transition-all  p-6">

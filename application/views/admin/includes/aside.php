@@ -37,9 +37,9 @@
             <ul class="nav nav-second-level collapse" aria-expanded="false">
                 <?php foreach ($item['children'] as $submenu) {
                             ?>
-                <li class="sub-menu-item-<?php echo $submenu['slug']; ?>"
+                <li class="group sub-menu-item-<?php echo $submenu['slug']; ?>"
                     <?php echo _attributes_to_string(isset($submenu['li_attributes']) ? $submenu['li_attributes'] : []); ?>>
-                    <a href="<?php echo $submenu['href']; ?>"
+                    <a <?= (isset($submenu['is_noti'] ) && $submenu['is_noti']) ? 'class="w-full group-[.active]:w-[80%] !pr-2"' : '' ?> href="<?php echo $submenu['href']; ?>"
                         <?php echo _attributes_to_string(isset($submenu['href_attributes']) ? $submenu['href_attributes'] : []); ?>>
                         <?php if (!empty($submenu['icon'])) { ?>
                         <i class="<?php echo $submenu['icon']; ?> menu-icon"></i>

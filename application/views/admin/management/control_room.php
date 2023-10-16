@@ -345,7 +345,7 @@ function fetchStats() {
     });
 }
 
-clockInBtn.click(function() {
+$("#clock-in").click(function() {
     $.ajax({
         type: 'POST',
         url: admin_url + 'team_management/clock_in/',
@@ -366,7 +366,7 @@ clockInBtn.click(function() {
     });
 });
 
-clockOutBtn.click(function() {
+$("#clock-out").click(function() {
     $.ajax({
         type: 'POST',
         url: admin_url + 'team_management/clock_out/',
@@ -385,26 +385,25 @@ clockOutBtn.click(function() {
     });
 });
 
-statusSelect.change(function(event) {
-    var statusText = statusSelect.val();
-    
-    if (statusText != previousValue) {
-        $.ajax({
-            type: 'POST',
-            url: admin_url + 'team_management/update_status',
-            data: {
-                statusValue: statusText,
-                staff_id: "<?= $staff_id ?>"
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (!response.success) {
-                    alert('Unable to update status. Please try again.');
-                }
-                fetchStats();
+$("#status").change(function(event) {
+    var statusText = $("#status").val();
+ 
+    $.ajax({
+        type: 'POST',
+        url: admin_url + 'team_management/update_status',
+        data: {
+            statusValue: statusText,
+            staff_id: "<?= $staff_id ?>"
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (!response.success) {
+                alert('Unable to update status. Please try again.');
             }
-        });
-    }
+            fetchStats();
+        }
+    });
+    
 });
 
 

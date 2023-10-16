@@ -459,7 +459,30 @@ function changeStatusToOffline() {
     var requestData = csrf_token_name + '=' + encodeURIComponent(csrf_token) + '&statusValue=' + encodeURIComponent(statusText);
     xhr.send(requestData);
 }
+function updateAttendanceStatus(){
+    $.ajax({
+        type: 'GET',
+        url: admin_url + 'team_management/get_attendance_status',
+        dataType: 'json',
+        success: function(response) {
+            $("#attendanceStatus").removeClass("text-green-500");
+            $("#attendanceStatus").removeClass("text-gray-500");
+            $("#attendanceStatus").removeClass("text-red-500");
 
+            if(response.status == "absent"){
+                $("#attendanceStatus").addClass("text-gray-500");
+                $("#attendanceStatus").html("Absent");
+            }else if(response.status == "present"){
+                $("#attendanceStatus").addClass("text-green-500");
+                $("#attendanceStatus").html("Present");
+            }
+            else if(response.status == "late"){
+                $("#attendanceStatus").addClass("text-red-500");
+                $("#attendanceStatus").html("Late");
+            }
+        }
+    });
+}
 
 $('#clock-in').click(function() {
     Swal.fire({
@@ -481,6 +504,7 @@ $('#clock-in').click(function() {
                 Swal.fire('Success!', 'Successfully clocked in.', 'success');
                 clockedIn = true;
                 fetchStats();
+                updateAttendanceStatus();
                 $('#clockInBtn').prop('disabled', true);
                 timerInterval = setInterval(updateLiveTimer, 1000);
             } else {
@@ -651,6 +675,7 @@ updateClocks();
 setInterval(updateClocks, 1000);
 getOrSaveStaffSummary();
 fetchStats();
+updateAttendanceStatus();
 
 function statusSelectColors(element){
     element.classList.remove('text-lime-500');
@@ -675,6 +700,10 @@ function getOrSaveStaffSummary(summary = null) {
     var csrf_token_name = csrfData.token_name;
     var csrf_token = csrfData.hash;
     var date = document.getElementById("summary_date").value;
+    if(summary){
+        alert_float("info", "Summary saving!");
+    }
+   
 
     $.ajax({
         url: admin_url + 'team_management/staff_summary',

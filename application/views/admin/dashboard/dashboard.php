@@ -49,7 +49,7 @@
     border-radius:30px;
 }
 .not-seen {
-    background-color: #CCE5F1;
+    background-color: #fffcca;
 }
 </style>
 
@@ -89,20 +89,20 @@
                                 <!-- Attendance Status -->
                                 <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
                                     <span class="text-gray-600">Status:</span>
-                                    <span class="text-green-500 font-bold">Present</span>
+                                    <span id="attendanceStatus" class="text-gray-500 font-bold">-</span>
 
                                 </div>
 
                                 <!-- Punctuality Rate -->
                                 <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
                                     <span class="text-gray-600">Rate:</span>
-                                    <span class="font-semibold">95%</span>
+                                    <span class="font-semibold"><?= round($puctuality_rate,2); ?>%</span>
                                 </div>
 
                                 <!-- Current Month -->
                                 <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
                                     <span class="text-gray-600">Current Month:</span>
-                                    <span class="font-semibold">October</span>
+                                    <span class="font-semibold"><?= date("F") ?></span>
                                     <!-- Replace 'October' with the current month -->
                                 </div>
 
@@ -236,15 +236,15 @@
                         <!-- Row for Summary heading and Date Picker -->
                         <div class="flex justify-between items-center mb-4">
                             <div class="uppercase tracking-wide text-xl text-gray-700 font-bold text-center w-full">Summary</div>
-                            <input type="date" id="summary_date" class="rounded p-2 mr-4" onchange="getOrSaveStaffSummary();">
+                            <input type="date" value="<?=date("Y-m-d")?>" id="summary_date" class="rounded p-2 mr-4" onchange="getOrSaveStaffSummary();">
                         </div>
 
-                        <div class="flex flex-row bg-sky-100 min-h-[300px] rounded-[50px]">
+                        <div class="flex flex-row p-4 bg-sky-100 min-h-[300px] rounded-[50px]">
                             <!-- Left Box with dummy summary -->
                             
                             <div class="w-1/2 p-4">
                                     <!-- <h4><b>DUMMY SUMMARY </b></h4> -->
-                                    <textarea class="w-full h-full transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-hidden text-lg border border-gray-200 border-solid hover:border-yellow-400" readonly >DUMMY SUMMARY: Today I worked on the QCA Newsletter Design, followed up with the team for the October 2023 plan for recurring marketing projects, and connected with Ansar to discuss the new scrum workflow.</textarea>
+                                    <textarea class="w-full h-full transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-hidden text-lg border border-gray-200 border-solid hover:border-yellow-400" readonly ><?= get_option('dummy_summary'); ?></textarea>
                             </div>
                             
                             
@@ -452,7 +452,7 @@
 
 
 <!-- MODAL CODE -->
-<div id="postModal" class="hidden fixed inset-0 flex items-center justify-center z-50">
+<div id="postModal" class="hidden fixed inset-0 flex items-center justify-center z-[1000]">
     <div class="bg-gray-800 bg-opacity-70 absolute inset-0"></div>
 
     <div class="relative bg-gray-900 p-8 max-w-2xl w-full mx-4 rounded-lg shadow-xl z-10 overflow-y-auto">  
@@ -463,7 +463,7 @@
         
         <div class="text-gray-500 mb-5" id="modalDate"></div>
         
-        <div class="text-md mb-3 text-gray-200" id="modalContent"></div>
+        <div class="text-md mb-3 text-gray-200 overflow-y-scroll max-h-[65vh] myscrollbar" id="modalContent"></div>
         
         <div class="flex justify-between items-center">
             <button id="likeButton" class="text-lg btnlike flex items-center mb-2 p-2 rounded-full focus:outline-none" data-postid="<?= $post["postid"] ?>" onclick="likes(this)">
@@ -545,7 +545,7 @@ function openPostModal(postElement) {
     document.getElementById('modalCreatorName').innerText = creatorName;
     document.getElementById('modalTime').innerText = timeString;
     document.getElementById('modalDate').innerText = dateCreated;
-    document.getElementById('modalContent').innerText = content;
+    document.getElementById('modalContent').innerHTML = content;
 
     document.getElementById('postModal').classList.remove('hidden');
 }
@@ -579,99 +579,6 @@ function markPostAsSeen(postId) {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
 
-<script>
-    var dailyStats = <?php echo json_encode($daily_stats); ?>;
-
-    function fetchDailyInfos(staff_id) {
-        let data = dailyStats;
-
-        const today = new Date();
-        let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
-        let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
-        console.log(data);
-        // AFK entries filter
-        const afk_entries = data.afk_and_offline.filter(entry => entry.status === 'AFK');
-
-        var items = new vis.DataSet();
-        var options = {
-        zoomMin: 1000 * 60 * 60,
-        zoomMax: 1000 * 60 * 60 * 24,
-
-        format: {
-            minorLabels: function(date, scale, step) {
-            return moment(date).format('hh:mm A');
-            },
-            majorLabels: function(date, scale, step) {
-            return moment(date).format('MMM DD YYYY');
-            }
-        }
-        };
-        var container = document.getElementById('visualization');
-        if (container) {
-        var timeline = new vis.Timeline(container, items, options);
-
-        } else {
-        console.error("Timeline container not found");
-        return;
-        }
-
-        // Clock-in aur Clock-out times ko timeline mein add karte hain
-        if (data.clock_ins_outs) {
-            data.clock_ins_outs.forEach(clock => {
-                const inTime = new Date(clock.clock_in).toISOString();
-                const outTime = new Date(clock.clock_out).toISOString();
-
-                // Setting startDate and endDate based on clock-in and clock-out times
-                if (new Date(inTime) < startDate) {
-                    startDate = new Date(inTime);
-                }
-                if (new Date(outTime) > endDate) {
-                    endDate = new Date(outTime);
-                }
-
-                items.add({
-                    content: 'Clock in',
-                    start: inTime,
-                    end: outTime,
-                    type: 'range',
-                    className: 'clock-in-time',
-                    group: 2
-                });
-            });
-        }
-<<<<<<< Updated upstream
-        if (shiftEnd > endDate) {
-            endDate = shiftEnd;
-        }
-    });
-}
-
-    // AFK timings ko timeline mein add karte hain
-    if (afk_entries) {
-      afk_entries.forEach(function (entry) {
-        const startDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.start_time}`, "YYYY-MM-DD hh:mm A").toDate();
-        const endDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.end_time}`, "YYYY-MM-DD hh:mm A").toDate();
-
-        items.add({
-          content: 'AFK',
-          start: startDateTime,
-          end: endDateTime,
-          type: 'range',
-          className: 'afk-time',
-          group: 1
-        });
-      });
-    } else {
-      console.warn("afk_entries is not available");
-    }
-
-    // Setting the timeline to focus on our startDate to endDate
-    timeline.setWindow(startDate, endDate);
-}
-
-
-</script>
-
 
 <script>
 
@@ -763,251 +670,6 @@ var timeline = new vis.Timeline(container, items, options);
 // Setting the timeline to focus on our startDate to endDate
 timeline.setWindow(startDate, endDate);
 timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
-=======
-        if (data.shift_timings && data.shift_timings.length > 0) {
-        data.shift_timings.forEach(shift => {
-            const shiftStart = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_start}`);
-            const shiftEnd = new Date(`${shift.year}-${shift.month}-${shift.day} ${shift.shift_end}`);
-
-            items.add({
-                content: 'Shift',
-                start: shiftStart,
-                end: shiftEnd,
-                type: 'range',
-                className: 'shift-time',
-                group: 3  // Group 3 for shifts. You can adjust as needed.
-            });
-
-            // Setting startDate and endDate based on shift timings
-            if (shiftStart < startDate) {
-                startDate = shiftStart;
-            }
-            if (shiftEnd > endDate) {
-                endDate = shiftEnd;
-            }
-        });
-    }
-
-        // AFK timings ko timeline mein add karte hain
-        if (afk_entries) {
-        afk_entries.forEach(function (entry) {
-            const startDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.start_time}`, "YYYY-MM-DD hh:mm A").toDate();
-            const endDateTime = moment(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${entry.end_time}`, "YYYY-MM-DD hh:mm A").toDate();
-
-            items.add({
-            content: 'AFK',
-            start: startDateTime,
-            end: endDateTime,
-            type: 'range',
-            className: 'afk-time',
-            group: 1
-            });
-        });
-        } else {
-        console.warn("afk_entries is not available");
-        }
-
-        // Setting the timeline to focus on our startDate to endDate
-        timeline.setWindow(startDate, endDate);
-    }
-
->>>>>>> Stashed changes
-
-</script>
-
-
-<script>
-
-    
-function getCurrentTimeInAsiaKolkata() {
-    const now = new Date();
-    const timeZone = 'Asia/Kolkata';
-    const localTimeString = now.toLocaleString('en-US', { timeZone });
-  
-    return new Date(localTimeString);
-}
-    
-var shift_timings = <?php echo json_encode($shift_timings); ?>;
-var afk_offline_entries = <?php echo json_encode($afk_offline_entries); ?>;
-var clock_in_entries = <?php echo json_encode($clock_in_entries); ?>;
-
-    function fetchDailyInfos() {
-        let data = dailyStats;
-
-        const today = new Date();
-        let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
-        let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
-        console.log(data);
-        // AFK entries filter
-        const afk_entries = data.afk_and_offline.filter(entry => entry.status === 'AFK');
-const today = new Date();
-let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
-let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
-
-        var items = new vis.DataSet();
-        var options = {
-            zoomMin: 1000 * 60 * 60, // one hour in milliseconds
-            zoomMax: 1000 * 60 * 60 * 24 * 31, // 31 days in milliseconds
-            height: "180px"
-        };
-var items = new vis.DataSet();
-var options = {
-    zoomMin: 1000 * 60 * 60, // one hour in milliseconds
-    zoomMax: 1000 * 60 * 60 * 24 * 31, // 31 days in milliseconds
-    height: "180px"
-};
-
-        // Clock-in aur Clock-out times ko timeline mein add karte hain
-        if (data.clock_ins_outs) {
-            data.clock_ins_outs.forEach(clock => {
-                const inTime = new Date(clock.clock_in).toISOString();
-                const outTime = new Date(clock.clock_out).toISOString();
-
-                // Setting startDate and endDate based on clock-in and clock-out times
-                if (new Date(inTime) < startDate) {
-                    startDate = new Date(inTime);
-                }
-                if (new Date(outTime) > endDate) {
-                    endDate = new Date(outTime);
-                }
-
-                items.add({
-                    content: 'Clock in',
-                    start: inTime,
-                    end: outTime,
-                    type: 'range',
-                    className: 'clock-in-time',
-                    group: 2
-                });
-            });
-        }
-        if (data.shift_timings && data.shift_timings.length > 0) {
-            data.shift_timings.forEach(shift => {
-                const shiftStart = new Date(`${shift.Year}-${shift.month}-${shift.day} ${shift.shift_start_time}`).toISOString();;
-                const shiftEnd = new Date(`${shift.Year}-${shift.month}-${shift.day} ${shift.shift_end_time}`).toISOString();;
-clock_in_entries.forEach(clock => {
-    const inTime = new Date(clock.clock_in).toISOString();
-    const outTime = new Date(clock.clock_out).toISOString();
-    // Setting startDate and endDate based on clock-in and clock-out times
-    if (new Date(inTime) < startDate) {
-        startDate = new Date(inTime);
-    }
-    if (new Date(outTime) > endDate) {
-        endDate = new Date(outTime);
-    }
-    items.add({
-        content: 'Clock in',
-        start: inTime,
-        end: outTime,
-        type: 'range',
-        className: 'clock-in-time',
-        group: 2
-    });
-});
-
-for(let shiftKey in shift_timings) {
-    let shift = shift_timings[shiftKey];
-    let shiftStart = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${shift.start}`).toISOString();
-    let shiftEnd = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${shift.end}`).toISOString();
-
-                console.log(shiftStart);
-                
-                items.add({
-                    content: 'Shift',
-                    start: shiftStart,
-                    end: shiftEnd,
-                    type: 'range',
-                    className: 'shift-time',
-                    group: 3  // Group 3 for shifts. You can adjust as needed.
-                });
-
-            });
-        }
-    // If shift ends before it starts, add one day to the end date
-    if(shift.end < shift.start) {
-        let endDateTime = new Date(shiftEnd);
-        endDateTime.setDate(endDateTime.getDate() + 1);
-        shiftEnd = endDateTime.toISOString();
-    }
-
-    items.add({
-        content: 'Shift',
-        start: shiftStart,
-        end: shiftEnd,
-        type: 'range',
-        className: 'shift-time',
-        group: 3  // Group 3 for shifts. You can adjust as needed.
-    });
-}
-
-        // AFK timings ko timeline mein add karte hain
-        if (afk_entries) {
-        afk_entries.forEach(function (entry) {
-
-            const start24HourTime = convertTo24Hour(entry.start_time);
-            const end24HourTime = convertTo24Hour(entry.end_time);
-
-            const startDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${start24HourTime}`).toISOString();;
-            const endDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${end24HourTime}`).toISOString();;
-
-            items.add({
-            content: 'AFK',
-            start: startDateTime,
-            end: endDateTime,
-            type: 'range',
-            className: 'afk-time',
-            group: 1
-            });
-        });
-        } else {
-        console.warn("afk_entries is not available");
-        }
-afk_offline_entries.forEach(function (entry) {
-  const start24HourTime = entry.start_time;
-  const end24HourTime = entry.end_time;
-  const startDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${start24HourTime}`).toISOString();;
-  const endDateTime = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${end24HourTime}`).toISOString();;
-  items.add({
-    content: entry.status,
-    start: startDateTime,
-    end: endDateTime,
-    type: 'range',
-    className: 'afk-time',
-    group: 1
-  });
-});
-
-        var container = document.getElementById('visualization');
-        if (container) {
-        var timeline = new vis.Timeline(container, items, options);
-var container = document.getElementById('visualization');
-var timeline = new vis.Timeline(container, items, options);
-
-        } else {
-        console.error("Timeline container not found");
-        return;
-        }
-
-        // Setting the timeline to focus on our startDate to endDate
-        timeline.setWindow(startDate, endDate);
-        timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
-    }
-
-    // Convert 12-hour time format to 24-hour time format
-    function convertTo24Hour(time) {
-        const [hourMin, period] = time.split(' ');
-        let [hour, minute] = hourMin.split(':');
-        hour = +hour;
-        if (period === "PM" && hour !== 12) hour += 12;
-        if (period === "AM" && hour === 12) hour -= 12;
-        return `${hour.toString().padStart(2, '0')}:${minute}`;
-    }
-
-    fetchDailyInfos();
-// Setting the timeline to focus on our startDate to endDate
-timeline.setWindow(startDate, endDate);
-timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
-
 </script>
 
 <?php init_tail(); ?>

@@ -120,7 +120,11 @@ class Dashboard extends AdminController
         $data['shift_timings'] = $shift_timings;
         $data['afk_offline_entries'] = $this->team_management_model->get_afk_and_offline_entries($staff_id, $date);
         $data['clock_in_entries'] = $this->team_management_model->get_staff_time_entries($staff_id, $date);
-        
+
+        $this->load->library('kpi_system');
+
+        $data['puctuality_rate'] = $this->kpi_system->kpi_punctuality_rate($staff_id, date("Y-m-01"), date("Y-m-d"))['on_time_percentage'];
+
         $this->load->view('admin/dashboard/dashboard', $data);
     }
 

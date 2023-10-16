@@ -12,13 +12,18 @@
                 <a href="<?php echo admin_url('profile'); ?>">
                     <?php echo staff_profile_image($current_user->staffid, ['staff-profile-image-small']); ?>
                     <?php echo $current_user->firstname . ' ' . $current_user->lastname ; ?></a>
-                <textarea name="content" id="post" rows="5" class="form-control"
-                    placeholder="<?php echo _l('whats_on_your_mind'); ?>"></textarea>
+                    
+                    <div class="mt-4">
+                        <?php echo render_textarea('content', '', '', [], [], '', 'tinymce'); ?>
+                    </div>
+
                 <hr />
+
                 <button type="submit" class="btn btn-primary pull-right"><?php echo _l('new_post'); ?></button>
-                <a href="#" class="btn btn-default add-post-attachments"><i data-toggle="tooltip"
+
+                <a href="#" class="hidden btn btn-default add-post-attachments"><i data-toggle="tooltip"
                         title="<?php echo _l('newsfeed_upload_tooltip'); ?>" class="fa-solid fa-file"></i></a>
-                <select id="post-visibility" class="selectpicker" multiple name="visibility[]" data-width="60%"
+                <select id="post-visibility" class="hidden selectpicker" multiple name="visibility[]" data-width="60%"
                     data-none-selected-text="<?php echo _l('newsfeed_all_departments'); ?>">
 
                     <?php foreach ($departments as $department) { ?>
@@ -35,3 +40,13 @@
         <div id="newsfeed_data"></div>
     </div>
 </div>
+
+<script>
+
+tinymce.init({
+  selector: '.tinymce',
+  plugins: "textcolor",
+  toolbar: "forecolor backcolor preview ",
+  height: '300px'
+});
+</script>

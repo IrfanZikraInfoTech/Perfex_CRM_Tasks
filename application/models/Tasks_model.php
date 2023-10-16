@@ -33,6 +33,7 @@ class Tasks_model extends App_Model
         $this->db->join('tbltask_assigned', 'tbltasks.id = tbltask_assigned.taskid');
         $this->db->where('tbltask_assigned.staffid', $staff_id);
         $this->db->group_by('tbltasks.id');
+        $this->db->order_by('tbltasks.startdate');
         $query = $this->db->get();
 
         return $query->result();

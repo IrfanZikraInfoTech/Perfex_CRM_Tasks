@@ -151,9 +151,11 @@ function app_init_admin_sidebar_menu_items()
         'icon'     => 'fa fa-user-friends', // Font awesome icon
     ]);
 
+    $name = (has_permission('team_management', '', 'admin')) ? 'Staff Dashboard' : 'My Dashboard';
+
     $CI->app_menu->add_sidebar_children_item('team_management', [
         'slug'     => 'my_dashboard', // Required ID/slug UNIQUE for the child menu
-        'name'     => 'My Dashboard', // The name if the item
+        'name'     => $name, // The name if the item
         'href'     => admin_url('team_management/individual_dashboard'), // URL of the item
         'position' => 2, // The menu position
         'icon'     => 'fa fa-user', // Font awesome icon
@@ -169,12 +171,17 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
     
-
+    
     if(has_staff_under()){
+
+        $applicationsCounter = get_pending_applications_counter();
+
+        $applicationsHTML = ($applicationsCounter) ? '<div class="flex flex-row justify-between"><div>Applications</div><div class="px-1 rounded-full bg-white text-black">'.$applicationsCounter.'</div></div>' : 'Applications';
     
         $CI->app_menu->add_sidebar_children_item('team_management', [
             'slug'     => 'all_applications', // Required ID/slug UNIQUE for the child menu
-            'name'     => 'Staff Applications', // The name if the item
+            'name'     => $applicationsHTML, // The name if the item
+            'is_noti' => ($applicationsCounter) ? true : false,
             'href'     => admin_url('team_management/all_applications'), // URL of the item
             'position' => 2, // The menu position
             'icon'     => 'fa fa-address-book', // Font awesome icon
@@ -183,12 +190,23 @@ function app_init_admin_sidebar_menu_items()
 
     $CI->app_menu->add_sidebar_children_item('team_management', [
         'slug'     => 'management_projects', // Required ID/slug UNIQUE for the child menu
-        'name'     => 'Projects', // The name if the item
+        'name'     => 'Projects Dashboard', // The name if the item
         'href'     => admin_url('team_management/projects'), // URL of the item
         'position' => 2, // The menu position
         'icon'     => 'fa fa-user-clock', // Font awesome icon
     ]);
 
+    $kudosCounter = 2;
+    $kudosHTML = ($kudosCounter) ? '<div class="flex flex-row justify-between"><div>Kudos System</div><div class="px-1 rounded-full bg-white text-black">'.$kudosCounter.'</div></div>' : 'Kudos System';
+
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'kudos_system', // Required ID/slug UNIQUE for the child menu
+        'name'     => $kudosHTML, // The name if the item
+        'is_noti' => ($kudosCounter) ? true : false,
+        'href'     => admin_url('team_management/kudos'), // URL of the item
+        'position' => 2, // The menu position
+        'icon'     => 'fa fa-thumbs-up', // Font awesome icon
+    ]);
     
 
     if (has_permission('team_management', '', 'admin')) {
@@ -203,13 +221,7 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 
-    $CI->app_menu->add_sidebar_children_item('team_management', [
-        'slug'     => 'kudos_system', // Required ID/slug UNIQUE for the child menu
-        'name'     => 'Kudos System', // The name if the item
-        'href'     => admin_url('team_management/kudos'), // URL of the item
-        'position' => 2, // The menu position
-        'icon'     => 'fa fa-thumbs-up', // Font awesome icon
-    ]);
+    
 
     $CI->app_menu->add_sidebar_menu_item('projects', [
         'name'     => _l('projects'),

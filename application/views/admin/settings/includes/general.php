@@ -82,6 +82,8 @@
 
 		<?php echo render_input('settings[gaz_leaves]','Gazetted Leaves',get_option('gaz_leaves'), 'number'); ?>
 
+		<?php echo render_textarea('settings[dummy_summary]','Dummy Summary',get_option('dummy_summary')); ?>
+
 		
 	</div>
 </div>

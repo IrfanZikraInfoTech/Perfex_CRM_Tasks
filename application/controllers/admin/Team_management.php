@@ -14,6 +14,8 @@ class Team_management extends AdminController {
         $this->load->model('projects_model');
         $this->load->library('webhook_library', null, 'webhook_lib');
 
+        $this->load->library('kpi_system');
+
         //hooks()->add_action('task_assignee_added', 'notify_task_allocation');
     }
 
@@ -68,13 +70,13 @@ class Team_management extends AdminController {
         $data['from'] = $from;
         $data['to'] = $to;
 
-        $data['punctuality_rate'] = $this->kpi_punctuality_rate($staff_id, $from, $to);
-        $data['task_rates'] = $this->kpi_task_rates($staff_id, $from, $to);
+        $data['punctuality_rate'] = $this->kpi_system->kpi_punctuality_rate($staff_id, $from, $to);
+        $data['task_rates'] = $this->kpi_system->kpi_task_rates($staff_id, $from, $to);
 
-        $data['summary_adherence_rate'] = $this->kpi_summary_adherence_rate($staff_id, $from, $to);
+        $data['summary_adherence_rate'] = $this->kpi_system->kpi_summary_adherence_rate($staff_id, $from, $to);
         
-        $data['afk_adherence_rate'] = $this->kpi_afk_adherence_rate($staff_id, $from, $to);
-        $data['shift_productivity_rate'] = $this->kpi_shift_productivity_rate($staff_id, $from, $to);
+        $data['afk_adherence_rate'] = $this->kpi_system->kpi_afk_adherence_rate($staff_id, $from, $to);
+        $data['shift_productivity_rate'] = $this->kpi_system->kpi_shift_productivity_rate($staff_id, $from, $to);
         
         if($from == $to){
 
@@ -96,16 +98,252 @@ class Team_management extends AdminController {
                 $story->project_name = id_to_name($story->rel_id, 'tblprojects', 'id', 'name');
             }
 
-            $dueDate = new DateTime($story->duedate);
+            $dueDate = ($story->duedate) ? new DateTime($story->duedate) : new DateTime($story->startdate);
             $completedDate = $story->datefinished ? new DateTime($story->datefinished) : new DateTime();
             $interval = $dueDate->diff($completedDate);
             $story->late = ($completedDate > $dueDate) ? $interval->days . " days" : "On Time";
             
         }
         
-        $data['ops'] = (0.2 * $data['task_rates']['completion_rate']) + (0.1 * $data['shift_productivity_rate']['percentage']) + (0.15 * $data['summary_adherence_rate']['percentage']) + (0.2 * $data['punctuality_rate']['on_time_percentage']) + (0.15 * $data['task_rates']['timer_adherence_rate']) + (0.1 * $data['afk_adherence_rate']['percentage']) + (0.1 * $data['task_rates']['efficiency_rate']);
+        $data['ops'] = $this->kpi_system->calculate_ops(
+            $data['task_rates']['completion_rate'],
+            $data['shift_productivity_rate']['percentage'],
+            $data['summary_adherence_rate']['percentage'],
+            $data['punctuality_rate']['on_time_percentage'],
+            $data['task_rates']['timer_adherence_rate'],
+            $data['afk_adherence_rate']['percentage'],
+            $data['task_rates']['efficiency_rate']
+        );
 
         $this->load->view('admin/management/individual_dashboard', $data);
+    }
+
+    
+
+    public function kpi_board($from = null, $to = null){
+        $from = $from ?? date("Y-m-d");
+        $to = $to ?? date("Y-m-d");
+
+        $data['from'] = $from;
+        $data['to'] = $to;
+
+        $start_date = new DateTime($from);
+        $end_date = new DateTime($to);
+        $end_date->add(new DateInterval('P1D'));
+        $interval = new DateInterval('P1D');
+        $date_range = new DatePeriod($start_date, $interval, $end_date);
+        
+        
+
+        $data['kpi_data'] = [];
+        foreach ($date_range as $date) {
+            $formatted_date = $date->format('Y-m-d');
+            $data['kpi_data'][] = $formatted_date;
+        }
+
+        $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+
+        $staff_ops_data = [];
+
+        foreach ($staffs as $staff) {
+            $staff_id = $staff->staffid;
+
+            // Fetch KPIs for the staff member for the given date range
+            $punctuality_rate = $this->kpi_system->kpi_punctuality_rate($staff_id, $from, $to);
+            $task_rates = $this->kpi_system->kpi_task_rates($staff_id, $from, $to);
+            $summary_adherence_rate = $this->kpi_system->kpi_summary_adherence_rate($staff_id, $from, $to);
+            $afk_adherence_rate = $this->kpi_system->kpi_afk_adherence_rate($staff_id, $from, $to);
+            $shift_productivity_rate = $this->kpi_system->kpi_shift_productivity_rate($staff_id, $from, $to);
+
+            // Calculate OPS for the staff member
+            $ops = $this->kpi_system->calculate_ops(
+                $task_rates['completion_rate'],
+                $shift_productivity_rate['percentage'],
+                $summary_adherence_rate['percentage'],
+                $punctuality_rate['on_time_percentage'],
+                $task_rates['timer_adherence_rate'],
+                $afk_adherence_rate['percentage'],
+                $task_rates['efficiency_rate']
+            );
+
+            // Store the OPS in the array
+            $staff_ops_data[$staff_id] = [
+                'name' => $staff->firstname . ' ' . $staff->lastname,
+                'ops' => $ops
+            ];
+        }
+
+        // Pass the OPS data to the view
+        $data['staff_ops_data'] = $staff_ops_data;
+
+
+        $this->load->view('admin/management/kpi_board', $data);
+    }
+
+    public function fetch_kpi_for_date() {
+        $date = $this->input->post('date');
+        $staffs = $this->db->select('staffid, firstname, lastname')->get('tblstaff')->result();
+    
+        $data = [];
+        foreach ($staffs as $staff) {
+            $staff_id = $staff->staffid;
+            
+            $punctuality_rate = $this->kpi_system->kpi_punctuality_rate($staff_id, $date);
+            $task_rates = $this->kpi_system->kpi_task_rates($staff_id, $date);
+            $summary_adherence_rate = $this->kpi_system->kpi_summary_adherence_rate($staff_id, $date);
+            $afk_adherence_rate = $this->kpi_system->kpi_afk_adherence_rate($staff_id, $date);
+            $shift_productivity_rate = $this->kpi_system->kpi_shift_productivity_rate($staff_id, $date);
+    
+            $ops = $this->kpi_system->calculate_ops(
+                $task_rates['completion_rate'],
+                $shift_productivity_rate['percentage'],
+                $summary_adherence_rate['percentage'],
+                $punctuality_rate['on_time_percentage'],
+                $task_rates['timer_adherence_rate'],
+                $afk_adherence_rate['percentage'],
+                $task_rates['efficiency_rate']
+            );
+    
+            $data[$staff_id] = [
+                'name' => $staff->firstname . ' ' . $staff->lastname,
+                'punctuality_rate' => $punctuality_rate,
+                'task_rates' => $task_rates,
+                'summary_adherence_rate' => $summary_adherence_rate,
+                'afk_adherence_rate' => $afk_adherence_rate,
+                'shift_productivity_rate' => $shift_productivity_rate,
+                'ops' => $ops
+            ];
+        }
+    
+        echo json_encode($data);
+    }
+
+    public function attendance_board($from = null, $to = null){
+        $from = $from ?? date("Y-m-d");
+        $to = $to ?? date("Y-m-d");
+
+        $data['from'] = $from;
+        $data['to'] = $to;
+
+        $start_date = new DateTime($from);
+        $end_date = new DateTime($to);
+        $end_date->add(new DateInterval('P1D'));
+        $interval = new DateInterval('P1D');
+        $date_range = new DatePeriod($start_date, $interval, $end_date);
+        
+        
+
+        $data['dates'] = [];
+        foreach ($date_range as $date) {
+            $formatted_date = $date->format('Y-m-d');
+
+            $date_data = $this->fetch_attendance_for_date($formatted_date);
+
+            $data['dates'][$formatted_date] = $date_data;
+        }
+
+        $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+
+        $staff_dates_data = [];
+
+        foreach ($staffs as $staff) {
+            $staff_id = $staff->staffid;
+
+            // Fetch KPIs for the staff member for the given date range
+            $punctuality_rate = $this->kpi_system->kpi_punctuality_rate($staff_id, $from, $to);
+            $attendance_data = $this->kpi_system->attendance_data($staff_id, $from, $to);
+
+            // Store the OPS in the array
+            $staff_dates_data[$staff_id] = [
+                'name' => $staff->firstname . ' ' . $staff->lastname,
+                'ar' => $punctuality_rate['present_percentage'],
+                'pr' => $punctuality_rate['on_time_percentage'],
+                'ct' => $attendance_data['total_clockable'],
+                'cdt' => $attendance_data['total_clocked'],
+            ];
+        }
+
+        // Pass the OPS data to the view
+        $data['staff_dates_data'] = $staff_dates_data;
+
+
+        $this->load->view('admin/management/attendance_board', $data);
+    }
+
+    public function fetch_attendance_for_date($date) {
+        $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+        
+        $data = [];
+
+        $clockableShift1 = 0;
+        $clockedShift1 = 0;
+        $clockableShift2 = 0;
+        $clockedShift2 = 0;
+
+        $totalStaffCount = 0;
+        $totalStaffOnTime = 0;
+        $totalStaffPresent = 0;
+
+        foreach ($staffs as $staff) {
+            $staff_id = $staff->staffid;
+
+            $shifts_data = $this->team_management_model->staff_attendance_data($staff_id, $date);
+    
+            $data[$staff_id] = [
+                'name' => $staff->firstname . ' ' . $staff->lastname,
+                'data' => $shifts_data
+            ];
+
+
+            if(isset($shifts_data['shifts'])){
+
+                if(isset($shifts_data['shifts'][0]['clockable_seconds'])){
+                    $clockableShift1 += $shifts_data['shifts'][0]['clockable_seconds'];
+                }
+                if(isset($shifts_data['shifts'][0]['clocked_seconds'])){
+                    $clockableShift1 += $shifts_data['shifts'][0]['clocked_seconds'];
+                }
+
+                if(isset($shifts_data['shifts'][1]['clockable_seconds'])){
+                    $clockableShift2 += $shifts_data['shifts'][1]['clockable_seconds'];
+                }
+                if(isset($shifts_data['shifts'][1]['clocked_seconds'])){
+                    $clockableShift2 += $shifts_data['shifts'][1]['clocked_seconds'];
+                }
+
+                if($shifts_data['status'] != "leave"){
+                    $totalStaffCount++;
+
+                    if($shifts_data['status'] == 'present'){
+                        $totalStaffOnTime ++;
+                        $totalStaffPresent ++;
+                    }else if($shifts_data['status'] == 'late'){
+                        $totalStaffPresent ++;
+                    }
+                }
+            }
+        }
+
+        $totalPunctualityScore = ($totalStaffCount != 0) ? ($totalStaffOnTime / $totalStaffCount) * 100 : 0;
+        $totalAttendanceScore = ($totalStaffCount != 0) ? ($totalStaffPresent / $totalStaffCount) * 100 : 0;
+
+        $data['totals'] = [
+            'clockable_shift_1' => $clockableShift1,
+            'clocked_shift_1' => $clockedShift1,
+            'clockable_shift_2' => $clockableShift2,
+            'clocked_shift_2' => $clockedShift2,
+            'pr' => $totalPunctualityScore,
+            'ar' => $totalAttendanceScore,
+        ];
+    
+        return $data;
+    }
+    
+    
+    public function staff_data($staff_id, $date){
+        echo '<pre>';
+        print_r($this->team_management_model->staff_attendance_data($staff_id, $date));
+        echo '</pre>';
     }
 
     public function applications()
@@ -274,11 +512,11 @@ class Team_management extends AdminController {
             if ($current_time >= $shift_start_time && $current_time <= $shift_end_time) {
                 $shift_info->status = 0;
                 $shift_info->statusText = 'Shift Time Ongoing:';
-                $shift_info->time_left = $this->convertSecondsToRoundedTime($shift_end_time - $current_time);
+                $shift_info->time_left = convertSecondsToRoundedTime($shift_end_time - $current_time);
             } else if ($current_time < $shift_start_time) {
                 $shift_info->status = 1;
                 $shift_info->statusText = 'Upcoming shift in:';
-                $shift_info->time_left = $this->convertSecondsToRoundedTime($shift_start_time - $current_time);
+                $shift_info->time_left = convertSecondsToRoundedTime($shift_start_time - $current_time);
             } else {
                 $shift_info->status = 2;
                 $shift_info->statusText = 'none';
@@ -420,12 +658,9 @@ class Team_management extends AdminController {
         $is_force = ($this->input->post('force') == null) ? false : $this->input->post('force');
     
         
-        $clock_out_result = $this->team_management_model->clock_out($staff_id);
+        $clock_out_result = $this->team_management_model->clock_out($staff_id, $is_force);
 
-        // print_r($clock_out_result);
-        // return;
-
-        if ($clock_out_result['success'] || $is_force) {
+        if ($clock_out_result['success']) {
 
 
             // format the date for readability
@@ -484,6 +719,7 @@ class Team_management extends AdminController {
         echo json_encode(['success' => true]);
     }
 
+    
     public function fetch_stats()
     {
         $staff_id = ($this->input->post('staff_id') == null) ? $this->session->userdata('staff_user_id') : $this->input->post('staff_id');
@@ -491,6 +727,16 @@ class Team_management extends AdminController {
 
         echo json_encode($stats);
     }
+
+    public function get_attendance_status()
+    {
+        $staff_id = ($this->input->get('staff_id') == null) ? $this->session->userdata('staff_user_id') : $this->input->get('staff_id');
+
+        $status = $this->team_management_model->staff_attendance_data($staff_id, date("Y-m-d"))['status'];
+
+        echo json_encode(['status' => $status]);
+    }
+
 
     public function fetch_staff_time_entries($staff_id) {
         if (!has_permission('team_management', '', 'admin')) {
@@ -529,19 +775,6 @@ class Team_management extends AdminController {
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false]);
-        }
-    }
-    
-
-    function convertSecondsToRoundedTime($seconds)
-    {
-        $hours = floor($seconds / 3600);
-        $minutes = round(($seconds % 3600) / 60);
-
-        if ($hours > 0) {
-            return "{$hours}h {$minutes}m";
-        } else {
-            return "{$minutes}m";
         }
     }
 
@@ -1017,279 +1250,7 @@ class Team_management extends AdminController {
         echo json_encode($response);
     }
 
-    public function check_late($staff_id){
-        print_r($this->team_management_model->check_staff_late($staff_id, date("Y-m-d")));
-    }
 
-    public function kpi_punctuality_rate($staff_id, $from, $to = null){
-        if(!$to){
-            $to = $from;
-        }
-    
-        // Initialize counters
-        $daysOnTime = 0;
-        $daysPresent = 0;
-        $totalDays = 0;
-    
-        // Convert dates to DateTime objects for iteration
-        $startDate = new DateTime($from);
-        $endDate = new DateTime($to);
-    
-        // Iterate through each date in the range
-        while($startDate <= $endDate){
-
-            $currentDate = $startDate->format("Y-m-d");
-
-            $onLeave = $this->team_management_model->is_on_leave($staff_id, $currentDate);
-
-            if(!$onLeave){
-                $totalDays++;
-
-                $statusData = $this->team_management_model->check_staff_late($staff_id, $currentDate);
-        
-                // Check if status is 'present' and increment counters accordingly
-                if(isset($statusData['status']) && $statusData['status'] == 'present'){
-                    $daysOnTime++;
-                }
-                
-                if (isset($statusData['status']) && $statusData['status'] != 'absent'){
-                    $daysPresent++;
-                }
-
-            }
-
-
-            $startDate->modify('+1 day');
-        }
-    
-        // Calculate punctuality rate
-        if($totalDays > 0) {
-            $punctualityRate = ($daysOnTime / $totalDays) * 100;
-            $attendanceRate = ($daysPresent / $totalDays) * 100;
-        } else {
-            $punctualityRate = 0; // To handle edge case where totalDays is 0
-            $attendanceRate = 0;
-        }
-
-        return ['total_days'=>$totalDays, 'days_on_time' => $daysOnTime, 'days_present' =>  $daysPresent, 'on_time_percentage'=> $punctualityRate, 'present_percentage'=> $attendanceRate];
-    }
-
-    
-    public function kpi_task_rates($staff_id, $from, $to = null){
-        if(!$to){
-            $to = $from;
-        }
-    
-        // Initialize counters
-        $completedTasksWithinDue = 0;
-        $completedTasksPastDue = 0;
-
-        // Initialize counters for total estimated hours and total spent hours
-        $totalEstimatedHours = 0;
-        $totalSpentHours = 0;
-    
-        // Fetch tasks in date range using helper function
-        $tasks = get_tasks_in_date_range($staff_id, $from, $to);
-    
-        // Iterate through each task
-        foreach($tasks as $task){
-
-            // Completion KPIS
-            if(isset($task->datefinished) && $task->status == 5){
-
-                if(strtotime(date("Y-m-d", strtotime($task->datefinished))) <= strtotime($task->duedate) ){
-                    $completedTasksWithinDue++;
-                }else{
-                    $completedTasksPastDue++;
-                }
-
-            }
-
-            //Timer KPIS
-            $estimatedHours = $task->estimated_hours;
-            
-            // Get the total time spent on the task in seconds
-            $spentSeconds = $this->tasks_model->calc_task_total_time($task->id);
-            // Convert seconds to hours
-            $spentHours = $spentSeconds / 3600;
-    
-            $totalEstimatedHours += $estimatedHours;
-            $totalSpentHours += $spentHours;
-
-        }
-    
-        // Calculate task completion rate
-        $taskCount = count($tasks);
-        if($taskCount > 0) {
-            $taskCompletionRate = ($completedTasksWithinDue / $taskCount) * 100;
-            $taskEfficiencyRate = (1 - ($completedTasksPastDue / $taskCount)) * 100;
-        } else {
-            $taskCompletionRate = 0; // To handle edge case where taskCount is 0
-            $taskEfficiencyRate = 0;
-        }
-
-        // Calculate Task Time Adherence Rate
-        if($totalSpentHours > 0) {
-            $taskTimeAdherenceRate = ($totalEstimatedHours / $totalSpentHours) * 100;
-
-            if($taskTimeAdherenceRate > 100) $taskTimeAdherenceRate = 100;
-
-        } else {
-            $taskTimeAdherenceRate = 0; // To handle edge case where totalSpentHours is 0
-        }
-    
-        return ['completed_tasks_past_due'=>$completedTasksPastDue, 'completed_tasks_within_due' => $completedTasksWithinDue, 'total_tasks'=>$taskCount, 'completion_rate'=> $taskCompletionRate, 'efficiency_rate'=>$taskEfficiencyRate,'esimate_hours'=>$totalEstimatedHours , 'spent_hours'=>$totalSpentHours,'timer_adherence_rate'=>$taskTimeAdherenceRate];
-    }
-
-    
-    public function kpi_summary_adherence_rate($staff_id, $from, $to = null){
-        if(!$to){
-            $to = $from;
-        }
-    
-        // Get summaries for the staff in the date range
-        $summaries = $this->team_management_model->get_staff_summaries_in_range($staff_id, $from, $to);
-    
-        $daysWithSummaries = 0;
-        foreach($summaries as &$summary){
-            if(!$this->team_management_model->is_on_leave($staff_id, $summary->date)){
-                $daysWithSummaries++;
-            }else{
-                unset($summary);
-            }
-        }
-
-        // Convert dates to DateTime objects
-        $startDate = new DateTime($from);
-        $endDate = new DateTime($to);
-    
-        // Calculate total days in the range
-        $totalDays = $startDate->diff($endDate)->days + 1;
-    
-        $daysOnLeave = 0;
-        for ($date = clone $startDate; $date <= $endDate; $date->modify('+1 day')) {
-            if ($this->team_management_model->is_on_leave($staff_id, $date->format("Y-m-d"))) {
-                $daysOnLeave++;
-            }
-        }
-    
-        // Calculate Summary Adherence Rate
-        $workingDays = $totalDays - $daysOnLeave;
-        $SAR = ($workingDays > 0) ? ($daysWithSummaries / $workingDays) * 100 : 0;
-    
-        return [
-            'days_with_summaries' => $daysWithSummaries,
-            'working_days' => $workingDays,
-            'percentage' => $SAR,
-            'summaries' => $summaries
-        ];
-    }
-    
-
-    public function kpi_afk_adherence_rate($staff_id, $from, $to = null){
-        if(!$to){
-            $to = $from;
-        }
-    
-        // Initialize counters for total allowed and actual AFK time
-        $totalAllowedAfkTime = 0;
-        $totalActualAfkTime = 0;
-    
-        // Convert dates to DateTime objects for iteration
-        $startDate = new DateTime($from);
-        $endDate = new DateTime($to);
-    
-        // Iterate through each date in the range
-        while($startDate <= $endDate){
-            $currentDate = $startDate->format("Y-m-d");
-    
-            // Fetch shift timings for the day
-            $shiftTiming = $this->team_management_model->get_day_shift_total($staff_id, $currentDate);
-    
-            // Determine allowed AFK time based on shift timing and sum it up
-            if($shiftTiming > (4 * 3600)) { // 4 hours in seconds
-                $totalAllowedAfkTime += (30 * 60); // 30 minutes in seconds
-            } else {
-                $totalAllowedAfkTime += (15 * 60); // 15 minutes in seconds
-            }
-    
-            // Fetch actual AFK time for the day and sum it up
-            $totalActualAfkTime += $this->team_management_model->get_total_afk_time($staff_id, $currentDate);
-    
-            $startDate->modify('+1 day');
-        }
-    
-        // Calculate AFK Adherence Rate
-        if($totalActualAfkTime > 0) {
-            $afkAdherenceRate = ($totalAllowedAfkTime / $totalActualAfkTime) * 100;
-            if($afkAdherenceRate > 100) $afkAdherenceRate = 100;
-        } else {
-            $afkAdherenceRate = 100; // If no actual AFK time, adherence is considered optimal
-        }
-
-        $totalAllowedAfkTime /= 3600;
-        $totalActualAfkTime /= 3600;
-    
-        return [
-            'allowed_afk_time' => $totalAllowedAfkTime,
-            'actual_afk_time' => $totalActualAfkTime,
-            'percentage' => $afkAdherenceRate
-        ];
-    }
-    
-    public function kpi_shift_productivity_rate($staff_id, $from, $to = null){
-        if(!$to){
-            $to = $from;
-        }
-    
-        // Initialize counters for total task time and logged time
-        $totalTaskTime = 0;
-        $totalLoggedTime = 0;
-    
-        // Grace period is 30 minutes in seconds for each day
-        $gracePeriodPerDay = 30 * 60;
-    
-        // Convert dates to DateTime objects for iteration
-        $startDate = new DateTime($from);
-        $endDate = new DateTime($to);
-    
-        // Iterate through each date in the range
-        while($startDate <= $endDate){
-            $currentDate = $startDate->format("Y-m-d");
-            
-            // Extract day, month, and year from the current date for the task time method
-            $day = $startDate->format("d");
-            $month = $startDate->format("m");
-            $year = $startDate->format("Y");
-    
-            // Fetch total task time for the day and sum it up
-            $totalTaskTime += $this->team_management_model->get_total_task_time_for_day($staff_id, $day, $month, $year);
-    
-            // Fetch total logged time for the day and sum it up
-            $totalLoggedTime += $this->team_management_model->get_total_logged_time_of_date($staff_id, $currentDate);
-    
-            $startDate->modify('+1 day');
-        }
-    
-        // Subtract grace period from total logged time
-        $adjustedLoggedTime = $totalLoggedTime - ($gracePeriodPerDay * ($endDate->diff($startDate)->days + 1)); // Including both start and end date
-    
-        // Calculate Shift Productivity Rate
-        if($adjustedLoggedTime > 0) {
-            $shiftProductivityRate = ($totalTaskTime / $adjustedLoggedTime) * 100;
-        } else {
-            $shiftProductivityRate = 0; // To handle edge case where adjustedLoggedTime is 0
-        }
-
-        $totalTaskTime /= 3600;
-        $totalLoggedTime /= 3600;
-    
-        return [
-            'total_task_time' => $totalTaskTime,
-            'total_logged_time' => $totalLoggedTime,
-            'percentage' => $shiftProductivityRate
-        ];
-    }
     
 
     private function cronAPI()
@@ -1300,7 +1261,10 @@ class Team_management extends AdminController {
 
     public function kudos(){
 
-        $staff_id = $this->session->userdata('staff_user_id');
+        $staff_id = get_staff_user_id(); 
+        
+
+
         $kudos_sent_this_month = $this->team_management_model->kudos_count($staff_id);
         $remaining_kudos = 5 - $kudos_sent_this_month;
 
@@ -1315,6 +1279,20 @@ class Team_management extends AdminController {
             $staff_id_name[$staff['staffid']] = $staff['firstname'] . ' ' . $staff['lastname'];
         }
         $data['staff_id_name'] = $staff_id_name;
+
+        $all_kudos = $this->db->get('tblkudos')->result();
+        foreach($all_kudos as $kudos){
+            $kudos_id = $kudos->id;
+            $seen_users = explode(',', $kudos->seen_by);
+            if (!in_array($staff_id, $seen_users)) { // If not marked as seen already
+                $seen_users[] = $staff_id;
+                $updated_seen_users = implode(',', $seen_users);
+                $this->db->where('id', $kudos_id);
+                $this->db->update('tblkudos', ['seen_by' => $updated_seen_users]);
+
+            }
+        }
+        
 
         $this->load->view('admin/management/kudos', $data);
     }
@@ -1376,37 +1354,6 @@ class Team_management extends AdminController {
         }
     }
 
-    public function mark_as_seen() {
-        $kudos_id = $this->input->post('kudos_id');
-        $staff_id = $this->session->userdata('staff_user_id'); 
-    
-        $this->db->where('id', $kudos_id);
-        $kudos = $this->db->get('tblkudos')->row();
-    
-        if ($kudos) {
-            $seen_users = explode(',', $kudos->seen_by);
-            if (!in_array($staff_id, $seen_users)) { // If not marked as seen already
-                $seen_users[] = $staff_id;
-                $updated_seen_users = implode(',', $seen_users);
-                $this->db->where('id', $kudos_id);
-                $success = $this->db->update('tblkudos', ['seen_by' => $updated_seen_users]);
-    
-                // Fetch the staff profile image URL
-                $image_url = staff_profile_image($staff_id, ['w-6 h-6 rounded-full'], 'thumb', []); 
-                preg_match('/src="([^"]+)"/', $image_url, $match);
-                $actual_image_url = $match[1];
-    
-                echo json_encode(['success' => $success, 'action' => 'marked as seen', 'image_url' => $actual_image_url]);
-            } else {
-                // User already marked it as seen
-                echo json_encode(['success' => true, 'message' => 'Already marked as seen']);
-                return;
-            }
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Kudos not found']);
-        }
-    }
-    
     
     public function set_shifts($id){
         

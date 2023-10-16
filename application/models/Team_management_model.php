@@ -220,7 +220,7 @@ class Team_management_model extends App_Model
         return $this->db->affected_rows() > 0;
     }
 
-    public function clock_out($staff_id)
+    public function clock_out($staff_id, $is_force = false)
     {
         $now = date('Y-m-d H:i:s');
         $now_timestamp = time(); // Get the current Unix timestamp
@@ -234,7 +234,7 @@ class Team_management_model extends App_Model
 
         if (isset($row)) {
             $clock_in_date = date("Y-m-d", strtotime($row->clock_in));
-            if (!$this->team_management_model->get_staff_summary($staff_id, $clock_in_date)) {
+            if (!$this->team_management_model->get_staff_summary($staff_id, $clock_in_date) && !$is_force) {
                 return ['success' => false, 'message' => "Please add your summary first."];
             }
         }
@@ -1241,7 +1241,7 @@ class Team_management_model extends App_Model
     }
 
 
-    public function check_staff_late($staff_id, $date){
+    public function staff_attendance_data($staff_id, $date){
 
 
         // First, fetch the shifts for the given staff and date
@@ -1253,17 +1253,25 @@ class Team_management_model extends App_Model
         $query = "SELECT * FROM tbl_staff_time_entries WHERE staff_id = ?  AND DATE(clock_in) = ? ORDER BY clock_in ASC";
         $entries = $this->db->query($query, [$staff_id, $date])->result();
         
-        $late_shifts = [];
+        $all_shifts = [];
         $overall_late = false;
+        $overall_leaves = 0;
 
+        $total_clockable_seconds = 0;
+        $total_clocked_seconds = 0;
 
-        if(count($entries) <= 0){
-            return ['status' => 'absent'];
-        }
-    
         foreach ($shifts as $index => $shift) {
             $shift_start = new DateTime($date . ' ' . $shift->shift_start_time);
             $shift_end = new DateTime($date . ' ' . $shift->shift_end_time);
+
+            $shift_start_time_plus_5_seconds = date('H:i:s', strtotime($shift->shift_start_time) + 5);
+            $shiftDateTime = date('Y-m-d H:i:s', strtotime($date. ' ' . $shift_start_time_plus_5_seconds));
+
+            $is_on_leave = 0;
+            if($this->is_on_leave($staff_id, $shiftDateTime)){
+                $is_on_leave = 1;
+                $overall_leaves += 1;
+            }
             
             $shift_start_def = clone $shift_start;
             
@@ -1275,46 +1283,252 @@ class Team_management_model extends App_Model
             if (isset($entries[$index])) {
                 $clock_in = new DateTime($entries[$index]->clock_in);
                 $clock_out = isset($entries[$index]->clock_out) ? new DateTime($entries[$index]->clock_out) : null;
-                $is_direct = true;
+                $clock_status = 'mono';
             } else {
-                // In case of consecutive shifts without clock_out, use the last clock_in and clock_out
-               $clock_in = new DateTime(end($entries)->clock_in);
-               $clock_out = isset(end($entries)->clock_out) ? new DateTime(end($entries)->clock_out) :new DateTime();
-               $is_direct = false;
-    
-            }
-            
-            $late = $clock_in > $shift_start;
 
-            if($is_direct){
-                $difference = $clock_in->getTimestamp() - $shift_start_def->getTimestamp();
-            }else{
-                $difference = 'Consecutive Shift';
-            }
-            
-    
-            // Check the special case where a staff member was already clocked in during the start of the next consecutive shift
-
-            if (!$is_direct && $clock_out && ($clock_out < $shift_start)) {
-                // $late = $late && !($clock_in <= $shift_start && $clock_out >= $shift_start);
-                $late_shifts[] = ['status' => 'absent', 'shift' => $shift->shift_number, 'start_time'=>$shift->shift_start_time, 'end_time'=>$shift->shift_end_time];
+                //Clock Entry was not found for shift
                 
-            }else{
+                if(count($entries) > 0){
 
-                if ($late) {
-                    $overall_late = true;
-
-                    $late_shifts[] = ['status' => 'late', 'shift' => $shift->shift_number, 'difference' => $difference, 'start_time'=>$shift->shift_start_time, 'end_time'=>$shift->shift_end_time];
-                } else {
-                    $late_shifts[] = ['status' => 'present', 'shift' => $shift->shift_number, 'difference' => $difference, 'start_time'=>$shift->shift_start_time, 'end_time'=>$shift->shift_end_time];
+                    // In case of consecutive shifts without clock_out, use the last clock_in and clock_out
+                    $clock_in = new DateTime(end($entries)->clock_in);
+                    $clock_out = isset(end($entries)->clock_out) ? new DateTime(end($entries)->clock_out) : null;
+                    $clock_status = 'last';
+                    
+                }else{
+                    //No clock in found for the day
+                    $clock_status = 'null';
                 }
+
                 
             }
+
+            $difference = 0;
+
+            if($clock_status == 'mono'){
+                $difference = $clock_in->getTimestamp() - $shift_start_def->getTimestamp();
+            }
+
+            if($clock_status != 'null'){    
+
+                // Case where Last shift is added but shifts are not consecutive and current shift is not clocked in
+                // print_r($shift_start);
+                if (($clock_status == 'last') && $clock_out && ($clock_out < $shift_start_def)) {
+                    $shift_status = 'absent';
+
+                    $clock_in = '';
+                    $clock_out = '';  
+                    $total_clocked = 0;
+                    $sum_afk_offline_times = 0;
+                    $clock_status = 'null';
+                }else{
+
+                    //Case where this is a separate shift
+                    if($clock_status == 'mono'){
+
+                        //Setting Late Status
+                        $late = $clock_in > $shift_start;
+                        if ($late) {
+                            $overall_late = true;
+                            $shift_status = 'late';
+                        } else {
+                            $shift_status = 'present';
+                        }
+                        
+                        $clock_in_time = $clock_in->getTimestamp();
+                        $clock_out_time = ($clock_out) ? $clock_out->getTimestamp() : time();
+
+                        if ($clock_out_time < $clock_in_time) {
+                            $clock_out_time += 86400; // Add 24 hours (86400 seconds) to the end_unix.
+                        }
+
+                        $total_clocked = $clock_out_time - $clock_in_time;
+                        
+                        $sum_afk_offline_times = $this->team_management_model->get_sum_afk_and_offline_times($staff_id, date("Y-m-d H:i:s", $clock_in_time), date("Y-m-d H:i:s", $clock_out_time));
+
+                        $total_clocked -= $sum_afk_offline_times;
+                        
+                        $clock_in = date("h:i A", $clock_in_time);
+                        $clock_out = ($clock_out) ? date("h:i A", $clock_out_time) : 'Going';
+
+                    }else{
+                        //Case where this shift is carried from last clock_in
+                        $shift_status = 'present';
+
+                        $clock_in_time = $clock_in->getTimestamp(); // Set shift 2 clockin time to start of this shift because user is already clocked in
+                        $clock_out_time = ($clock_out) ? $clock_out->getTimestamp() : time();
+
+                        if ($clock_out_time < $clock_in_time) {
+                            $clock_out_time += 86400; // Add 24 hours (86400 seconds) to the end_unix.
+                        }
+
+                        $total_clocked = $clock_out_time - $clock_in_time;
+                        
+                        
+                        $sum_afk_offline_times = $this->team_management_model->get_sum_afk_and_offline_times($staff_id, date("Y-m-d H:i:s", $clock_in_time), date("Y-m-d H:i:s", $clock_out_time));
+                        
+                        $total_clocked -= $sum_afk_offline_times;
+
+                        
+
+                        $clock_in = 'Continued';
+                        $clock_out = ($clock_out) ? date("h:i A", $clock_out_time) : 'Going';
+                    }
+
+                }
+
+            }else{
+                $shift_status = 'absent';
+                $total_clocked = 0;
+                $sum_afk_offline_times = 0;
+                $clock_in = '';
+                $clock_out = '';   
+            }
+
+            $sum_afk_offline_times = $sum_afk_offline_times ?? 0;
+            
+            $start_unix = strtotime($shift->shift_start_time);
+            $end_unix = strtotime($shift->shift_end_time);
+            
+            if ($end_unix < $start_unix) {
+                $end_unix += 86400; // Add 24 hours (86400 seconds) to the end_unix.
+            }
+            
+            $start_time = date("h:i A", $start_unix);
+            $end_time = date("h:i A", $end_unix);
+
+            $clockable_seconds = $end_unix - $start_unix;
+
+            $total_clockable_seconds += $clockable_seconds;
+
+            $is_early_departure = 0;
+            if($clock_out != 'Continued'){
+                if((strtotime($clock_out) + 300) < strtotime($end_time)){
+                    $is_early_departure = 1;
+                }
+            }
+            
+            
+            $all_shifts[] = ['status' => $shift_status, 'shift_number' => $shift->shift_number,  'clock_status'=> $clock_status, 'shift_start_time'=> $start_time, 'shift_end_time'=>$end_time, 'clock_in' => $clock_in, 'clock_out'=>$clock_out, 'difference' => $difference, 'clockable_seconds' => $clockable_seconds, 'clocked_seconds'=>$total_clocked, 'afk_time' => $sum_afk_offline_times, 'is_on_leave'=>$is_on_leave,'is_early_departure'=>$is_early_departure];
             
         }
 
-        $status = $overall_late ? 'late' : 'present';
-        return ['status' => $status, 'shifts' => $late_shifts];
+        if(count($shifts) > 0){
+            if(count($entries) < 1){
+                $status = 'absent';
+            }else{
+                $status = ($overall_leaves == (count($shifts) + 1)) ? 'leave' : ($overall_late ? 'late' : 'present');
+            }
+        }else{
+            $status = 'no-shifts';
+        }
+        
+
+        
+                
+        $is_next_continued_shift = false;
+        foreach($all_shifts as $index => $shift){
+
+            if($shift['clock_status'] == 'last'){
+                $all_shifts[$index - 1]['clock_out'] = 'Continued';
+              
+                $all_shifts[$index - 1]['clocked_seconds'] = $all_shifts[$index - 1]['clockable_seconds'] - $all_shifts[$index - 1]['difference'];
+
+                $all_shifts[$index - 1]['clocked_seconds'] -= ($all_shifts[$index - 1]['afk_time'] - $all_shifts[$index]['afk_time']);
+
+                
+            }
+
+        }
+        $total_clocked_seconds =  0;
+        foreach($all_shifts as $shift){
+            $total_clocked_seconds += $shift['clocked_seconds'];
+        }
+
+        $day_status = 1;
+        if(($total_clocked_seconds + 600) < $total_clockable_seconds){
+            $day_status = 0;
+        }else if (($total_clocked_seconds - 1800) > $total_clockable_seconds){
+            $day_status = 2;
+        }
+        
+        
+        return ['status' => $status, 'clockable_seconds' => $total_clockable_seconds, 'clocked_seconds' => $total_clocked_seconds, 'day_status'=>$day_status, 'shifts' => $all_shifts, ''];
+    }
+
+    public function get_total_clockable($staff_id, $date){
+
+
+        // First, fetch the shifts for the given staff and date
+        $query = "SELECT * FROM tbl_staff_shifts WHERE staff_id = ? AND Year = YEAR(?) AND month = MONTH(?) AND day = DAY(?) ORDER BY shift_number ASC";
+        $shifts = $this->db->query($query, [$staff_id, $date, $date, $date])->result();
+
+        $total_clockable_seconds = 0;
+
+        foreach ($shifts as $index => $shift) {
+
+            $shift_start_time_plus_5_seconds = date('H:i:s', strtotime($shift->shift_start_time) + 5);
+
+            $shiftDateTime = date('Y-m-d H:i:s', strtotime($date. ' ' . $shift_start_time_plus_5_seconds));
+
+            if(!$this->is_on_leave($staff_id, $shiftDateTime)){
+                $start_unix = strtotime($shift->shift_start_time);
+                $end_unix = strtotime($shift->shift_end_time);
+
+                if ($end_unix < $start_unix) {
+                    $end_unix += 86400; // Add 24 hours (86400 seconds) to the end_unix.
+                }
+                
+                $start_time = date("h:i A", $start_unix);
+                $end_time = date("h:i A", $end_unix);
+    
+                $clockable_seconds = $end_unix - $start_unix;
+            }else{
+                $clockable_seconds = 0;
+            }
+            
+            $total_clockable_seconds += $clockable_seconds;
+
+        }
+
+        
+        return $total_clockable_seconds;
+    }
+
+    public function get_total_clocked($staff_id, $date){
+
+
+        // First, fetch the shifts for the given staff and date
+        $query = "SELECT * FROM tbl_staff_time_entries WHERE staff_id = ?  AND DATE(clock_in) = ? ORDER BY clock_in ASC";
+        $entries = $this->db->query($query, [$staff_id, $date])->result();
+        
+        $total_clocked_seconds = 0;
+
+        foreach($entries as $entry){
+
+            $clock_in = new DateTime($entry->clock_in);
+            $clock_out = isset($entry->clock_out) ? new DateTime($entry->clock_out) : null;
+
+            $clock_in_time = $clock_in->getTimestamp(); 
+            $clock_out_time = ($clock_out) ? $clock_out->getTimestamp() : time();
+
+            if ($clock_out_time < $clock_in_time) {
+                $clock_out_time += 86400; // Add 24 hours (86400 seconds) to the end_unix.
+            }
+
+            $total_clocked = $clock_out_time - $clock_in_time;
+            
+            
+            $sum_afk_offline_times =$this->team_management_model->get_sum_afk_and_offline_times($staff_id, date("Y-m-d H:i:s", $clock_in_time), date("Y-m-d H:i:s", $clock_out_time));
+            
+            $total_clocked -= $sum_afk_offline_times;
+
+
+            $total_clocked_seconds += $total_clocked;
+        }
+
+        
+        return $total_clocked_seconds;
     }
     
 
