@@ -69,7 +69,7 @@
 var ctx = document.getElementById('progressChart').getContext('2d');
 
 var clock_in = <?= $total_time ?>;
-var total = <?= $shift_seconds ?>;
+var total = <?= $shift_seconds ? $shift_seconds : 27000 ?>;
 
 function secondsToHm(seconds) {
     var hours = Math.floor(seconds / 3600);

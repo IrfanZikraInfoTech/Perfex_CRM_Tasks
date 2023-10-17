@@ -125,6 +125,11 @@ class Dashboard extends AdminController
 
         $data['puctuality_rate'] = $this->kpi_system->kpi_punctuality_rate($staff_id, date("Y-m-01"), date("Y-m-d"))['on_time_percentage'];
 
+        if(!$this->db->where('staff_id',$staff_id)->get('tbl_staff_status')->row()){
+            $this->db->insert('tbl_staff_status',['staff_id'=>$staff_id, 'status'=>'Offline']);
+        }
+
+
         $this->load->view('admin/dashboard/dashboard', $data);
     }
 
