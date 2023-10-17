@@ -36,28 +36,31 @@
                 <?php $staff_members = $this->team_management_model->get_staff_by_department($department->departmentid); 
                 
                 ?>
-                    <div class="p-5 rounded-[40px] bg-gray-100 flex flex-row flex-wrap gap-10">
+                    <div class="p-5 rounded-[40px] bg-gray-100 grid 2xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 grid-cols-1  gap-10">
                     <?php  foreach ($staff_members as $staff): ?>
                         <!-- Your staff card code starts here -->
-                        <div class="flex flex-col bg-white xl:w-1/4 2xl:w-1/5 lg:w-1/3 md:w-[40%] w-full rounded-[30px] overflow-hidden transition-all duration-500 ease-in-out hover:scale-[0.97] shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400">
+                        <div class="flex flex-col bg-white w-full rounded-[30px] overflow-hidden transition-all duration-500 ease-in-out hover:scale-[0.97] shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400">
                             <div class="flex justify-center items-center p-4 bg-gray-200">
                                 <?php echo staff_profile_image($staff->staffid, ['h-48', 'w-48', 'rounded-full', 'object-cover'], 'thumb'); ?>
                             </div>
                             <div class="p-4">
-                                <h2 class="text-lg font-bold text-center"><?php echo $staff->firstname. ' ' .$staff->lastname ?></h2>
-                                <h2 class="text-lg font-bold text-center"><?php echo $staff->staff_title ?></h2>
-                                
-                                <div class="mt-1">
+                                <h2 class="text-base text-center"><?php echo $staff->firstname. ' ' .$staff->lastname ?></h2>
+
+
                                 <?php
                                 $report_to_id = $staff->report_to;
 
                                 $reporting_to_name = id_to_name($report_to_id, 'tblstaff', 'staffid', 'firstname') . ' ' .id_to_name($report_to_id, 'tblstaff', 'staffid', 'lastname');
                                 ?>
-                                <p class="text-md">
-                                    <span class="font-semibold">Reporting to:</span> 
+                                <p class="text-base text-center">
+                                    <span class="font-semibold">Report:</span> 
                                     <span class="font-medium"><?= $reporting_to_name; ?></span>
                                 </p>
-                                </div>
+  
+
+                                <h2 class="text-lg font-bold text-center"><?php echo $staff->staff_title ?></h2>
+                                
+                                
                                 
                                 <div class="mt-4">
                                     <div class="text-sm font-semibold text-gray-500">Current Status</div>

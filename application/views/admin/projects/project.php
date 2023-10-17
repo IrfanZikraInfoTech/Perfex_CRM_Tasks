@@ -84,19 +84,19 @@
                                         <div class="form-group select-placeholder">
                                             <label for="billing_type"><?php echo _l('project_billing_type'); ?></label>
                                             <div class="clearfix"></div>
-                                            <select name="billing_type" class="selectpicker" id="billing_type"
+                                            <select name="billing_type" class="" id="billing_type"
                                                 data-width="100%" <?php echo $disable_type_edit ; ?>
                                                 data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
                                                 <option value=""></option>
-                                                <option value="1" <?php if (isset($project) && $project->billing_type == 1 || !isset($project) && $auto_select_billing_type && $auto_select_billing_type->billing_type == 1) {
-                        echo 'selected';
+                                                <option value="1" selected <?php if (isset($project) && $project->billing_type == 1 || !isset($project) && $auto_select_billing_type && $auto_select_billing_type->billing_type == 1) {
+                        echo '';
                     } ?>><?php echo _l('project_billing_type_fixed_cost'); ?></option>
                                                 <option value="2" <?php if (isset($project) && $project->billing_type == 2 || !isset($project) && $auto_select_billing_type && $auto_select_billing_type->billing_type == 2) {
-                        echo 'selected';
+                        echo '';
                     } ?>><?php echo _l('project_billing_type_project_hours'); ?></option>
                                                 <option value="3"
                                                     data-subtext="<?php echo _l('project_billing_type_project_task_hours_hourly_rate'); ?>" <?php if (isset($project) && $project->billing_type == 3 || !isset($project) && $auto_select_billing_type && $auto_select_billing_type->billing_type == 3) {
-                        echo 'selected';
+                        echo '';
                     } ?>><?php echo _l('project_billing_type_project_task_hours'); ?></option>
                                             </select>
                                             <?php if ($disable_type_edit != '') {
