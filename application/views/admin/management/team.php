@@ -46,7 +46,20 @@
                             <div class="p-4">
                                 <h2 class="text-lg font-bold text-center"><?php echo $staff->firstname. ' ' .$staff->lastname ?></h2>
                                 <h2 class="text-lg font-bold text-center"><?php echo $staff->staff_title ?></h2>
-                                <div class="mt-2">
+                                
+                                <div class="mt-1">
+                                <?php
+                                $report_to_id = $staff->report_to;
+
+                                $reporting_to_name = id_to_name($report_to_id, 'tblstaff', 'staffid', 'firstname') . ' ' .id_to_name($report_to_id, 'tblstaff', 'staffid', 'lastname');
+                                ?>
+                                <p class="text-md">
+                                    <span class="font-semibold">Reporting to:</span> 
+                                    <span class="font-medium"><?= $reporting_to_name; ?></span>
+                                </p>
+                                </div>
+                                
+                                <div class="mt-4">
                                     <div class="text-sm font-semibold text-gray-500">Current Status</div>
                                     <div class="flex flex-row gap-1 mt-1 text-gray-800"><div class="w-1 <?php echo 'bg-' . $staff->statusColor; ?> h-5 mr-2"></div><?php echo $staff->status; ?> \ <?php echo $staff->working ? 'Working' : 'Not working'; ?></div>
                                 </div>
