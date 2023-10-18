@@ -621,7 +621,7 @@ var afk_offline_entries = <?php echo json_encode($afk_offline_entries); ?>;
 var clock_in_entries = <?php echo json_encode($clock_in_entries); ?>;
 
 
-const today = new Date();
+const today = new Date("<?php echo $from; ?>");
 let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
 let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
 
@@ -692,6 +692,9 @@ afk_offline_entries.forEach(function (entry) {
   });
 });
 
+console.log("Shift Timings:", shift_timings);
+console.log("AFK/Offline Entries:", afk_offline_entries);
+console.log("Clock In Entries:", clock_in_entries);
 var container = document.getElementById('visualization');
 var timeline = new vis.Timeline(container, items, options);
 
