@@ -98,7 +98,7 @@ function app_init_project_tabs()
 
 
     $CI->app_tabs->add_project_tab('project_files', [
-        'name'                      => "Files",
+        'name'                      => "Project Data",
         'icon'                      => 'fa-solid fa-file',
         'view'                      => 'admin/projects/project_files',
         'position'                  => 30,

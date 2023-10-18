@@ -161,13 +161,13 @@ function get_staff_above($staff_id){
                         ->where('staffid', $staff_id)
                         ->get()->row();
 
-    if($department && $department->departmentid == 3) {
+    if($department && $department->departmentid == get_option('hr_dept_id')) {
         $is_hr = true;
     }
 
 
     if(is_admin($staff_id)){
-        $staff_above = $CI->staff_model->get('', ['staffid !=' => $staff_id, 'admin'=>1]);
+        $staff_above = $CI->staff_model->get('', ['staffid' => 1]);
         foreach($staff_above as $staff){
             $staff_ids_above[] = $staff['staffid'];
         }
@@ -194,7 +194,7 @@ function get_staff_above($staff_id){
         $hrs = $CI->db->select('tblstaff.*')
               ->from('tblstaff')
               ->join('tblstaff_departments', 'tblstaff.staffid = tblstaff_departments.staffid')
-              ->where('tblstaff_departments.departmentid', 3)
+              ->where('tblstaff_departments.departmentid', get_option('hr_dept_id'))
               ->where('tblstaff.active', 1)
               ->get()->result_array();
 
@@ -222,14 +222,15 @@ function get_staff_under($staff_id){
                           ->where('staffid', $staff_id)
                           ->get()->row();
     
-    if($department && $department->departmentid == 3) {
+    if($department && $department->departmentid == get_option('hr_dept_id')) {
         $is_hr = true;
     }
     
 
     if(is_admin($staff_id)){
         
-        $staff_under = $CI->staff_model->get('', ['staffid !=' => $staff_id, 'staffid !=' => 1]);
+        $staff_under = $CI->staff_model->get('', ['staffid !=' => $staff_id, 'staffid !=' => 1, 'admin' => 1]);
+
     }else if($is_hr){
         $staff_under = $CI->staff_model->get('', ['active' => 1, 'staffid !=' => $staff_id , 'admin' => 0]);
     }else{

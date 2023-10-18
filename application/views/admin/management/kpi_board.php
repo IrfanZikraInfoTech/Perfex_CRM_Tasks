@@ -27,7 +27,26 @@
 
                         <input type="date" id="to" class="w-full py-2 px-4 border !rounded-3xl text-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="To" value="<?= $to ?>">
 
-                        <button class="px-4 py-2 bg-sky-100 border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="window.location.href=admin_url+'team_management/kpi_board/'+document.getElementById('from').value + '/' + document.getElementById('to').value">
+                        <select data-width="100%" id="staff" data-live-search="true" class="selectpicker text-2xl font-bold text-uppercase" multiple>
+                                
+                            <?php 
+                                $staff_members = $this->staff_model->get();
+
+
+                                foreach($staff_members as $staff_member){
+                                    $selected = '';
+
+                                    if(isset($exclude_ids) && in_array($staff_member['staffid'], $exclude_ids)){
+                                        $selected = 'selected';
+                                    }
+
+                                    echo '<option '.$selected.' value="'.$staff_member['staffid'].'">'.$staff_member['full_name'].'</option>';
+                                }
+                            ?>
+                                
+                        </select>
+
+                        <button class="px-4 py-2 bg-sky-100 border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="redirectToKpiBoard()">
                         <i class="fa fa-search" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -50,7 +69,7 @@
             </div>
 
             <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-sky-100 shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
-                <?php foreach($staff_ops_data as $staff_id => $staff): ?>
+                <?php foreach($staff_kpi_data as $staff_id => $staff): ?>
                     <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-yellow-300 rounded-[40px] min-h-[100px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box" data-name="<?= $staff['name'] ?>" data-ops="<?= $staff['ops'] ?>">
                         <h3 class="text-xl font-bold"><?= $staff['name'] ?></h3>
                         <h4 class="text-2xl font-bold"><?= round($staff['ops']/10,2) ?>/10</h4>
@@ -63,37 +82,113 @@
 
         <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all flex flex-col">  
 
-            <div class="w-full transition-all ease-in-out rounded-[40px] bg-yellow-300 font-bold flex flex-row text-xl overflow-hidden sticky top-4 z-10 mb-4">
+            <div class="w-full transition-all ease-in-out rounded-[40px] bg-yellow-300 font-bold flex flex-row text-xl overflow-hidden sticky top-4 z-20 mb-4">
                 <div class="w-[20%] hover:bg-yellow-200 transition-all py-2 text-center">
                     Staff
                 </div>
-                <button title="Attendance Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2">
+                <button title="Attendance Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ar">
                     AR
                 </button>
-                <button title="Punctuality Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2">
+                <button title="Punctuality Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="pr">
                     PR
                 </button>
-                <button title="Task Completion Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2">
+                <button title="Task Completion Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="tcr">
                     TCR
                 </button>
-                <button title="Task Efficiency Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2">
+                <button title="Task Efficiency Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ter">
                     TER
                 </button>
-                <button title="Task Time Adherence" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2">
+                <button title="Task Time Adherence" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ttr">
                     TTR
                 </button>
 
-                <button title="Summary Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2">
+                <button title="Summary Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="sar">
                     SAR
                 </button>
-                <button title="AFK Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2">
+                <button title="AFK Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="adr">
                     ADR
                 </button>
-                <button title="Shift Productivity Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2">
+                <button title="Shift Productivity Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="spr">
                     SPR
                 </button>
-                <button title="Overall Performance Score" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2">
+                <button title="Overall Performance Score" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ops">
                     OPS
+                </button>
+                
+            </div>
+
+            <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-sky-100 shadow-inner overflow-hidden mb-4 rows-container">
+             
+                <?php foreach($staff_kpi_data as $staff_id => $staff): ?>
+                    <div class="flex flex-row text-base transition-all hover:bg-sky-200/75 staff-row" data-ar="<?= round($staff['ar'],2) ?>" data-pr="<?= round($staff['pr'],2) ?>" data-tcr="<?= round($staff['tcr'],2) ?>" data-ter="<?= round($staff['ter'],2) ?>" data-ttr="<?= round($staff['ttr'],2) ?>" data-sar="<?= round($staff['sar'],2) ?>" data-adr="<?= round($staff['adr'],2) ?>" data-spr="<?= round($staff['spr'],2) ?>" data-ops="<?= round($staff['ops']/10,2) ?>">
+
+                        <div class="w-[20%] hover:bg-yellow-200 transition-all py-2 text-center">
+                        <?= $staff['name'] ?>
+                        </div>
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                            <?= round($staff['ar'],2) ?>%
+                        </div>
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <?= round($staff['pr'],2) ?>%
+                        </div>
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <?= round($staff['tcr'],2) ?>%
+                        </div>
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <?= round($staff['ter'],2) ?>%
+                        </div>
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <?= round($staff['ttr'],2) ?>%
+                        </div>
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <?= round($staff['sar'],2) ?>%
+                        </div>
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <?= round($staff['adr'],2) ?>%
+                        </div>
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <?= round($staff['spr'],2) ?>%
+                        </div>
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <?= round($staff['ops']/10,2) ?>/10
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+
+            </div>
+
+
+            <div class="w-full transition-all ease-in-out rounded-[40px] bg-yellow-100 font-bold flex flex-row text-xl top-4 z-10 mb-5 overflow-hidden sticky bottom-4">
+                <div class="w-[20%] hover:bg-yellow-200 transition-all py-2 text-center">
+                    Cumuluative KPIs
+                </div>
+                <button title="Attendance Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ar">
+                    <?= round($cumulative_kpis['ar'],2) ?>%
+                </button>
+                <button title="Punctuality Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="pr">
+                <?= round($cumulative_kpis['pr'],2) ?>%
+                </button>
+                <button title="Task Completion Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="tcr">
+                <?= round($cumulative_kpis['tcr'],2) ?>%
+                </button>
+                <button title="Task Efficiency Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ter">
+                <?= round($cumulative_kpis['ter'],2) ?>%
+                </button>
+                <button title="Task Time Adherence" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ttr">
+                <?= round($cumulative_kpis['ttr'],2) ?>%
+                </button>
+
+                <button title="Summary Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="sar">
+                <?= round($cumulative_kpis['sar'],2) ?>%
+                </button>
+                <button title="AFK Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="adr">
+                <?= round($cumulative_kpis['adr'],2) ?>%
+                </button>
+                <button title="Shift Productivity Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="spr">
+                <?= round($cumulative_kpis['spr'],2) ?>%
+                </button>
+                <button title="Overall Performance Score" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ops">
+                <?= round($cumulative_kpis['total_ops'],2) ?>%
                 </button>
                 
             </div>
@@ -112,11 +207,9 @@
             </div>
 
             <!-- This div will be populated with the staff KPI data for the clicked date using AJAX -->
-            <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-sky-100 shadow-inner overflow-hidden mb-5 <?= $firstClass ?>" id="<?= $date ?>"></div>
+            <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-sky-100 shadow-inner overflow-hidden mb-5 <?= $firstClass ?> rows-container" id="<?= $date ?>"></div>
 
             <?php endforeach; ?>
-
-
             
         </div>
 
@@ -124,6 +217,29 @@
 <?php init_tail(); ?>
 
 <script>
+function redirectToKpiBoard() {
+    // Get the selected values from the #staff select element
+    var staffSelect = document.getElementById('staff');
+    var selectedOptions = [];
+    for (var i = 0; i < staffSelect.options.length; i++) {
+        if (staffSelect.options[i].selected) {
+            selectedOptions.push(staffSelect.options[i].value);
+        }
+    }
+
+    // Convert the selected values to a comma-separated string
+    var staffValues = selectedOptions.join('e');
+
+    // Get the values of 'from' and 'to' elements
+    var fromValue = document.getElementById('from').value;
+    var toValue = document.getElementById('to').value;
+
+    // Construct the URL with the selected staff values
+    var url = admin_url + 'team_management/kpi_board/' + fromValue + '/' + toValue + '/' + staffValues;
+
+    // Redirect to the constructed URL
+    window.location.href = url;
+}
 
 function toggleCollapse(button, event, elementId) {
     if (event.target.tagName.toLowerCase() === 'button' || event.target.tagName.toLowerCase() === 'input') {
@@ -229,8 +345,8 @@ function fetchKpiDataForDate(dateDiv, callback) {
 
 
 $(document).ready(function() {
-    var firstDateButton = $('.first-date').prev(); // Assuming the button is directly before the collapsible content
-    toggleCollapse(firstDateButton[0], {target: firstDateButton[0]}, $('.first-date').attr('id'));
+    // var firstDateButton = $('.first-date').prev(); // Assuming the button is directly before the collapsible content
+    // toggleCollapse(firstDateButton[0], {target: firstDateButton[0]}, $('.first-date').attr('id'));
 
     $('#sortSelect').on('change', function() {
         var sortBy = $(this).val();
@@ -247,10 +363,10 @@ $(document).ready(function() {
     });
 
     $(".kpi-button").on('click', function() {
-        var kpiType = $(this).text().trim().toLowerCase(); // e.g. "ar"
+        var kpiType = $(this).data("kpi_name"); // e.g. "ar"
 
         // Iterate over all expanded date sections
-        $(".collapsible-content.expanded").each(function() {
+        $(".rows-container").each(function() {
             var dateSection = $(this);
 
             var sortedRows = $(".staff-row", dateSection).sort(function(a, b) {

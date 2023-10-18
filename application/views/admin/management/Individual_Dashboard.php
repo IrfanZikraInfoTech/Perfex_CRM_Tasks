@@ -654,6 +654,9 @@ clock_in_entries.forEach(clock => {
 
 for(let shiftKey in shift_timings) {
     let shift = shift_timings[shiftKey];
+    if(!shift.start || !shift.end){
+        continue;
+    }
     let shiftStart = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${shift.start}`).toISOString();
     let shiftEnd = new Date(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${shift.end}`).toISOString();
 

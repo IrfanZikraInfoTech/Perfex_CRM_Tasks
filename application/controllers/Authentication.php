@@ -24,28 +24,31 @@ class Authentication extends ClientsController
         $client->setRedirectUri(base_url('authentication/google_callback'));
         $client->addScope("email");
         $client->addScope("profile");
-
+        $client->addScope(Google_Service_Docs::DOCUMENTS);
+        $client->addScope(Google_Service_Drive::DRIVE);
         redirect($client->createAuthUrl());
     }
 
     public function google_callback()
     {
-        //$client = $this->custom_google_client;
-        //$client->setClientId('769395247432-st7i60r55cm9sifnt3n4mmuspd41n4hp.apps.googleusercontent.com');
-        //$client->setClientSecret('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');
-        //$client->setRedirectUri(base_url('authentication/google_callback'));
-//
-        //$accessToken = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-        //$client->setAccessToken($accessToken);
-//
-        //$oauth2 = new Google_Service_Oauth2($client);
-        //$google_user = $oauth2->userinfo->get();
+        $client = $this->custom_google_client;
+        $client->setClientId('769395247432-st7i60r55cm9sifnt3n4mmuspd41n4hp.apps.googleusercontent.com');
+        $client->setClientSecret('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');
+        $client->setRedirectUri(base_url('authentication/google_callback'));
+
+        $accessToken = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+        $client->setAccessToken($accessToken);
+
+        $this->session->set_userdata('google_access_token', $accessToken);
+
+        $oauth2 = new Google_Service_Oauth2($client);
+        $google_user = $oauth2->userinfo->get();
 
         //Perform your login logic here based on the user's email or other information
         //Example: verify if the email exists in the Perfex CRM users database
         //If the user exists, log them in; otherwise, show an error message or create a new user as needed
 
-        $email = "maryam@zikrainfotech.com";
+        $email = $google_user->email;
 
         $this->load->model('staff_model');
         $user = $this->staff_model->get('', ['email' => $email]);

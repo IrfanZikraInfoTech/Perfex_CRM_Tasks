@@ -129,7 +129,15 @@
                                                 $timeString = 'just now';
                                             }
 
-                                            $seen_staff_ids = explode(',', $kudos['seen_by']);
+                                            if($kudos['seen_by']){
+                                                $seen_staff_ids = array_unique(explode(',', $kudos['seen_by']));
+                                                if(!is_numeric($seen_staff_ids[0])){
+                                                    unset($seen_staff_ids[0]);
+                                                }
+                                            }else{
+                                                $seen_staff_ids = [];
+                                            }
+
                                             
                                             ?>
                                             <div class="lg:p-8 p-4 bg-white rounded-[30px] shadow-lg mb-5"   data-type="<?php 
@@ -155,7 +163,7 @@
                                                     </div>
                                                     <div class="text-right">
                                                         <span class="font-medium text-xs text-gray-600">
-                                                            <?php echo $timeString; ?>, <?= 'Seen by '.(count($seen_staff_ids)-1); ?>
+                                                            <?php echo $timeString; ?>, <?= 'Seen by '.(count($seen_staff_ids)); ?>
                                                         </span>
                                                     </div>
                                                 </div>

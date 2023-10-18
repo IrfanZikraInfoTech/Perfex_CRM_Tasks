@@ -41,11 +41,11 @@ $monthName = $dateObj->format('F');
 
                             <div class="w-1/2">
                                 <label for="s1s">Shift 1 Start</label>
-                                <input type="time" class="form-control" id="s1s">
+                                <input  <?= !$is_editable ? 'readonly' : '' ?> type="time" class="form-control" id="s1s">
                             </div>
                             <div class="w-1/2">
                                 <label for="s1e">Shift 1 End</label>
-                                <input type="time" class="form-control" id="s1e" >
+                                <input <?= !$is_editable ? 'readonly' : '' ?> type="time" class="form-control" id="s1e" >
                             </div>
 
                         </div>
@@ -54,11 +54,11 @@ $monthName = $dateObj->format('F');
 
                             <div class="w-1/2">
                                 <label for="s2s">Shift 2 Start</label>
-                                <input type="time" class="form-control"  id="s2s">
+                                <input <?= !$is_admin ? 'readonly' : '' ?> type="time" class="form-control"  id="s2s">
                             </div>
                             <div class="w-1/2">
                                 <label for="s2e">Shift 2 End</label>
-                                <input type="time" class="form-control" id="s2e" >
+                                <input <?= !$is_admin ? 'readonly' : '' ?> type="time" class="form-control" id="s2e" >
                             </div>
 
                         </div>
@@ -85,7 +85,7 @@ $monthName = $dateObj->format('F');
 
                 <div>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveShifts" data-staff-id="" onclick="setShifts();">Save Changes</button>
+                    <button type="button" class="btn btn-primary" id="saveShifts" data-staff-id="" onclick="setShifts();" <?= !$is_editable ? 'disabled' : '' ?>>Save Changes</button>
                 </div>
                 
             </div>
@@ -124,12 +124,12 @@ function openShiftsModal(date, shiftsData) {
     if(shiftsData[1]){
         document.querySelector('#s2s').value = shiftsData[1].shiftStart.toISOString().substring(11,16);
     }else{
-        document.querySelector('#s2s').value = '';
+        document.querySelector('#s2s').value = '18:00';
     }
     if(shiftsData[1]){
         document.querySelector('#s2e').value = shiftsData[1].shiftEnd.toISOString().substring(11,16) ;
     }else{
-        document.querySelector('#s2e').value = '';
+        document.querySelector('#s2e').value = '22:00';
     }
     
     $('#shiftsModal').modal('show');

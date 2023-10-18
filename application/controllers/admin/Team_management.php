@@ -121,7 +121,7 @@ class Team_management extends AdminController {
 
     
 
-    public function kpi_board($from = null, $to = null){
+    public function kpi_board($from = null, $to = null, $exclude_ids = ''){
         $from = $from ?? date("Y-m-d");
         $to = $to ?? date("Y-m-d");
 
@@ -134,19 +134,47 @@ class Team_management extends AdminController {
         $interval = new DateInterval('P1D');
         $date_range = new DatePeriod($start_date, $interval, $end_date);
         
-        
-
         $data['kpi_data'] = [];
         foreach ($date_range as $date) {
             $formatted_date = $date->format('Y-m-d');
             $data['kpi_data'][] = $formatted_date;
         }
 
-        $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+        if($exclude_ids){
+            $exclude_ids = explode('e', $exclude_ids);
+        }
 
-        $staff_ops_data = [];
+        if(!empty($exclude_ids) && is_array($exclude_ids)){
+            // Fetch staff data excluding the ones with IDs in the $exclude_ids array
+            $this->db->select('staffid, firstname, lastname');
+            $this->db->where_not_in('staffid', $exclude_ids); // Exclude the IDs from the query
+            $this->db->order_by('firstname');
+            $staffs = $this->db->get('tblstaff')->result();
+
+            $data['exclude_ids'] = $exclude_ids;
+
+        } else {
+            // If $exclude_ids is empty, just fetch all staff data
+            $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+        }
+
+        $staff_kpi_data = [];
+
+        $ar = 0;
+        $pr  = 0;
+        $tcr = 0;
+        $ter = 0;
+        $ttr = 0;
+        $sar = 0;
+        $adr = 0;
+        $spr = 0;
+        $total_ops = 0;
+
+        $total_staff_members = 0;
+
 
         foreach ($staffs as $staff) {
+            $total_staff_members++;
             $staff_id = $staff->staffid;
 
             // Fetch KPIs for the staff member for the given date range
@@ -155,6 +183,17 @@ class Team_management extends AdminController {
             $summary_adherence_rate = $this->kpi_system->kpi_summary_adherence_rate($staff_id, $from, $to);
             $afk_adherence_rate = $this->kpi_system->kpi_afk_adherence_rate($staff_id, $from, $to);
             $shift_productivity_rate = $this->kpi_system->kpi_shift_productivity_rate($staff_id, $from, $to);
+
+            //Cumulative KPI
+            $ar += $punctuality_rate['present_percentage'];
+            $pr += $punctuality_rate['on_time_percentage'];
+            $tcr += $task_rates['completion_rate'];
+            $ter += $task_rates['efficiency_rate'];
+            $ttr += $task_rates['timer_adherence_rate'];
+            $sar += $summary_adherence_rate['percentage'];
+            $adr += $afk_adherence_rate['percentage'];
+            $spr += $shift_productivity_rate['percentage'];
+
 
             // Calculate OPS for the staff member
             $ops = $this->kpi_system->calculate_ops(
@@ -167,15 +206,47 @@ class Team_management extends AdminController {
                 $task_rates['efficiency_rate']
             );
 
+            $total_ops += $ops;
+
             // Store the OPS in the array
-            $staff_ops_data[$staff_id] = [
+            $staff_kpi_data[$staff_id] = [
                 'name' => $staff->firstname . ' ' . $staff->lastname,
-                'ops' => $ops
+                'ops' => $ops,
+                'ar' => $punctuality_rate['present_percentage'],
+                'pr' => $punctuality_rate['on_time_percentage'],
+                'tcr' => $task_rates['completion_rate'],
+                'ter' => $task_rates['efficiency_rate'],
+                'ttr' => $task_rates['timer_adherence_rate'],
+                'sar' => $summary_adherence_rate['percentage'],
+                'adr' => $afk_adherence_rate['percentage'],
+                'spr' => $shift_productivity_rate['percentage']
             ];
         }
 
+        $average_ar = $ar / $total_staff_members;
+        $average_pr = $pr / $total_staff_members;
+        $average_tcr = $tcr / $total_staff_members;
+        $average_ter = $ter / $total_staff_members;
+        $average_ttr = $ttr / $total_staff_members;
+        $average_sar = $sar / $total_staff_members;
+        $average_adr = $adr / $total_staff_members;
+        $average_spr = $spr / $total_staff_members;
+        $average_total_ops = $total_ops / $total_staff_members;
+
         // Pass the OPS data to the view
-        $data['staff_ops_data'] = $staff_ops_data;
+        $data['staff_kpi_data'] = $staff_kpi_data;
+
+        $data['cumulative_kpis'] = [
+            'ar' => $average_ar,
+            'pr' => $average_pr,
+            'tcr' => $average_tcr,
+            'ter' => $average_ter,
+            'ttr' => $average_ttr,
+            'sar' => $average_sar,
+            'adr' => $average_adr,
+            'spr' => $average_spr,
+            'total_ops' => $average_total_ops
+        ];        
 
 
         $this->load->view('admin/management/kpi_board', $data);
@@ -1321,7 +1392,9 @@ class Team_management extends AdminController {
         $all_kudos = $this->db->get('tblkudos')->result();
         foreach($all_kudos as $kudos){
             $kudos_id = $kudos->id;
-            $seen_users = explode(',', $kudos->seen_by);
+
+            $seen_users = ($kudos->seen_by) ? explode(',', $kudos->seen_by) : [];
+
             if (!in_array($staff_id, $seen_users)) { // If not marked as seen already
                 $seen_users[] = $staff_id;
                 $updated_seen_users = implode(',', $seen_users);
@@ -1335,24 +1408,64 @@ class Team_management extends AdminController {
         $this->load->view('admin/management/kudos', $data);
     }
 
+    private function convert_html_to_google_chat_format($text) {
+        // Replace bold tags with * for Google Chat
+        $text = preg_replace('/<strong>(.*?)<\/strong>/', '*$1*', $text);
+    
+        // Replace italics tags with _ for Google Chat
+        $text = preg_replace('/<em>(.*?)<\/em>/', '_$1_', $text);
+    
+         $text = strip_tags($text);
+
+        // Decode any HTML entities
+        $text = html_entity_decode($text);
+    
+        return $text;
+    }
+    
+    
+
     public function save_kudos_data() {
 
         $principles = $this->input->post('principles');
-        $principles_str = implode(' , ', $principles);
+        $principles_str = implode(', ', $principles);
     
         $staff_id = $this->session->userdata('staff_user_id');
+        $to_id = $this->input->post('to_');
+
+        // Convert staff_id and to_id to their respective tags
+        $from_tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
+        $to_tag = id_to_name($to_id, 'tblstaff', 'staffid', 'google_chat_id');
+
+        // Construct the kudos message
+        $kudos_type = $this->input->post('type');
+        $remarks = $_POST['remarks'];
+        
 
         $data = [
-            'kudosType' => $this->input->post('type'),
-            'to' => $this->input->post('to_'),
+            'kudosType' => $kudos_type,
+            'to' => $to_id,
             'principles' => $principles_str,
-            'remarks' => $_POST['remarks'],
+            'remarks' => $remarks,
             'staff_id' => $staff_id
 
         ];
     
         $response = $this->team_management_model->kudosdata($data);
-    
+
+        $remarks = $this->convert_html_to_google_chat_format($remarks);
+
+        $message = sprintf(
+            "🌟 *#%s* from *<users/%s>* to *<users/%s>* 🌟\n\n *Following Principles:* %s\n\n*With Remarks:* %s ",
+            ucfirst($kudos_type),
+            $from_tag,
+            $to_tag,
+            $principles_str,
+            $remarks
+        );
+
+        $this->webhook_lib->send_chat_webhook($message, 'kudos');
+
         echo json_encode([
             'success' => $response,
         ]);
@@ -1393,15 +1506,21 @@ class Team_management extends AdminController {
     }
 
     
-    public function set_shifts($id, $month){
-        
-        $staff_id = $this->session->userdata('staff_user_id');
+    public function set_shifts($id = '', $month = ''){
 
+        if (!has_permission('team_management', '', 'admin')) {
+            $id = get_staff_user_id();
+            $month = date('m');
+        }
+        
         $data['staff'] = $this->staff_model->get($id);
 
-        $data['shifts'] = $this->team_management_model->get_shift_timings($staff_id, $month);
+        $data['shifts'] = $this->team_management_model->get_shift_timings($id, $month);
 
         $data['month'] = $month;
+
+        $data['is_admin'] = has_permission('team_management', '', 'admin');
+        $data['is_editable'] = ($data['is_admin']) ? 1 : ((date('d') < 3) ? 1 : 0);
 
         $this->load->view('admin/management/set_shifts',$data);
     }

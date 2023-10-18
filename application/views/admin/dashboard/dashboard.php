@@ -174,7 +174,7 @@
                                         $totalLikes = count($this->newsfeed_model->get_post_likes($post["postid"]));
                                         $currentDateTime = new DateTime();
                                         $postDateTime = new DateTime($post["datecreated"]);
-                                        $hasUserSeenPost = in_array($currentUserId, explode(',', $post["seen_by"])); // Check if user ID exists in seen_by column
+                                        $hasUserSeenPost = in_array($currentUserId, $post['seen_by'] ? (explode(',', $post["seen_by"])) : []); // Check if user ID exists in seen_by column
                                         $postClass = $hasUserSeenPost ? "" : "not-seen"; // Assign the class based on if the user has seen the post or not
                                         $interval = $currentDateTime->diff($postDateTime);
                                         
@@ -193,7 +193,7 @@
                                             $timeString = 'just now';
                                         }
                                     ?>
-                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-yellow-400  <?= $postClass ?>" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this)">
+                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-yellow-400  <?= $postClass ?>" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this);">
                                             <div class="flex justify-between items-center">
                                                 <div class="font-bold text-xl"><?= $post["creator_name"] ?></div>
                                                 <div class="text-gray-500 text-sm italic"><?= $timeString ?></div>

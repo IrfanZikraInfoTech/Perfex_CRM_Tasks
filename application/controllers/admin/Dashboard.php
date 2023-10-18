@@ -13,7 +13,6 @@ class Dashboard extends AdminController
         $this->load->model('newsfeed_model');
         $this->load->model('team_management_model');
         $this->load->model('staff_model');
-        $this->load->library('webhook_library', null, 'webhook_lib');
     }
 
     /* This is admin dashboard view */

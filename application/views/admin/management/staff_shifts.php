@@ -11,7 +11,7 @@
 
             <a class="btn-primary p-2 rounded float-right mr-4" target="_blank" href="<?php echo admin_url('team_management/process_staff_leaves_cron_access/OUIYUGBSCL')?>" >Update Leaves</a>
             
-            <button class="btn-primary p-2 rounded float-right mr-4 manage-globalleaves-btn " data-toggle="modal" data-target="#globalleavesModal">Global Leaves</button>
+            <button class="btn-primary p-2 rounded float-right mr-4 manage-globalleaves-btn " data-toggle="modal" data-target="#globalleavesModal">Global Holidays</button>
            
             <br>
         
@@ -71,7 +71,7 @@
     <div class="max-w-3xl mx-auto my-3">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-xl" id="globalleavesModalLabel">Global leaves for Organization</h5>
+                <h5 class="modal-title text-xl" id="globalleavesModalLabel">Global holidays for Organization</h5>
             </div>
             <div class="modal-body p-4">
 

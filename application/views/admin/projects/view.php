@@ -95,7 +95,7 @@
                             <?php if (has_permission('invoices', '', 'create')) { ?>
                             <a href="#"
                                 onclick="<?php echo $invoice_func; ?>(<?php echo $project->id; ?>); return false;"
-                                class="invoice-project btn btn-primary<?php if ($project->client_data->active == 0) {
+                                class="hidden invoice-project btn btn-primary<?php if ($project->client_data->active == 0) {
                                echo ' disabled';
                            } ?>">
                                 <i class="fa-solid fa-file-invoice tw-mr-1"></i>
