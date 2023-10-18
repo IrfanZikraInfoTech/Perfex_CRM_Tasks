@@ -16,15 +16,23 @@
 
        
         <div class="w-full">
-        <div class="w-full mb-4">
+        <div class="w-full mb-4 bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all overflow-x-auto xl:cursor-auto cursor-move ">
             <h2 class="text-3xl font-bold text-center">Team</h2>
-            <div class="my-4 p-4 rounded-[50px] border border-solid border-gray-100 hover:border-yellow-400 bg-gray-200">
-                <div class="w-flex justify-center w-full overflow-x-auto" id="chart_div"></div>
-            </div>
-
+            <div class="mt-10 flex flex-row justify-between items-center gap-4 px-4 py-2 cursor-pointer text-lg text-gray-600 transition-all bg-gray-100 rounded-[40px]" onclick="toggleCollapse(this, event, 'chart_div')">
+        <div class="opacity-0 transform transition-transform duration-300"></div>
+            <div>View Chart</div>
+            <div class="fas fa-angle-down rotate-[90deg] transform transition-transform duration-300"></div>
         </div>
+        <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-sky-100 shadow-inner overflow-hidden mb-5 xl:text-base text-sm " id="chart_div" style="max-height: 0; overflow: hidden;">
+        <div class="my-4 p-4 rounded-[50px] border border-solid border-gray-100 hover:border-yellow-400 bg-gray-200">
+                <div class="w-flex justify-center w-full overflow-x-auto py-4" id="chart_div"></div>
+            </div> 
+        </div> 
+        </div>
+        
 
-    <div class="flex flex-col gap-4">
+
+    <div class="flex flex-col gap-4 mt-4">
 
         <?php  foreach ($departments as $department): ?>
 
@@ -90,6 +98,28 @@
 <?php init_tail(); ?>
 
 <script>
+    function toggleCollapse(button, event, elementId) {
+    if (event.target.tagName.toLowerCase() === 'button' || event.target.tagName.toLowerCase() === 'input') {
+        return;
+    }
+
+    var content = document.getElementById(elementId);
+    var arrow = button.querySelector('.fa-angle-down');
+
+    var isExpanding = !content.classList.contains("expanded");
+    content.classList.toggle("expanded");
+    if(isExpanding) {
+        content.style.padding = " 10px";
+        content.style.maxHeight = content.scrollHeight + "px";
+    } else {
+       
+        content.style.maxHeight = "0px";
+        content.style.padding = " 0px";
+
+    }
+    arrow.classList.toggle('rotate-[90deg]');
+}
+
     $('#universalReminders').on('click', function() {
 
         if(confirm("Are you sure?")){
@@ -156,7 +186,7 @@
     // Create the chart.
     var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
     // Draw the chart, setting the allowHtml option to true for the tooltips.
-    chart.draw(data, {'allowHtml':true, nodeClass: '!text-lg !rounded-[30px] !px-10 !py-2 bg-white transition-all hover:bg-sky-100 !border-none', width: '100%'});
+    chart.draw(data, {'allowHtml':true, nodeClass: 'py-3 !text-lg !rounded-[30px] !px-10 !py-2 bg-white transition-all hover:bg-yellow-100 !border-none', width: '100%'});
     }
 
 
