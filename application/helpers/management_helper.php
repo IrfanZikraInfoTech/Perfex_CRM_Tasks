@@ -24,9 +24,9 @@ function notify_task_allocation($data) {
     $CI->load->model('staff_model');
     $CI->load->model('tasks_model');
     $CI->load->model('projects_model');
-    $CI->load->model('team_management/team_management_model');
+    $CI->load->model('team_management_model');
 
-    $CI->load->library('team_management/webhook_library');
+    $CI->load->library('webhook_library');
     
 
     
@@ -47,8 +47,7 @@ function notify_task_allocation($data) {
     $last_assignee = end($assignees);
     $staff_id = $last_assignee['assigneeid'];
 
-    $tag = id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
-
+    $tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
 
     // Prepare message content
     $message_content = "🎯 *Task Assigned*\n";
@@ -73,7 +72,7 @@ function notify_task_timer_started($data) {
     $CI->load->model('projects_model');
     $CI->load->model('team_management/team_management_model');
 
-    $CI->load->library('team_management/webhook_library');
+    $CI->load->library('webhook_library');
     
 
     // Get task details
@@ -96,8 +95,7 @@ function notify_task_timer_started($data) {
     // Get staff details
     $staff = $CI->staff_model->get($staff_id);
 
-    $tag = id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
-
+    $tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
     // Prepare message content
     $message_content = "⏱️ *Task Timer Started*\n";
     $message_content .= "------------------------\n";
@@ -119,7 +117,7 @@ function notify_task_timer_stopped($data) {
     $CI->load->model('projects_model');
     $CI->load->model('team_management/team_management_model');
 
-    $CI->load->library('team_management/webhook_library');
+    $CI->load->library('webhook_library');
 
     
     // Get timer details
@@ -140,8 +138,7 @@ function notify_task_timer_stopped($data) {
         $project_name = "";
     }
 
-    $tag = id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
-
+    $tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
     // Prepare message content
     $message_content = "⏱️ *Task Timer Stopped*\n";
     $message_content .= "------------------------\n";
@@ -165,7 +162,7 @@ function notify_task_status_changed($data) {
     $CI->load->model('team_management/team_management_model');
 
     // Load necessary library
-    $CI->load->library('team_management/webhook_library');
+    $CI->load->library('webhook_library');
 
     // Get task details
     $task_id = $data['task_id'];
@@ -189,8 +186,7 @@ function notify_task_status_changed($data) {
         $total_task_time += $timer['end_time'] - $timer['start_time'];
     }
 
-    $tag = id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
-
+    $tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
     // Prepare message content
     $message_content = "📝 *Task Completed*\n";
     $message_content .= "-----------------------\n";
@@ -211,7 +207,7 @@ function notify_task_comment_added($data) {
     $CI->load->model('team_management/team_management_model');
 
     // Load webhook library
-    $CI->load->library('team_management/webhook_library');
+    $CI->load->library('webhook_library');
 
     // Get task details
     $task_id = $data['task_id'];
@@ -227,8 +223,7 @@ function notify_task_comment_added($data) {
     // Get staff details
     $staff_id = $comment->staffid;
 
-    $tag = id_to_name($staff_id, 'tbl_staff_google_chat', 'staff_id', 'google_chat_user_id');
-
+    $tag = id_to_name($staff_id, 'tblstaff', 'staffid', 'google_chat_id');
     // Prepare message content
     $message_content = "💬 *Task Comment Added*\n";
     $message_content .= "----------------\n";

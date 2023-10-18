@@ -38,6 +38,9 @@ class Webhook_library
             $url = "https://chat.googleapis.com/v1/spaces/AAAAsGG8iYM/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=Mifshsjgb3HLutqyd8ScfXtpPfkDcykf2d_POhGWN3c&threadKey={$threadUrl}&messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD";
         }else if($threadKey == "buddy"){
             $url = "https://chat.googleapis.com/v1/spaces/AAAAvf7-Lxg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=Ip5xTAPI-0iG1D03Dhlij94c3H_llrjIBKxkwXkV_Gg";
+        }else if($threadKey == 'kudos'){
+            $url = "https://chat.googleapis.com/v1/spaces/AAAAr3_Hkjs/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=40qDnpmXWEkOrqoZnpHQAEa28arCW637rc-w_rYrTxw";
+            //$data = $message;
         }
 
         

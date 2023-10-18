@@ -84,6 +84,8 @@
 
 		<?php echo render_textarea('settings[dummy_summary]','Dummy Summary',get_option('dummy_summary')); ?>
 
+		<?php echo render_input('settings[hr_dept_id]','HR Department Id',get_option('hr_dept_id'), 'number'); ?>
+
 		
 	</div>
 </div>

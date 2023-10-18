@@ -13,7 +13,6 @@ class Dashboard extends AdminController
         $this->load->model('newsfeed_model');
         $this->load->model('team_management_model');
         $this->load->model('staff_model');
-        $this->load->library('webhook_library', null, 'webhook_lib');
     }
 
     /* This is admin dashboard view */
@@ -124,6 +123,11 @@ class Dashboard extends AdminController
         $this->load->library('kpi_system');
 
         $data['puctuality_rate'] = $this->kpi_system->kpi_punctuality_rate($staff_id, date("Y-m-01"), date("Y-m-d"))['on_time_percentage'];
+
+        if(!$this->db->where('staff_id',$staff_id)->get('tbl_staff_status')->row()){
+            $this->db->insert('tbl_staff_status',['staff_id'=>$staff_id, 'status'=>'Offline']);
+        }
+
 
         $this->load->view('admin/dashboard/dashboard', $data);
     }

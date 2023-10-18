@@ -54,22 +54,12 @@
 </style>
 
 <div id="wrapper">
-    <div class="screen-options-area"></div>
-        <div class="screen-options-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                class="tw-w-5 tw-h-5 tw-mr-1">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
 
-            <?php echo _l('dashboard_options'); ?>
-        </div>
     <div class="content">
         <div class="row">
                 <?php //$this->load->view('admin/includes/alerts'); ?>
 
-                <?php hooks()->do_action('before_start_render_dashboard_content'); ?>
+                <?php //hooks()->do_action('before_start_render_dashboard_content'); ?>
 
                 <div class="clearfix"></div> 
                 
@@ -127,15 +117,20 @@
 
                         <div class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">Assigned Task</div>
                         
-                        <div class="flex flex-col h-full bg-sky-100 p-4 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar max-h-[300px]">
-                            <div class="p-1 flex flex-col mt-4 gap-2">         
-                                    <?php
+                        <div class="flex flex-col bg-sky-100 px-4 py-2 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar max-h-[300px]">
+                                <?php
                                     $tasks = $this->tasks_model->get_user_tasks_assigned($GLOBALS['current_user']->staffid);
                                     $total_tasks = 0;
                                     $completed_tasks = 0;
 
-                                        $current_date = date('Y-m-d'); 
+                                    $current_date = date('Y-m-d'); 
 
+                                    if(count($tasks) > 0){
+                                ?>
+                        
+                                <div class="p-4 flex flex-col mt-4 gap-2">         
+                                    
+                                    <?php
                                         foreach ($tasks as $task) {
                                             $current_time = time();
                                             $start_time = strtotime($task->startdate);
@@ -156,8 +151,13 @@
                                         <?php
 
                                     }
+                                    echo '</div>';
+                                }else{
+                                    echo 'No Task!';
+                                }
+                                   
                                     ?>
-                            </div>
+                            
                         </div>
                     </div>
 
@@ -174,7 +174,7 @@
                                         $totalLikes = count($this->newsfeed_model->get_post_likes($post["postid"]));
                                         $currentDateTime = new DateTime();
                                         $postDateTime = new DateTime($post["datecreated"]);
-                                        $hasUserSeenPost = in_array($currentUserId, explode(',', $post["seen_by"])); // Check if user ID exists in seen_by column
+                                        $hasUserSeenPost = in_array($currentUserId, $post['seen_by'] ? (explode(',', $post["seen_by"])) : []); // Check if user ID exists in seen_by column
                                         $postClass = $hasUserSeenPost ? "" : "not-seen"; // Assign the class based on if the user has seen the post or not
                                         $interval = $currentDateTime->diff($postDateTime);
                                         
@@ -193,7 +193,7 @@
                                             $timeString = 'just now';
                                         }
                                     ?>
-                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-yellow-400  <?= $postClass ?>" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this)">
+                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-yellow-400  <?= $postClass ?>" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this);">
                                             <div class="flex justify-between items-center">
                                                 <div class="font-bold text-xl"><?= $post["creator_name"] ?></div>
                                                 <div class="text-gray-500 text-sm italic"><?= $timeString ?></div>
@@ -276,7 +276,9 @@
 
             <!-- Upcoming Birthdays -->
             <div class="col-md-12">
-                    <?php if(isset($upcoming_birthdays) && !empty($upcoming_birthdays)): ?>
+                    <?php
+
+                    if(isset($upcoming_birthdays) && !empty($upcoming_birthdays)): ?>
                         <div class="upcoming-birthdays bg-white p-6 rounded-[50px] shadow-lg">
                             <h3 class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">Upcoming Birthdays</h3>
                             <div class="grid grid-cols-2 gap-6">

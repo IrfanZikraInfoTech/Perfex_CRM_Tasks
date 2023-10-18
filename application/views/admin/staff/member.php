@@ -160,7 +160,7 @@
                                                 <?php foreach($staff_members as $staff): ?>
                                                     <option value="<?php echo $staff['staffid']; ?>" 
                                                         <?php 
-                                                        if (isset($member) && $member->staffid == $staff['staffid']) {
+                                                        if (isset($member) && $member->staffid == $staff['staffid'] && $member->staffid != 1) {
                                                             echo 'disabled';
                                                         }
                                                         if (isset($member) && $member->report_to == $staff['staffid']) {
