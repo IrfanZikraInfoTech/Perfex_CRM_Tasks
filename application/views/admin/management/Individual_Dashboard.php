@@ -623,7 +623,9 @@ var clock_in_entries = <?php echo json_encode($clock_in_entries); ?>;
 
 const today = new Date("<?php echo $from; ?>");
 let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
-let endDate = new Date(today.getTime() + 24*60*60*1000); // Default: next day
+let endDate = new Date(today.getTime() + (24*60*60*1000)); // Default: next day
+
+console.log(endDate);
 
 var items = new vis.DataSet();
 var options = {
@@ -635,13 +637,7 @@ var options = {
 clock_in_entries.forEach(clock => {
     const inTime = new Date(clock.clock_in).toISOString();
     const outTime = new Date(clock.clock_out).toISOString();
-    // Setting startDate and endDate based on clock-in and clock-out times
-    if (new Date(inTime) < startDate) {
-        startDate = new Date(inTime);
-    }
-    if (new Date(outTime) > endDate) {
-        endDate = new Date(outTime);
-    }
+
     items.add({
         content: 'Clock in',
         start: inTime,
@@ -700,7 +696,7 @@ var timeline = new vis.Timeline(container, items, options);
 
 // Setting the timeline to focus on our startDate to endDate
 timeline.setWindow(startDate, endDate);
-timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
+// timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
 
 </script>
 

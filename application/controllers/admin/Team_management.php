@@ -253,9 +253,9 @@ class Team_management extends AdminController {
     }
 
     public function fetch_kpi_for_date() {
-        $date = $this->input->post('date');
+        
         $staffs = $this->db->select('staffid, firstname, lastname')->get('tblstaff')->result();
-    
+        echo $this->db->getLastQuery();
         $data = [];
         foreach ($staffs as $staff) {
             $staff_id = $staff->staffid;
@@ -290,7 +290,7 @@ class Team_management extends AdminController {
         echo json_encode($data);
     }
 
-    public function attendance_board($from = null, $to = null){
+    public function attendance_board($from = null, $to = null, $exclude_ids = ''){
         $from = $from ?? date("Y-m-d");
         $to = $to ?? date("Y-m-d");
 
@@ -314,7 +314,23 @@ class Team_management extends AdminController {
             $data['dates'][$formatted_date] = $date_data;
         }
 
-        $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+        if($exclude_ids){
+            $exclude_ids = explode('e', $exclude_ids);
+        }
+
+        if(!empty($exclude_ids) && is_array($exclude_ids)){
+            // Fetch staff data excluding the ones with IDs in the $exclude_ids array
+            $this->db->select('staffid, firstname, lastname');
+            $this->db->where_not_in('staffid', $exclude_ids); // Exclude the IDs from the query
+            $this->db->order_by('firstname');
+            $staffs = $this->db->get('tblstaff')->result();
+
+            $data['exclude_ids'] = $exclude_ids;
+
+        } else {
+            // If $exclude_ids is empty, just fetch all staff data
+            $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+        }
 
         $staff_dates_data = [];
 
@@ -579,6 +595,24 @@ class Team_management extends AdminController {
              ->set_content_type('application/json')
              ->set_output(json_encode($result));
     }
+
+    public function copy_shifts() {
+        $staff_id = $this->input->post('staff_id');
+        $month = $this->input->post('month');
+        
+        // Validate the inputs
+        if (empty($staff_id) || empty($month) || !is_numeric($month) || $month < 1 || $month > 12) {
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid input'));
+            return;
+        }
+    
+        // Call the model function
+        $result = $this->team_management_model->copy_shifts($staff_id, $month);
+    
+        // Return the result
+        echo json_encode($result);
+    }
+    
 
     public function get_shift_timings($staff_id, $month) {
 

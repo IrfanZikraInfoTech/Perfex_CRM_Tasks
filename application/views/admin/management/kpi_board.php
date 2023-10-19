@@ -290,7 +290,9 @@ function fetchKpiDataForDate(dateDiv, callback) {
     $.ajax({
         url: '<?= admin_url("team_management/fetch_kpi_for_date") ?>',
         type: 'POST',
-        data: { date: date },
+        data: { 
+            date: date
+        },
         dataType: 'json',
         success: function(staffStats) {
             var content = '';

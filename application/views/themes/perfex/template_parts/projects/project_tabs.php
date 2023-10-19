@@ -14,13 +14,33 @@
 
             <?php hooks()->do_action('after_customers_area_project_overview_tab', $project); ?>
 
-            <?php if ($project->settings->view_tasks == 1 && $project->settings->available_features['project_tasks'] == 1) { ?>
-            <li role="presentation" class="project_tab_tasks">
-                <a data-group="project_tasks"
-                    href="<?php echo site_url('clients/project/' . $project->id . '?group=project_tasks'); ?>"
+            <?php if ($project->settings->available_features['project_board'] == 1) { ?>
+            <li role="presentation" class="project_tab_board">
+                <a data-group="project_board"
+                    href="<?php echo site_url('clients/project/' . $project->id . '?group=project_board'); ?>"
                     role="tab">
                     <i class="fa-regular fa-check-circle menu-icon" aria-hidden="true"></i>
-                    <?php echo _l('tasks'); ?></a>
+                    Board</a>
+            </li>
+            <?php } ?>
+
+            <?php if ($project->settings->available_features['project_backlog'] == 1) { ?>
+            <li role="presentation" class="project_tab_backlog">
+                <a data-group="project_backlog"
+                    href="<?php echo site_url('clients/project/' . $project->id . '?group=project_backlog'); ?>"
+                    role="tab">
+                    <i class="fa-regular fa-check-circle menu-icon" aria-hidden="true"></i>
+                    Backlog</a>
+            </li>
+            <?php } ?>
+
+            <?php if ($project->settings->view_gantt == 1 && $project->settings->available_features['project_gantt'] == 1) { ?>
+            <li role="presentation" class="project_tab_gantt">
+                <a data-group="project_gantt"
+                    href="<?php echo site_url('clients/project/' . $project->id . '?group=project_gantt'); ?>"
+                    role="tab">
+                    <i class="fa-solid fa-chart-gantt menu-icon" aria-hidden="true"></i>
+                    Timeline</a>
             </li>
             <?php } ?>
 
@@ -50,7 +70,17 @@
                     href="<?php echo site_url('clients/project/' . $project->id . '?group=project_files'); ?>"
                     role="tab">
                     <i class="fa-solid fa-file menu-icon" aria-hidden="true"></i>
-                    <?php echo _l('project_files'); ?></a>
+                    Data</a>
+            </li>
+            <?php } ?>
+
+            <?php if ($project->settings->view_activity_log == 1 && $project->settings->available_features['project_activity'] == 1) { ?>
+            <li role="presentation" class="project_tab_activity">
+                <a data-group="project_activity"
+                    href="<?php echo site_url('clients/project/' . $project->id . '?group=project_activity'); ?>"
+                    role="tab">
+                    <i class="fa-regular fa-file-lines menu-icon" aria-hidden="true"></i>
+                    <?php echo _l('project_activity'); ?></a>
             </li>
             <?php } ?>
 
@@ -64,25 +94,9 @@
             </li>
             <?php } ?>
 
-            <?php if ($project->settings->view_gantt == 1 && $project->settings->available_features['project_gantt'] == 1) { ?>
-            <li role="presentation" class="project_tab_gantt">
-                <a data-group="project_gantt"
-                    href="<?php echo site_url('clients/project/' . $project->id . '?group=project_gantt'); ?>"
-                    role="tab">
-                    <i class="fa-solid fa-chart-gantt menu-icon" aria-hidden="true"></i>
-                    <?php echo _l('project_gant'); ?></a>
-            </li>
-            <?php } ?>
+            
 
-            <?php if (has_contact_permission('support') && $project->settings->available_features['project_tickets'] == 1) { ?>
-            <li role="presentation" class="project_tab_tickets">
-                <a data-group="project_tickets"
-                    href="<?php echo site_url('clients/project/' . $project->id . '?group=project_tickets'); ?>"
-                    role="tab">
-                    <i class="fa fa-life-ring menu-icon" aria-hidden="true"></i>
-                    <?php echo _l('project_tickets'); ?></a>
-            </li>
-            <?php } ?>
+           
 
             <?php if (has_contact_permission('contracts') && $project->settings->available_features['project_contracts'] == 1) { ?>
             <li role="presentation" class="project_tab_contracts">
@@ -125,13 +139,15 @@
             </li>
             <?php } ?>
 
-            <?php if ($project->settings->view_activity_log == 1 && $project->settings->available_features['project_activity'] == 1) { ?>
-            <li role="presentation" class="project_tab_activity">
-                <a data-group="project_activity"
-                    href="<?php echo site_url('clients/project/' . $project->id . '?group=project_activity'); ?>"
+            
+
+            <?php if (has_contact_permission('support') && $project->settings->available_features['project_tickets'] == 1) { ?>
+            <li role="presentation" class="project_tab_tickets">
+                <a data-group="project_tickets"
+                    href="<?php echo site_url('clients/project/' . $project->id . '?group=project_tickets'); ?>"
                     role="tab">
-                    <i class="fa-regular fa-file-lines menu-icon" aria-hidden="true"></i>
-                    <?php echo _l('project_activity'); ?></a>
+                    <i class="fa fa-life-ring menu-icon" aria-hidden="true"></i>
+                    Support</a>
             </li>
             <?php } ?>
         </ul>

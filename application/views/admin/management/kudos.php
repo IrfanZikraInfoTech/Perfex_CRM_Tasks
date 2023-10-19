@@ -303,7 +303,7 @@
         event.preventDefault();
 
         var remainingKudos = parseInt($(".text-xl").text().split(':')[1].trim(), 10); // Extract the remaining kudos from the text
-
+// remainingKudos = 3;
         if (remainingKudos <= 0) {
             Swal.fire({
                 icon: 'info',

@@ -376,7 +376,7 @@ class Clients extends ClientsController
                 if ($project->settings->create_tasks == 0) {
                     redirect(site_url('clients/project/' . $project->id));
                 }
-                $data['milestones'] = $this->projects_model->get_milestones($id, ['hide_from_customer' => 0]);
+                $data['epics'] = $this->projects_model->get_epics($id);
             } elseif ($group == 'project_gantt') {
                 $data['gantt_data'] = (new Gantt($id, 'milestones'))->excludeMilestonesFromCustomer()->get();
             } elseif ($group == 'project_discussions') {
@@ -469,6 +469,66 @@ class Clients extends ClientsController
                 }
             } elseif ($group == 'project_timesheets') {
                 $data['timesheets'] = $this->projects_model->get_timesheets($id);
+            } elseif ($group == 'project_board'){
+                $sprint = $this->projects_model->is_active_sprint_exists($id)['sprint'];
+                if($sprint){
+                    $sprint->stories = $this->projects_model->get_stories('sprint', $sprint->id);
+                    
+                    $sprint->not_started_count = 0;
+                    $sprint->in_progress_count = 0;
+                    $sprint->completed_count = 0;
+    
+                    foreach($sprint->stories as &$story){
+                        $story = $this->tasks_model->get($story->id);
+                        $story->epic = $this->projects_model->get_epic($story->epic_id);
+    
+                        if ($story->status == 1) {
+                            $sprint->not_started_count++;
+                        } elseif ($story->status == 4) {
+                            $sprint->in_progress_count++;
+                        } elseif ($story->status == 5) {
+                            $sprint->completed_count++;
+                        }
+                    }
+
+                    $data['active_sprint'] = $sprint;
+                    
+                    $data['task_statuses'] = $this->tasks_model->get_statuses();
+                }
+            } elseif ($group == 'project_backlog'){
+
+                $this->load->model('tasks_model');
+
+                $data['epics'] = $this->projects_model->get_epics($id);
+                foreach ($data['epics'] as $epic) {
+                    $epic->stories = $this->projects_model->get_stories('epic', $epic->id);
+                    foreach($epic->stories as &$story){
+                        $story = $this->tasks_model->get($story->id);
+                    }
+                }
+
+                $data['sprints'] = $this->projects_model->get_sprints($id);
+                foreach ($data['sprints'] as $sprint) {
+                    $sprint->stories = $this->projects_model->get_stories('sprint', $sprint->id);
+                    
+                    $sprint->not_started_count = 0;
+                    $sprint->in_progress_count = 0;
+                    $sprint->completed_count = 0;
+
+                    foreach($sprint->stories as &$story){
+                        $story = $this->tasks_model->get($story->id);
+                        $story->epic = $this->projects_model->get_epic($story->epic_id);
+
+                        if ($story->status == 1) {
+                            $sprint->not_started_count++;
+                        } elseif ($story->status == 4) {
+                            $sprint->in_progress_count++;
+                        } elseif ($story->status == 5) {
+                            $sprint->completed_count++;
+                        }
+                    }
+                }
+
             }
 
             if ($this->input->get('taskid')) {

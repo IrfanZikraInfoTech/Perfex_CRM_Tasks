@@ -9,11 +9,7 @@
             <input type="text" name="name" id="name" class="form-control" required>
         </div>
         <div class="row">
-            <div class="col-md-<?php if ($project->settings->view_milestones == 1) {
-    echo 6;
-} else {
-    echo 12;
-} ?>">
+            <div class="col-md-6">
                 <div class="form-group">
                     <label for="priority" class="control-label"><?php echo _l('task_add_edit_priority'); ?></label>
                     <select name="priority" class="selectpicker" id="priority" data-width="100%"
@@ -34,20 +30,20 @@
                     </select>
                 </div>
             </div>
-            <?php if ($project->settings->view_milestones == 1) { ?>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="milestone"><?php echo _l('task_milestone'); ?></label>
-                    <select name="milestone" id="milestone" class="selectpicker" data-width="100%"
-                        data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                        <option value=""></option>
-                        <?php foreach ($milestones as $milestone) { ?>
-                        <option value="<?php echo $milestone['id']; ?>"><?php echo $milestone['name']; ?></option>
-                        <?php } ?>
-                    </select>
-                </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="epic_id">Select Epic</label>
+                <select required name="epic_id" id="epic" class="selectpicker" data-width="100%"
+                    data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
+                    <option value=""></option>
+                    <?php foreach ($epics as $epic) { ?>
+                    <option <?php if($epic->id == $this->input->get('epicid')){ echo 'selected' ;} ?> value="<?php echo $epic->id; ?>"><?php echo $epic->name; ?></option>
+                    <?php } ?>
+                </select>
             </div>
-            <?php } ?>
+        </div>
+
         </div>
         <div class="row">
             <div class="col-md-6">

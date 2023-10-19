@@ -495,47 +495,63 @@ class Team_management_model extends App_Model
 
 
 
-    public function save_staff_shifts($staff_id, $dateObj, $repeat, $shift_1_start, $shift_1_end, $shift_2_start, $shift_2_end) {
-        // Depending on $repeat, calculate the array of dates for which the shifts need to be set
-        $dates = $this->calculate_dates($dateObj, $repeat);
-
-        // Prepare data for insertion
-        $shiftsData = [];
-        foreach ($dates as $date) {
-            // If records for this date already exist, delete them
-            $this->db->delete('tbl_staff_shifts', ['staff_id' => $staff_id, 'Year' => $date->format('Y'), 'month' => $date->format('m'), 'day' => $date->format('d')]);
-
-            // Prepare the new records
-            if (!empty($shift_1_start) && !empty($shift_1_end)) {
-                $shiftsData[] = [
-                    'staff_id' => $staff_id,
-                    'Year' => $date->format('Y'),
-                    'month' => $date->format('m'),
-                    'day' => $date->format('d'),
-                    'shift_number' => 1,
-                    'shift_start_time' => $shift_1_start,
-                    'shift_end_time' => $shift_1_end,
-                ];
-            }
-            if (!empty($shift_2_start) && !empty($shift_2_end)) {
-                $shiftsData[] = [
-                    'staff_id' => $staff_id,
-                    'Year' => $date->format('Y'),
-                    'month' => $date->format('m'),
-                    'day' => $date->format('d'),
-                    'shift_number' => 2,
-                    'shift_start_time' => $shift_2_start,
-                    'shift_end_time' => $shift_2_end,
-                ];
-            }
+    public function copy_shifts($staff_id, $month) {
+        // Validate the month
+        if ($month < 1 || $month > 12) {
+            return array('status' => 'error', 'message' => 'Invalid month');
         }
-
-        // Insert the new shift records
-        if (!empty($shiftsData)) {
-            $this->db->insert_batch('tbl_staff_shifts', $shiftsData);
+    
+        // Calculate the year, taking into account if the month is January
+        $year = date('Y');
+        $prevYear = ($month == 1) ? $year - 1 : $year;
+    
+        // Adjust for the previous month, considering if the current month is January
+        $prevMonth = ($month == 1) ? 12 : $month - 1;
+    
+        // Start a transaction
+        $this->db->trans_start();
+    
+        // Delete shifts for the current month
+        $this->db->where('staff_id', $staff_id)
+                 ->where('Year', $year)
+                 ->where('month', $month)
+                 ->delete('tbl_staff_shifts');
+    
+        // Get shifts from the previous month
+        $prevMonthShifts = $this->db->select('*')
+                                    ->from('tbl_staff_shifts')
+                                    ->where('staff_id', $staff_id)
+                                    ->where('Year', $prevYear)
+                                    ->where('month', $prevMonth)
+                                    ->get()
+                                    ->result();
+    
+        // Copy previous shifts to current month
+        foreach ($prevMonthShifts as $shift) {
+            // Adjust the date to the current month and year
+            $shift->Year = $year;
+            $shift->month = $month;
+    
+            // Remove the primary key (if it's there)
+            unset($shift->id);
+    
+            // Insert the new record
+            $this->db->insert('tbl_staff_shifts', $shift);
         }
-        return ['status' => 'success', 'message' => 'Shifts saved successfully.'];
+    
+        // Complete the transaction
+        $this->db->trans_complete();
+    
+        // Check for transaction status
+        if ($this->db->trans_status() === FALSE) {
+            return array('status' => 'error', 'message' => 'Could not copy shifts');
+        } else {
+            return array('status' => 'success', 'message' => 'Shifts copied successfully');
+        }
     }
+    
+
+    
 
     private function calculate_dates($dateObj, $repeat) {
         $dates = [];
@@ -579,6 +595,8 @@ class Team_management_model extends App_Model
 
         return $dates;
     }
+
+    
     
     public function get_shift_timings($staff_id, $month) {
         $query = $this->db->where('staff_id', $staff_id)->where('month', $month)->get(''.db_prefix().'_staff_shifts');

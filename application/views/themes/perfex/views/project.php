@@ -25,13 +25,7 @@
             echo '<span class="label project-status-' . $project_status['id'] . ' tw-ml-3" style="color:' . $project_status['color'] . ';border:1px solid ' . adjust_hex_brightness($project_status['color'], 0.4) . ';background: ' . adjust_hex_brightness($project_status['color'], 0.04) . ';">' . $project_status['name'] . '</span>';
        ?>
     </div>
-    <?php if ($project->settings->view_tasks == 1 && $project->settings->create_tasks == 1) { ?>
-    <a href="<?php echo site_url('clients/project/' . $project->id . '?group=new_task'); ?>"
-        class="btn btn-primary new-task">
-        <i class="fa-regular fa-plus tw-mr-1"></i>
-        <?php echo _l('new_task'); ?>
-    </a>
-    <?php } ?>
+    
 </div>
 <div class="panel_s">
     <div class="panel-body">

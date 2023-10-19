@@ -8,7 +8,12 @@ $monthName = $dateObj->format('F');
     <div class="content flex flex-col">
         <div class="w-full rounded-[40px] bg-sky-100 text-gray-700 p-6 flex flex-row justify-between border border-solid border-sky-100 hover:border-yellow-400 transition-all items-center text-xl">
             Settings shifts of <?= $staff->full_name ?> for the month of <?= $monthName ?>
-            <a href="<?= admin_url("team_management/staff_shifts") ?>" class="px-4 py-2 bg-yellow-400 rounded-xl text-white hover:text-white focus:text-white hover:bg-yellow-300 transition-all text-lg">Back</a>
+            
+            <div class="flex flex-row gap-4">
+                <button class="px-4 py-2 bg-yellow-400 rounded-xl text-black hover:bg-yellow-300 transition-all text-lg" onclick="copyMonthTimings()">Copy Previous month timings</button>
+
+                <a href="<?= admin_url("team_management/staff_shifts") ?>" class="px-4 py-2 bg-yellow-400 rounded-xl hover:bg-yellow-300 transition-all text-lg">Back</a>
+            </div>
         </div>
 
         <div class="col-md-12 mt-7">
@@ -200,7 +205,7 @@ function handleClick(info){
 
         openShiftsModal(clickedDate, shiftsData);
 }
-
+var staff_id = <?= $staff->staffid ?>;
 function setShifts(){
     var shift_1_start = $("#s1s").val();
     var shift_1_end = $("#s1e").val();
@@ -212,7 +217,7 @@ function setShifts(){
 
     var repeat = $("#repeatSelectBox").val();
 
-    var staff_id = <?= $staff->staffid ?>;
+    
 
     $.ajax({
         url: '<?= admin_url("team_management/save_shifts") ?>',
@@ -229,6 +234,32 @@ function setShifts(){
         dataType: 'json',
         success: function(staffStats) {
             location.reload();
+        }
+    });
+}
+
+function copyMonthTimings(){
+    Swal.fire({
+        title: 'Copy Timings?',
+        text: 'This will replace all your current month\'s shifts with previous one?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Import!',
+        cancelButtonText: 'No'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '<?= admin_url("team_management/copy_shifts") ?>',
+                type: 'POST',
+                data: { 
+                    month: <?= $month ?>,
+                    staff_id : staff_id
+                },
+                dataType: 'json',
+                success: function(staffStats) {
+                    // location.reload();
+                }
+            });
         }
     });
 }

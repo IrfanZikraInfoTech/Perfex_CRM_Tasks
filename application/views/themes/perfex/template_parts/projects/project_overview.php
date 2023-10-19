@@ -100,34 +100,7 @@
                 </div>
             </div>
         </div>
-        <?php if ($project->settings->view_tasks == 1) { ?>
-        <div class="project-progress-bars tw-mb-3">
-            <div class="tw-rounded-md tw-border tw-border-solid tw-border-neutral-100 tw-bg-neutral-50 tw-py-2 tw-px-3">
-                <div class="row">
-                    <div class="col-md-9">
-                        <p class="bold text-dark font-medium tw-mb-0">
-                            <span dir="ltr"><?php echo $tasks_not_completed; ?> / <?php echo $total_tasks; ?></span>
-                            <?php echo _l('project_open_tasks'); ?>
-                        </p>
-                        <p class="tw-text-neutral-600 tw-font-medium"><?php echo $tasks_not_completed_progress; ?>%</p>
-                    </div>
-                    <div class="col-md-3 text-right">
-                        <i class="fa-regular fa-check-circle<?php echo $tasks_not_completed_progress >= 100 ? ' text-success' : ' text-muted'; ?>"
-                            aria-hidden="true"></i>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="progress tw-my-0 progress-bar-mini">
-                            <div class="progress-bar progress-bar-success no-percent-text not-dynamic"
-                                role="progressbar" aria-valuenow="<?php echo $tasks_not_completed_progress; ?>"
-                                aria-valuemin="0" aria-valuemax="100" style="width: 0%"
-                                data-percent="<?php echo $tasks_not_completed_progress; ?>">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <?php } ?>
+
         <?php if ($project->deadline) { ?>
         <div class="project-progress-bars">
             <div class="tw-rounded-md tw-border tw-border-solid tw-border-neutral-100 tw-bg-neutral-50 tw-py-2 tw-px-3">

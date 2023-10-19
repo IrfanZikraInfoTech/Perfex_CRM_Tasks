@@ -27,7 +27,26 @@
 
                         <input type="date" id="to" class="w-full py-2 px-4 border !rounded-3xl text-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="To" value="<?= $to ?>">
 
-                        <button class="px-4 py-2 bg-sky-100 border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="window.location.href=admin_url+'team_management/attendance_board/'+document.getElementById('from').value + '/' + document.getElementById('to').value">
+                        <select data-width="100%" id="staff" data-live-search="true" class="selectpicker text-2xl font-bold text-uppercase" multiple>
+                                
+                            <?php 
+                                $staff_members = $this->staff_model->get();
+
+
+                                foreach($staff_members as $staff_member){
+                                    $selected = '';
+
+                                    if(isset($exclude_ids) && in_array($staff_member['staffid'], $exclude_ids)){
+                                        $selected = 'selected';
+                                    }
+
+                                    echo '<option '.$selected.' value="'.$staff_member['staffid'].'">'.$staff_member['full_name'].'</option>';
+                                }
+                            ?>
+                                
+                        </select>
+
+                        <button class="px-4 py-2 bg-sky-100 border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="redirectToAttendanceBoard()">
                         <i class="fa fa-search" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -411,6 +430,29 @@
 <?php init_tail(); ?>
 
 <script>
+function redirectToAttendanceBoard() {
+    // Get the selected values from the #staff select element
+    var staffSelect = document.getElementById('staff');
+    var selectedOptions = [];
+    for (var i = 0; i < staffSelect.options.length; i++) {
+        if (staffSelect.options[i].selected) {
+            selectedOptions.push(staffSelect.options[i].value);
+        }
+    }
+
+    // Convert the selected values to a comma-separated string
+    var staffValues = selectedOptions.join('e');
+
+    // Get the values of 'from' and 'to' elements
+    var fromValue = document.getElementById('from').value;
+    var toValue = document.getElementById('to').value;
+
+    // Construct the URL with the selected staff values
+    var url = admin_url + 'team_management/attendance_board/' + fromValue + '/' + toValue + '/' + staffValues;
+
+    // Redirect to the constructed URL
+    window.location.href = url;
+}
 
 function toggleCollapse(button, event, elementId) {
     if (event.target.tagName.toLowerCase() === 'button' || event.target.tagName.toLowerCase() === 'input') {
