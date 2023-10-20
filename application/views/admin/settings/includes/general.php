@@ -86,6 +86,7 @@
 
 		<?php echo render_input('settings[hr_dept_id]','HR Department Id',get_option('hr_dept_id'), 'number'); ?>
 
+		<?php echo render_input('settings[management_theme_background]','Management Background',get_option('management_theme_background'), 'text'); ?>
 		
 	</div>
 </div>

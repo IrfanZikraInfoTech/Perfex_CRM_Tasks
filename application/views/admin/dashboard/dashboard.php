@@ -239,7 +239,7 @@
                             <input type="date" value="<?=date("Y-m-d")?>" id="summary_date" class="rounded p-2 mr-4" onchange="getOrSaveStaffSummary();">
                         </div>
 
-                        <div class="flex flex-row p-4 bg-sky-100 min-h-[300px] rounded-[50px]">
+                        <div class="flex flex-row p-4 bg-<?= get_option('management_theme_background') ?> min-h-[300px] rounded-[50px]">
                             <!-- Left Box with dummy summary -->
                             
                             <div class="w-1/2 p-4">
