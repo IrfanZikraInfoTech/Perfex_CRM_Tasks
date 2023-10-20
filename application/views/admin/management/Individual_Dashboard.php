@@ -622,16 +622,20 @@ var clock_in_entries = <?php echo json_encode($clock_in_entries); ?>;
 
 
 const today = new Date("<?php echo $from; ?>");
-let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Aaj ki date ka 12:00 AM
-let endDate = new Date(today.getTime() + (24*60*60*1000)); // Default: next day
-
+let startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); 
+let endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59); 
 console.log(endDate);
 
 var items = new vis.DataSet();
 var options = {
     zoomMin: 1000 * 60 * 60, // one hour in milliseconds
     zoomMax: 1000 * 60 * 60 * 24 * 31, // 31 days in milliseconds
-    height: "180px"
+    height: "180px",
+    min: startDate,
+    max: endDate,
+    moveable: false,
+    start: startDate,
+    end: endDate
 };
 
 clock_in_entries.forEach(clock => {

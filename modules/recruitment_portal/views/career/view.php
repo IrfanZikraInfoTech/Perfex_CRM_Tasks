@@ -1,3 +1,9 @@
+<?php
+if(isset($campaign) && $campaign->status == 0){
+    header("Location: ".base_url("career"));
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +20,7 @@ $default_button_color = "#e9b328";  // Grey color
 
 $bg_color = isset($colorScheme['background_color']) ? $colorScheme['background_color'] : $default_bg_color;
 $button_color = isset($colorScheme['button_color']) ? $colorScheme['button_color'] : $default_button_color;
+
 ?> 
     <div class="container mx-auto px-4 pb-8 pt-4">
         <div class="text-center mb-12">

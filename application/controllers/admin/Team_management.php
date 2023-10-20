@@ -294,26 +294,6 @@ class Team_management extends AdminController {
         $from = $from ?? date("Y-m-d");
         $to = $to ?? date("Y-m-d");
 
-        $data['from'] = $from;
-        $data['to'] = $to;
-
-        $start_date = new DateTime($from);
-        $end_date = new DateTime($to);
-        $end_date->add(new DateInterval('P1D'));
-        $interval = new DateInterval('P1D');
-        $date_range = new DatePeriod($start_date, $interval, $end_date);
-        
-        
-
-        $data['dates'] = [];
-        foreach ($date_range as $date) {
-            $formatted_date = $date->format('Y-m-d');
-
-            $date_data = $this->fetch_attendance_for_date($formatted_date);
-
-            $data['dates'][$formatted_date] = $date_data;
-        }
-
         if($exclude_ids){
             $exclude_ids = explode('e', $exclude_ids);
         }
@@ -331,6 +311,28 @@ class Team_management extends AdminController {
             // If $exclude_ids is empty, just fetch all staff data
             $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
         }
+
+        $data['from'] = $from;
+        $data['to'] = $to;
+
+        $start_date = new DateTime($from);
+        $end_date = new DateTime($to);
+        $end_date->add(new DateInterval('P1D'));
+        $interval = new DateInterval('P1D');
+        $date_range = new DatePeriod($start_date, $interval, $end_date);
+        
+        
+
+        $data['dates'] = [];
+        foreach ($date_range as $date) {
+            $formatted_date = $date->format('Y-m-d');
+
+            $date_data = $this->fetch_attendance_for_date($formatted_date, $staffs);
+
+            $data['dates'][$formatted_date] = $date_data;
+        }
+
+        
 
         $staff_dates_data = [];
 
@@ -358,9 +360,8 @@ class Team_management extends AdminController {
         $this->load->view('admin/management/attendance_board', $data);
     }
 
-    public function fetch_attendance_for_date($date) {
-        $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
-        
+    public function fetch_attendance_for_date($date, $staffs) {
+
         $data = [];
 
         $clockableShift1 = 0;
