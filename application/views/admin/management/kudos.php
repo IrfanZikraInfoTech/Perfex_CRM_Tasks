@@ -37,21 +37,21 @@
                 <div class="lg:w-2/3 w-full flex flex-col gap-5">
 
                     <!-- Left 2/3 Section -->
-                    <div class="w-full lg:p-8 p-2 bg-sky-100 rounded-[50px] shadow-lg">
-                        <div class="mb-4 bg-sky-100 text-center py-2 rounded-[40px]">
+                    <div class="w-full lg:p-8 p-2 bg-<?= get_option('management_theme_background')?> rounded-[50px] shadow-lg">
+                        <div class="mb-4 bg-<?= get_option('management_theme_background')?> text-center py-2 rounded-[40px]">
                             <h2 class="text-xl font-bold">KUDOS LEFT: <?= $remaining_kudos ?>/5</h2>
                         </div>
                         <div class="space-y-4">
                             <form id="kudosform">
                                 <div class="form-group select-placeholder">
-                                    <label class="block text-lg font-medium bg-sky-100" for="kudosType">Type of Kudos:</label>
+                                    <label class="block text-lg font-medium bg-<?= get_option('management_theme_background')?>" for="kudosType">Type of Kudos:</label>
                                     <select class="selectpicker bg-white rounded-[20px]" data-width="100%" name="kudosType" id="kudosType">
                                         <option value="advice">Advice</option>
                                         <option value="kudos">Kudos</option>
                                     </select>
                                 </div>  
                                 <div class="form-group select-placeholder">
-                                    <label class="block text-lg font-medium bg-sky-100" for="to_">To:</label>
+                                    <label class="block text-lg font-medium bg-<?= get_option('management_theme_background')?>" for="to_">To:</label>
                                     <select class="selectpicker bg-white rounded-[20px]"
                                             data-live-search="true"
                                             data-none-selected-text="<?php echo _l('system_default_string'); ?>"
@@ -66,7 +66,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group mt-4 select-placeholder">
-                                    <label class="block text-lg font-medium bg-sky-100" for="principles">Select Principles (one or more):</label>
+                                    <label class="block text-lg font-medium bg-<?= get_option('management_theme_background')?>" for="principles">Select Principles (one or more):</label>
                                     <select class="selectpicker bg-white rounded-[20px]" data-width="100%" name="principles[]" id="principles" multiple>    
                                         <?= 
                                         $principles = explode(',',get_option('company_principles'));
@@ -77,7 +77,7 @@
                                     </select>
                                 </div>
                                 <div class="mb-5">
-                                    <label class="block text-lg font-medium bg-sky-100">Remarks:</label>
+                                    <label class="block text-lg font-medium bg-<?= get_option('management_theme_background')?>">Remarks:</label>
                                     <textarea id="remarks" rows="4" class=" rounded-[20px] p-4 w-full border rounded focus:outline-none focus:border-blue-500"></textarea>
                                 </div>
                                 <button type="submit" id="btnform" class="rounded-[20px] w-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-semibold px-6 py-3 shadow-md hover:from-blue-600 hover:to-indigo-700 hover:shadow-lg transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 active:scale-95">
@@ -87,7 +87,7 @@
                         </div>
                     </div>
 
-                    <div class="w-full lg:p-8 p-2 mb-8 bg-sky-100 rounded-[50px] shadow-lg">
+                    <div class="w-full lg:p-8 p-2 mb-8 bg-<?= get_option('management_theme_background')?> rounded-[50px] shadow-lg">
                         <!-- Additional Div for filters and kudos feed -->
                         <div class="lg:p-8 p-4 py-4 m-2 bg-gray-100 rounded-[40px] shadow-inner">
                             

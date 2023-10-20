@@ -6,19 +6,19 @@ $monthName = $dateObj->format('F');
 
 <div id="wrapper" class="wrapper">
     <div class="content flex flex-col">
-        <div class="w-full rounded-[40px] bg-sky-100 text-gray-700 p-6 flex flex-row justify-between border border-solid border-sky-100 hover:border-yellow-400 transition-all items-center text-xl">
+        <div class="w-full rounded-[40px] bg-<?= get_option('management_theme_background')?> text-gray-700 p-6 flex flex-row justify-between border border-solid border-sky-100 hover:border-<?= get_option('management_theme_border')?> transition-all items-center text-xl">
             Settings shifts of <?= $staff->full_name ?> for the month of <?= $monthName ?>
             
             <div class="flex flex-row gap-4">
-                <button class="px-4 py-2 bg-yellow-400 rounded-xl text-black hover:bg-yellow-300 transition-all text-lg" onclick="copyMonthTimings()">Copy Previous month timings</button>
+                <button class="px-4 py-2 bg-<?= get_option('management_theme_foreground')?> rounded-xl text-black hover:bg-<?= get_option('management_theme_hover')?> transition-all text-lg" onclick="copyMonthTimings()">Copy Previous month timings</button>
 
-                <a href="<?= admin_url("team_management/staff_shifts") ?>" class="px-4 py-2 bg-yellow-400 rounded-xl hover:bg-yellow-300 transition-all text-lg">Back</a>
+                <a href="<?= admin_url("team_management/staff_shifts") ?>" class="px-4 py-2 bg-<?= get_option('management_theme_foreground')?> rounded-xl hover:bg-<?= get_option('management_theme_hover')?> transition-all text-lg">Back</a>
             </div>
         </div>
 
         <div class="col-md-12 mt-7">
             <!-- Calendar Section -->
-            <div class="w-3/3 rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-gray-400 transition-all">
+            <div class="w-3/3 rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
                 <div class="p-4 cal_container">
                     <div id="shifts_calendar"></div>
                 </div>

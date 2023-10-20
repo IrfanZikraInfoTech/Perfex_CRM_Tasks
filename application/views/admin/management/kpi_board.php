@@ -11,15 +11,15 @@
 <div id="wrapper" class="wrapper">
     <div class="content flex flex-col gap-8">
 
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all">
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
             <div class="flex lg:flex-row flex-col gap-4 items-stretch justify-between">
                 <!-- User Information Section -->
-                <div class="flex flex-col lg:w-1/3 w-full bg-sky-100 p-4 py-3 shadow-inner rounded-[50px]  max-h-[300px] min-h-full">
+                <div class="flex flex-col lg:w-1/3 w-full bg-<?= get_option('management_theme_background')?> p-4 py-3 shadow-inner rounded-[50px]  max-h-[300px] min-h-full">
                     <div class="h-full flex justify-center items-center">
                         <h2 class="text-3xl font-bold text-center text-gray-700">KPI Board</h2>
                     </div>
                 </div>
-                <div class="flex flex-col lg:w-1/3 w-full bg-sky-100 p-4 py-3 shadow-inner rounded-[50px]  max-h-[300px]">
+                <div class="flex flex-col lg:w-1/3 w-full bg-<?= get_option('management_theme_background')?> p-4 py-3 shadow-inner rounded-[50px]  max-h-[300px]">
                     <!-- Input boxes for FROM and TO -->
                     <div class="flex flex-col gap-2 my-2 mx-3 w-90">
 
@@ -46,7 +46,7 @@
                                 
                         </select>
 
-                        <button class="px-4 py-2 bg-sky-100 border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="redirectToKpiBoard()">
+                        <button class="px-4 py-2 bg-<?= get_option('management_theme_background')?> border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="redirectToKpiBoard()">
                         <i class="fa fa-search" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all flex flex-col">
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex flex-col">
 
 
             <!-- Select box for sorting -->
@@ -68,9 +68,9 @@
                 </select>
             </div>
 
-            <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-sky-100 shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
+            <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
                 <?php foreach($staff_kpi_data as $staff_id => $staff): ?>
-                    <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-yellow-300 rounded-[40px] min-h-[100px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box" data-name="<?= $staff['name'] ?>" data-ops="<?= $staff['ops'] ?>">
+                    <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[100px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box" data-name="<?= $staff['name'] ?>" data-ops="<?= $staff['ops'] ?>">
                         <h3 class="text-xl font-bold"><?= $staff['name'] ?></h3>
                         <h4 class="text-2xl font-bold"><?= round($staff['ops']/10,2) ?>/10</h4>
                     </div>
@@ -80,76 +80,76 @@
 
         </div>
 
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all flex flex-col">  
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex flex-col">  
 
-            <div class="w-full transition-all ease-in-out rounded-[40px] bg-yellow-300 font-bold flex flex-row text-xl overflow-hidden sticky top-4 z-20 mb-4">
-                <div class="w-[20%] hover:bg-yellow-200 transition-all py-2 text-center">
+            <div class="w-full transition-all ease-in-out rounded-[40px] bg-<?= get_option('management_theme_foreground')?> font-bold flex flex-row text-xl overflow-hidden sticky top-4 z-20 mb-4">
+                <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center">
                     Staff
                 </div>
-                <button title="Attendance Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ar">
+                <button title="Attendance Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="ar">
                     AR
                 </button>
-                <button title="Punctuality Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="pr">
+                <button title="Punctuality Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="pr">
                     PR
                 </button>
-                <button title="Task Completion Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="tcr">
+                <button title="Task Completion Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="tcr">
                     TCR
                 </button>
-                <button title="Task Efficiency Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ter">
+                <button title="Task Efficiency Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="ter">
                     TER
                 </button>
-                <button title="Task Time Adherence" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ttr">
+                <button title="Task Time Adherence" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="ttr">
                     TTR
                 </button>
 
-                <button title="Summary Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="sar">
+                <button title="Summary Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="sar">
                     SAR
                 </button>
-                <button title="AFK Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="adr">
+                <button title="AFK Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="adr">
                     ADR
                 </button>
-                <button title="Shift Productivity Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="spr">
+                <button title="Shift Productivity Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="spr">
                     SPR
                 </button>
-                <button title="Overall Performance Score" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ops">
+                <button title="Overall Performance Score" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="ops">
                     OPS
                 </button>
                 
             </div>
 
-            <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-sky-100 shadow-inner overflow-hidden mb-4 rows-container">
+            <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-4 rows-container">
              
                 <?php foreach($staff_kpi_data as $staff_id => $staff): ?>
                     <div class="flex flex-row text-base transition-all hover:bg-sky-200/75 staff-row" data-ar="<?= round($staff['ar'],2) ?>" data-pr="<?= round($staff['pr'],2) ?>" data-tcr="<?= round($staff['tcr'],2) ?>" data-ter="<?= round($staff['ter'],2) ?>" data-ttr="<?= round($staff['ttr'],2) ?>" data-sar="<?= round($staff['sar'],2) ?>" data-adr="<?= round($staff['adr'],2) ?>" data-spr="<?= round($staff['spr'],2) ?>" data-ops="<?= round($staff['ops']/10,2) ?>">
 
-                        <div class="w-[20%] hover:bg-yellow-200 transition-all py-2 text-center">
+                        <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center">
                         <?= $staff['name'] ?>
                         </div>
-                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                             <?= round($staff['ar'],2) ?>%
                         </div>
-                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                         <?= round($staff['pr'],2) ?>%
                         </div>
-                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                         <?= round($staff['tcr'],2) ?>%
                         </div>
-                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                         <?= round($staff['ter'],2) ?>%
                         </div>
-                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                         <?= round($staff['ttr'],2) ?>%
                         </div>
-                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                         <?= round($staff['sar'],2) ?>%
                         </div>
-                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                         <?= round($staff['adr'],2) ?>%
                         </div>
-                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                         <?= round($staff['spr'],2) ?>%
                         </div>
-                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                        <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                         <?= round($staff['ops']/10,2) ?>/10
                         </div>
                     </div>
@@ -159,35 +159,35 @@
 
 
             <div class="w-full transition-all ease-in-out rounded-[40px] bg-yellow-100 font-bold flex flex-row text-xl top-4 z-10 mb-5 overflow-hidden sticky bottom-4">
-                <div class="w-[20%] hover:bg-yellow-200 transition-all py-2 text-center">
+                <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center">
                     Cumuluative KPIs
                 </div>
-                <button title="Attendance Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ar">
+                <button title="Attendance Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="ar">
                     <?= round($cumulative_kpis['ar'],2) ?>%
                 </button>
-                <button title="Punctuality Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="pr">
+                <button title="Punctuality Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="pr">
                 <?= round($cumulative_kpis['pr'],2) ?>%
                 </button>
-                <button title="Task Completion Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="tcr">
+                <button title="Task Completion Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="tcr">
                 <?= round($cumulative_kpis['tcr'],2) ?>%
                 </button>
-                <button title="Task Efficiency Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ter">
+                <button title="Task Efficiency Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="ter">
                 <?= round($cumulative_kpis['ter'],2) ?>%
                 </button>
-                <button title="Task Time Adherence" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ttr">
+                <button title="Task Time Adherence" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="ttr">
                 <?= round($cumulative_kpis['ttr'],2) ?>%
                 </button>
 
-                <button title="Summary Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="sar">
+                <button title="Summary Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="sar">
                 <?= round($cumulative_kpis['sar'],2) ?>%
                 </button>
-                <button title="AFK Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="adr">
+                <button title="AFK Adherence Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="adr">
                 <?= round($cumulative_kpis['adr'],2) ?>%
                 </button>
-                <button title="Shift Productivity Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="spr">
+                <button title="Shift Productivity Rate" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="spr">
                 <?= round($cumulative_kpis['spr'],2) ?>%
                 </button>
-                <button title="Overall Performance Score" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all py-2" data-kpi_name="ops">
+                <button title="Overall Performance Score" data-toggle="tooltip" data-placement="top" class="kpi-button w-[8.88%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2" data-kpi_name="ops">
                 <?= round($cumulative_kpis['total_ops'],2) ?>%
                 </button>
                 
@@ -207,7 +207,7 @@
             </div>
 
             <!-- This div will be populated with the staff KPI data for the clicked date using AJAX -->
-            <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-sky-100 shadow-inner overflow-hidden mb-5 <?= $firstClass ?> rows-container" id="<?= $date ?>"></div>
+            <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-5 <?= $firstClass ?> rows-container" id="<?= $date ?>"></div>
 
             <?php endforeach; ?>
             
@@ -301,34 +301,34 @@ function fetchKpiDataForDate(dateDiv, callback) {
             content += `
             <div class="flex flex-row text-base transition-all hover:bg-sky-200/75 staff-row" data-ar="${Math.round(stats['punctuality_rate']['present_percentage'] )}" data-pr="${Math.round(stats['punctuality_rate']['on_time_percentage'] )}" data-tcr="${Math.round(stats['task_rates']['completion_rate'] )}" data-ter="${Math.round(stats['task_rates']['efficiency_rate'] )}" data-ttr="${Math.round(stats['task_rates']['timer_adherence_rate'] )}" data-sar="${Math.round(stats['summary_adherence_rate']['percentage'] )}" data-adr="${Math.round(stats['afk_adherence_rate']['percentage'] )}" data-spr="${Math.round(stats['shift_productivity_rate']['percentage'] )}" data-ops="${Math.round(stats['ops']) / 10}" >
 
-                <div class="w-[20%] hover:bg-yellow-200 transition-all py-2 text-center">
+                <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center">
                 ${stats['name']}
                 </div>
-                <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                     ${Math.round(stats['punctuality_rate']['present_percentage'] )}%
                 </div>
-                <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                     ${Math.round(stats['punctuality_rate']['on_time_percentage'] )}%
                 </div>
-                <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                     ${Math.round(stats['task_rates']['completion_rate'] )}%
                 </div>
-                <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                     ${Math.round(stats['task_rates']['efficiency_rate'] )}%
                 </div>
-                <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                     ${Math.round(stats['task_rates']['timer_adherence_rate'] )}%
                 </div>
-                <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                     ${Math.round(stats['summary_adherence_rate']['percentage'] )}%
                 </div>
-                <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                     ${Math.round(stats['afk_adherence_rate']['percentage'] )}%
                 </div>
-                <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                     ${Math.round(stats['shift_productivity_rate']['percentage'] )}%
                 </div>
-                <div class="w-[8.88%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2">
+                <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
                     ${Math.round(stats['ops']) / 10}/10
                 </div>
             </div>`;

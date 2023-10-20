@@ -11,15 +11,15 @@
 <div id="wrapper" class="wrapper">
     <div class="content flex flex-col gap-8">
 
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all">
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
             <div class="flex lg:flex-row flex-col gap-4 items-stretch justify-between">
                 <!-- User Information Section -->
-                <div class="flex flex-col lg:w-1/3 w-full bg-sky-100 p-4 py-3 shadow-inner rounded-[50px]  max-h-[300px] min-h-full">
+                <div class="flex flex-col lg:w-1/3 w-full bg-<?= get_option('management_theme_background')?> p-4 py-3 shadow-inner rounded-[50px]  max-h-[300px] min-h-full">
                     <div class="h-full flex justify-center items-center">
                         <h2 class="text-3xl font-bold text-center text-gray-700">Attendance Board</h2>
                     </div>
                 </div>
-                <div class="flex flex-col lg:w-1/3 w-full bg-sky-100 p-4 py-3 shadow-inner rounded-[50px]  max-h-[300px]">
+                <div class="flex flex-col lg:w-1/3 w-full bg-<?= get_option('management_theme_background')?> p-4 py-3 shadow-inner rounded-[50px]  max-h-[300px]">
                     <!-- Input boxes for FROM and TO -->
                     <div class="flex flex-col gap-2 my-2 mx-3 w-90">
 
@@ -46,7 +46,7 @@
                                 
                         </select>
 
-                        <button class="px-4 py-2 bg-sky-100 border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="redirectToAttendanceBoard()">
+                        <button class="px-4 py-2 bg-<?= get_option('management_theme_background')?> border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="redirectToAttendanceBoard()">
                         <i class="fa fa-search" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all flex flex-col">
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex flex-col">
 
 
             <!-- Select box for sorting -->
@@ -71,11 +71,11 @@
                 </select>
             </div>
 
-            <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-sky-100 shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
+            <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
                 <?php foreach($staff_dates_data as $staff_id => $staff): ?>
 
 
-                    <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-yellow-300 rounded-[40px] min-h-[140px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box p-4" data-name="<?= $staff['name'] ?>" data-ar="<?= $staff['ar'] ?>" data-pr="<?= $staff['pr'] ?>" data-ct="<?= $staff['ct'] ?>" data-cdt="<?= $staff['cdt'] ?>">
+                    <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[140px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box p-4" data-name="<?= $staff['name'] ?>" data-ar="<?= $staff['ar'] ?>" data-pr="<?= $staff['pr'] ?>" data-ct="<?= $staff['ct'] ?>" data-cdt="<?= $staff['cdt'] ?>">
                         <h3 class="text-xl text-center font-bold"><?= $staff['name'] ?></h3>
                         <hr class="bg-gray-700 text-gray-800 h-[1px] border-none w-full mb-1" />
                         <div class="xl:text-xl lg:text-lg text-base grid lg:grid-cols-2 grid-cols-1 gap-4 place-items-centers">
@@ -95,17 +95,17 @@
 
         </div>
 
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all overflow-x-auto xl:cursor-auto cursor-move">
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all overflow-x-auto xl:cursor-auto cursor-move">
 
             <div class="flex flex-col xl:min-w-full min-w-[900px] ">
 
-                <div class="w-full transition-all ease-in-out rounded-[40px] bg-yellow-300 font-bold flex flex-row xl:text-xl lg:text-md md:text-md overflow-hidden sticky top-4 z-10 mb-12">
+                <div class="w-full transition-all ease-in-out rounded-[40px] bg-<?= get_option('management_theme_foreground')?> font-bold flex flex-row xl:text-xl lg:text-md md:text-md overflow-hidden sticky top-4 z-10 mb-12">
 
-                    <div class="w-[20%] hover:bg-yellow-200 transition-all py-2 text-center flex justify-center items-center">
+                    <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center">
                         Staff
                     </div>
 
-                    <div class="w-[30%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all  flex flex-col">
+                    <div class="w-[30%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all  flex flex-col">
                         <div class="border-b border-solid border-gray-600 py-1">
                             Shift 1
                         </div>
@@ -115,7 +115,7 @@
                         </div>
                     </div>
 
-                    <div class="w-[30%] border-l border-solid border-gray-600 text-center hover:bg-yellow-200 transition-all  flex flex-col">
+                    <div class="w-[30%] border-l border-solid border-gray-600 text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all  flex flex-col">
                         <div class="border-b border-solid border-gray-600 py-1">
                             Shift 2
                         </div>
@@ -125,11 +125,11 @@
                         </div>
                     </div>
 
-                    <div class="w-[10%] border-l border-solid border-gray-600 hover:bg-yellow-200 transition-all py-2 text-center flex justify-center items-center">
+                    <div class="w-[10%] border-l border-solid border-gray-600 hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center">
                         Attendance
                     </div>
 
-                    <div class="w-[10%] border-l border-solid border-gray-600 hover:bg-yellow-200 transition-all py-2 text-center flex justify-center items-center">
+                    <div class="w-[10%] border-l border-solid border-gray-600 hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center">
                         Shift
                     </div>
                     
@@ -147,7 +147,7 @@
                         <div class="fas fa-angle-down rotate-[90deg] transform transition-transform duration-300"></div>
                     </div>
 
-                    <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-sky-100 shadow-inner overflow-hidden mb-5 xl:text-base text-sm" id="<?= $date ?>">
+                    <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-5 xl:text-base text-sm" id="<?= $date ?>">
 
                         <?php 
                             foreach($data as $index => $staff):   
@@ -157,18 +157,18 @@
                         
                             <div class="flex flex-row transition-all hover:bg-sky-200/75 staff-row" >
 
-                                <div class="w-[20%] hover:bg-yellow-200 transition-all py-2 text-center flex justify-center items-center">
+                                <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center">
                                     <?= $staff['name'] ?>
                                 </div>
 
-                                <div class="w-[15%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2 flex justify-center items-center">
+                                <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center">
                                     <?= !empty($staff['data']['shifts'][0]['shift_start_time']) 
                                     ? 
                                     $staff['data']['shifts'][0]['shift_start_time'] . ' - '. $staff['data']['shifts'][0]['shift_end_time']
                                     : '-'; ?>
                                 </div>
 
-                                <div class="w-[15%] border-l border-solid text-center hover:bg-yellow-200 transition-all flex justify-center items-center">
+                                <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all flex justify-center items-center">
                                     <?php 
 
                                     if(
@@ -238,14 +238,14 @@
 
                                 </div>
 
-                                <div class="w-[15%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2 flex justify-center items-center">
+                                <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center">
                                     <?= !empty($staff['data']['shifts'][1]['shift_start_time']) 
                                     ? 
                                     $staff['data']['shifts'][1]['shift_start_time'] . ' - '. $staff['data']['shifts'][1]['shift_end_time']
                                     : '-'; ?>
                                 </div>
 
-                                <div class="w-[15%] border-l border-solid text-center hover:bg-yellow-200 transition-all flex justify-center items-center">
+                                <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all flex justify-center items-center">
                                     <?php 
 
                                     if(
@@ -313,7 +313,7 @@
 
                                 </div>
 
-                                <div class="w-[10%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2 flex justify-center items-center">
+                                <div class="w-[10%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center">
                                     <?php
 
                                         $attendance = $staff['data']['status'];
@@ -349,7 +349,7 @@
                                     ?>
                                 </div>
                                 
-                                <div class="w-[10%] border-l border-solid text-center hover:bg-yellow-200 transition-all py-2 flex justify-center items-center">
+                                <div class="w-[10%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center">
                                     <?php
 
                                         $status = $staff['data']['status'];
@@ -379,23 +379,23 @@
 
                                 <div class="flex flex-row text-base transition-all hover:bg-sky-200/75 staff-row border-t border-solid border-gray-700" >
 
-                                    <div class="w-[20%] hover:bg-yellow-200 transition-all py-2 text-center flex justify-center items-center font-bold">
+                                    <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold">
                                         Totals
                                     </div>
 
-                                    <div class="w-[15%] hover:bg-yellow-200 transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
                                         <?= convertSecondsToRoundedTime($staff['clockable_shift_1']); ?>
                                     </div>
 
-                                    <div class="w-[15%] hover:bg-yellow-200 transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
                                         <?= convertSecondsToRoundedTime($staff['clocked_shift_1']); ?>
                                     </div>
 
-                                    <div class="w-[15%] hover:bg-yellow-200 transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
                                         <?= convertSecondsToRoundedTime($staff['clockable_shift_2']); ?>
                                     </div>
 
-                                    <div class="w-[15%] hover:bg-yellow-200 transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
                                         <?= convertSecondsToRoundedTime($staff['clocked_shift_2']); ?>
                                     </div>
 
@@ -404,8 +404,8 @@
                                             Rates
                                         </div>
                                         <div class="transition-all text-center flex flex-row">
-                                            <button data-toggle="tooltip" data-title="Punctuality Rate" class="py-1 w-1/2 hover:bg-yellow-200 transition-all"><?= round($staff['pr'],2) ?>%</button>
-                                            <button data-toggle="tooltip" data-title="Attenandance Rate" class="py-1 w-1/2 border-l border-solid border-gray-600 hover:bg-yellow-200 transition-all"><?= round($staff['ar'],2) ?>%</button>
+                                            <button data-toggle="tooltip" data-title="Punctuality Rate" class="py-1 w-1/2 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($staff['pr'],2) ?>%</button>
+                                            <button data-toggle="tooltip" data-title="Attenandance Rate" class="py-1 w-1/2 border-l border-solid border-gray-600 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($staff['ar'],2) ?>%</button>
                                         </div>
                                     </div>
 

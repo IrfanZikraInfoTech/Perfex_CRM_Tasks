@@ -16,15 +16,15 @@
 
        
         <div class="w-full">
-        <div class="w-full mb-4 bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all overflow-x-auto xl:cursor-auto cursor-move ">
+        <div class="w-full mb-4 bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all overflow-x-auto xl:cursor-auto cursor-move ">
             <h2 class="text-3xl font-bold text-center">Team</h2>
             <div class="mt-10 flex flex-row justify-between items-center gap-4 px-4 py-2 cursor-pointer text-lg text-gray-600 transition-all bg-gray-100 rounded-[40px]" onclick="toggleCollapse(this, event, 'chart_div')">
         <div class="opacity-0 transform transition-transform duration-300"></div>
             <div>View Chart</div>
             <div class="fas fa-angle-down rotate-[90deg] transform transition-transform duration-300"></div>
         </div>
-        <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-sky-100 shadow-inner overflow-hidden mb-5 xl:text-base text-sm " id="chart_div" style="max-height: 0; overflow: hidden;">
-        <div class="my-4 p-4 rounded-[50px] border border-solid border-gray-100 hover:border-yellow-400 bg-gray-200">
+        <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-5 xl:text-base text-sm " id="chart_div" style="max-height: 0; overflow: hidden;">
+        <div class="my-4 p-4 rounded-[50px] border border-solid border-gray-100 hover:border-<?= get_option('management_theme_border')?> bg-gray-200">
                 <div class="w-flex justify-center w-full overflow-x-auto py-4" id="chart_div"></div>
             </div> 
         </div> 
@@ -36,7 +36,7 @@
 
         <?php  foreach ($departments as $department): ?>
 
-            <div class="rounded-[40px] bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all">
+            <div class="rounded-[40px] bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
 
             <h2 class="text-xl pl-7 uppercase font-bold text-gray-800 text-center py-4"><?php echo $department->name; ?></h2>
             
@@ -47,7 +47,7 @@
                     <div class="p-5 rounded-[40px] bg-gray-100 grid 2xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 grid-cols-1  gap-10">
                     <?php  foreach ($staff_members as $staff): ?>
                         <!-- Your staff card code starts here -->
-                        <div class="flex flex-col bg-white w-full rounded-[30px] overflow-hidden transition-all duration-500 ease-in-out hover:scale-[0.97] shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400">
+                        <div class="flex flex-col bg-white w-full rounded-[30px] overflow-hidden transition-all duration-500 ease-in-out hover:scale-[0.97] shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?>">
                             <div class="flex justify-center items-center p-4 bg-gray-200">
                                 <?php echo staff_profile_image($staff->staffid, ['h-48', 'w-48', 'rounded-full', 'object-cover'], 'thumb'); ?>
                             </div>
@@ -202,7 +202,7 @@
     // Create the chart.
     var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
     // Draw the chart, setting the allowHtml option to true for the tooltips.
-    chart.draw(data, {'allowHtml':true, nodeClass: 'py-3 !text-lg !rounded-[30px] !px-10 !py-2 bg-white transition-all hover:bg-yellow-100 !border-none', width: '100%'});
+    chart.draw(data, {'allowHtml':true, nodeClass: 'py-3 !text-lg !rounded-[30px] !px-10 !py-2 bg-white transition-all hover:bg-<?= get_option('management_theme_hover')?> !border-none', width: '100%'});
     }
 
 

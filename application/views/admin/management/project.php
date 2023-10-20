@@ -22,11 +22,11 @@
         </div>
         
        
-        <div class="rounded-[40px] bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all p-6">
+        <div class="rounded-[40px] bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all p-6">
 
 
         <div class="flex flex-col justify-center gap-4 items-center mb-6 mr-4">
-            <div class="flex items-center bg-white rounded-full shadow-lg border border-solid border-white hover:border-yellow-400 transition-all ">
+            <div class="flex items-center bg-white rounded-full shadow-lg border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all ">
                     <div class="p-2">
                         <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-6a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -73,7 +73,7 @@
             </div>
 
         
-            <div class="p-5 rounded-[40px] bg-sky-100 flex flex-row flex-wrap gap-10 justify-between"> 
+            <div class="p-5 rounded-[40px] bg-<?= get_option('management_theme_background')?> flex flex-row flex-wrap gap-10 justify-between"> 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 p-5 w-full">
 
                 <?php
@@ -104,7 +104,7 @@
 
                                 $isAssigned = in_array($staff_id, $story->assignees_ids) ? 'true' : 'false';
                     ?>
-                            <button class="task-block bg-white px-3 py-2 rounded-xl cursor-pointer border border-gray-200 border-solid transition-all hover:border-yellow-400 hover:shadow-lg mb-4" data-task-id="<?= $story->id ?>" data-assigned="<?= $isAssigned ?>" onclick="init_task_modal(<?= $story->id ?>)">
+                            <button class="task-block bg-white px-3 py-2 rounded-xl cursor-pointer border border-gray-200 border-solid transition-all hover:border-<?= get_option('management_theme_border')?> hover:shadow-lg mb-4" data-task-id="<?= $story->id ?>" data-assigned="<?= $isAssigned ?>" onclick="init_task_modal(<?= $story->id ?>)">
                                 <div class="flex items-center justify-between">
                                     <span class="font-semibold"><?php echo $story->name; ?></span>
                                     <span><?php echo format_task_status($story->status); ?></span>

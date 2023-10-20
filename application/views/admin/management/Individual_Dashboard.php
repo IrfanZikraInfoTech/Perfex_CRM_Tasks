@@ -66,7 +66,7 @@ function interpolateColor($from, $to, $percent) {
         <div class="w-full mb-4">
              <h2 class="text-3xl font-bold text-center text-gray-500">Individual KPI Dashboard</h2>
         </div>
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all">
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
             <div class="flex lg:flex-row flex-col gap-4 items-center justify-between">
                 <!-- User Information Section -->
                 <div class="flex sm:flex-row flex-col  items-center lg:w-2/3 w-full">
@@ -98,7 +98,7 @@ function interpolateColor($from, $to, $percent) {
                         </p>
                     </div>
                 </div>
-                <div class="flex flex-col lg:w-1/3 w-full bg-sky-100 p-4 py-3 shadow-inner rounded-[50px]  max-h-[300px]">
+                <div class="flex flex-col lg:w-1/3 w-full bg-<?= get_option('management_theme_background')?> p-4 py-3 shadow-inner rounded-[50px]  max-h-[300px]">
                     <!-- Input boxes for FROM and TO -->
                     <div class="flex flex-col gap-2 mb-2 py-3 mx-3 w-90">
 
@@ -130,7 +130,7 @@ function interpolateColor($from, $to, $percent) {
                         }
                         ?>
 
-                        <button class="px-4 py-2 bg-sky-100 border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="window.location.href=admin_url+'team_management/individual_dashboard/'+document.getElementById('from').value + '/' + document.getElementById('to').value <?= (has_permission('team_management', '', 'admin')) ? (" +'/' + document.getElementById('staff').value") : '' ?>">
+                        <button class="px-4 py-2 bg-<?= get_option('management_theme_background')?> border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="window.location.href=admin_url+'team_management/individual_dashboard/'+document.getElementById('from').value + '/' + document.getElementById('to').value <?= (has_permission('team_management', '', 'admin')) ? (" +'/' + document.getElementById('staff').value") : '' ?>">
                         <i class="fa fa-search" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -148,11 +148,11 @@ function interpolateColor($from, $to, $percent) {
             
             <!-- Left side table -->
 
-            <div class="xl:w-[60%] w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all">
+            <div class="xl:w-[60%] w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
 
                 <h2 class="text-xl font-bold mb-4 text-center">Key Performance Indicators:</h2>
                 
-                <div class="flex flex-col bg-sky-100 p-6 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar">
+                <div class="flex flex-col bg-<?= get_option('management_theme_background')?> p-6 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar">
 
                     <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 shadow-inner rounded-[50px] transition-all p-6">
 
@@ -205,7 +205,7 @@ function interpolateColor($from, $to, $percent) {
 
             </div>
 
-             <div class="xl:w-[40%] w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all flex flex-col items-center">
+             <div class="xl:w-[40%] w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex flex-col items-center">
                 <h2 class="text-xl font-bold mb-4 text-center">Overall Performance Score:</h2>
                 <div class="relative w-full h-full min-h-[400px] flex justify-center items-center">
 
@@ -221,16 +221,16 @@ function interpolateColor($from, $to, $percent) {
             </div>
         </div>
 <?php if($from == $to){ ?>
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all">
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
             <div id="visualization"></div>
         </div>
         <?php }?>
 
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all overflow-hidden">
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all overflow-hidden">
                 <h2 class="text-xl font-bold mb-4 text-center text-uppercase ">METRICS</h2>
             <!-- Insert the charts or graphs as per your design and library of choice here -->
         
-            <div class="p-6 mt-6 bg-sky-100 min-h-[300px] rounded-[50px]">
+            <div class="p-6 mt-6 bg-<?= get_option('management_theme_background')?> min-h-[300px] rounded-[50px]">
 
                 <!-- Row 0 -->
                 <div class="flex justify-between">
@@ -243,15 +243,15 @@ function interpolateColor($from, $to, $percent) {
 
                 <div class="grid grid-cols-3 gap-4 mb-6">
 
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Loggable Days</span>
                         <span class="text-xl mt-2"><?= $punctuality_rate['total_days'] ?></span>
                     </div>
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Days Present</span>
                         <span class="text-xl mt-2"><?= $punctuality_rate['days_present'] ?></span>
                     </div>
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Days on Time</span>
                         <span class="text-xl mt-2"><?= $punctuality_rate['days_on_time'] ?></span>
                     </div>
@@ -268,15 +268,15 @@ function interpolateColor($from, $to, $percent) {
                 </div>
 
                 <div class="grid grid-cols-3 gap-4 mb-6">
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Assigned Stories</span>
                         <span class="text-xl mt-2"><?= $task_rates['total_tasks'] ?></span>
                     </div>
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Stories Completed</span>
                         <span class="text-xl mt-2"><?= $task_rates['completed_tasks_within_due'] ?></span>
                     </div>
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Stories Delayed Completed</span>
                         <span class="text-xl mt-2"><?= $task_rates['completed_tasks_past_due'] ?></span>
                     </div>
@@ -294,11 +294,11 @@ function interpolateColor($from, $to, $percent) {
                
                 <div class="grid grid-cols-2 gap-4 mb-6">
 
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Total Stories Time Estimation</span>
                         <span class="text-xl mt-2"><?= hoursToHoursMinutes($task_rates['esimate_hours']) ?></span>
                     </div>
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Total Time spent on Stories</span>
                         <span class="text-xl mt-2"><?= hoursToHoursMinutes($task_rates['spent_hours']) ?></span>
                     </div>
@@ -314,11 +314,11 @@ function interpolateColor($from, $to, $percent) {
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Total Logged Time</span>
                         <span class="text-xl mt-2"><?= hoursToHoursMinutes($shift_productivity_rate['total_logged_time']) ?></span>
                     </div>
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Total Hours on Tasks</span>
                         <span class="text-xl mt-2"><?= hoursToHoursMinutes($shift_productivity_rate['total_task_time']) ?></span>
                     </div>
@@ -334,11 +334,11 @@ function interpolateColor($from, $to, $percent) {
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Total Allowed AFK</span>
                         <span class="text-xl mt-2"><?= hoursToHoursMinutes($afk_adherence_rate['allowed_afk_time']) ?></span>
                     </div>
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Total AFK Time Taken</span>
                         <span class="text-xl mt-2"><?= hoursToHoursMinutes($afk_adherence_rate['actual_afk_time']) ?></span>
                     </div>
@@ -354,22 +354,22 @@ function interpolateColor($from, $to, $percent) {
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
                         <span class="text-sm font-medium">Working Days</span>
                         <span class="text-xl mt-2"><?= $summary_adherence_rate['working_days'] ?></span>
                     </div>
-                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition border border-gray-200 border-solid hover:border-yellow-400 cursor-pointer" onclick="$('#summaries').toggle('slow');">
+                    <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?> cursor-pointer" onclick="$('#summaries').toggle('slow');">
                         <span class="text-sm font-medium">Summaries Written</span>
                         <span class="text-xl mt-2"><?= $summary_adherence_rate['days_with_summaries'] ?></span>
                     </div>
                 </div>
 
-                <div id="summaries" class="grid grid-cols-2 gap-4 items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-yellow-400 overflow-y-scroll myscrollbar max-h-[400px]" style="display:none;">
+                <div id="summaries" class="grid grid-cols-2 gap-4 items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?> overflow-y-scroll myscrollbar max-h-[400px]" style="display:none;">
                                         
                                         <?php 
                                         foreach($summary_adherence_rate['summaries'] as $summary):                   
                                         ?>
-                                            <div class="w-full h-full bg-white rounded-[40px] cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-yellow-400 p-6"
+                                            <div class="w-full h-full bg-white rounded-[40px] cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-<?= get_option('management_theme_border')?> p-6"
                                             >
             
                                                 <div class="font-bold text-xl"><?= $summary->date ?></div>
@@ -393,12 +393,12 @@ function interpolateColor($from, $to, $percent) {
             </div>
 
         </div>
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-yellow-400 transition-all overflow-hidden">
+        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all overflow-hidden">
 
-        <div class="p-6 mt-6 bg-sky-100 rounded-[50px]"> 
+        <div class="p-6 mt-6 bg-<?= get_option('management_theme_background')?> rounded-[50px]"> 
 
             <h2 class="text-xl font-bold mb-4 text-center text-uppercase">All Tasks</h2>
-            <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 hover:border-yellow-400 shadow-inner rounded-[50px] transition-all  p-6">
+            <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 hover:border-<?= get_option('management_theme_border')?> shadow-inner rounded-[50px] transition-all  p-6">
                 <table class="w-full table  text-base">
                     <thead>
                     <tr>
@@ -448,7 +448,7 @@ function interpolateColor($from, $to, $percent) {
             ?>
 
             <h2 class="text-xl font-bold mb-4 mt-8 text-center text-uppercase">Task Timer Activity</h2>
-            <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 hover:border-yellow-400 shadow-inner rounded-[50px] transition-all p-6">
+            <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 hover:border-<?= get_option('management_theme_border')?> shadow-inner rounded-[50px] transition-all p-6">
 
                 <table class="w-full table  text-base">
                     <thead>
@@ -490,7 +490,7 @@ function interpolateColor($from, $to, $percent) {
             <div class="flex flex-row gap-4 mt-4">
                 <div class="w-1/2">
                     <h2 class="text-xl font-bold my-4 text-center text-uppercase">AFK Entries</h2>
-                    <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 hover:border-yellow-400 shadow-inner rounded-[50px] transition-all  p-6">
+                    <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 hover:border-<?= get_option('management_theme_border')?> shadow-inner rounded-[50px] transition-all  p-6">
 
                         <table class="w-full table  text-base">
                             <thead>
@@ -523,7 +523,7 @@ function interpolateColor($from, $to, $percent) {
                 </div>
                 <div class="w-1/2">
                     <h2 class="text-xl font-bold my-4  text-center text-uppercase">Offline Entries</h2>
-                    <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 hover:border-yellow-400 shadow-inner rounded-[50px] transition-all  p-6">
+                    <div class="w-full bg-white shadow-lg hover:shadow-xl border border-solid border-gray-200 hover:border-<?= get_option('management_theme_border')?> shadow-inner rounded-[50px] transition-all  p-6">
 
                         <table class="w-full table  text-base">
                             <thead>

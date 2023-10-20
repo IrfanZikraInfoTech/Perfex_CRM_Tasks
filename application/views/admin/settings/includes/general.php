@@ -88,5 +88,11 @@
 
 		<?php echo render_input('settings[management_theme_background]','Management Background',get_option('management_theme_background'), 'text'); ?>
 		
+		<?php echo render_input('settings[management_theme_border]','Management border',get_option('management_theme_border'), 'text'); ?>
+        
+		<?php echo render_input('settings[management_theme_foreground]','Management foreground',get_option('management_theme_foreground'), 'text'); ?>
+	
+		<?php echo render_input('settings[management_theme_hover]','Management hover',get_option('management_theme_hover'), 'text'); ?>
+
 	</div>
 </div>
