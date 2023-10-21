@@ -1331,8 +1331,8 @@ class Projects extends AdminController
 
     //SCRUM METHODOLOGIES
     public function create_epic() {
-        $project_id = $this->input->post('project_id');
         $epic_name = $this->input->post('name');
+        $project_id = $this->input->post('project_id');
         $epic_id = $this->projects_model->create_epic($project_id, $epic_name);
         echo json_encode(['epic_id' => $epic_id]);
     }

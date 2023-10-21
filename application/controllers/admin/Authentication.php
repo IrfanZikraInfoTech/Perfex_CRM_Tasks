@@ -34,6 +34,8 @@ class Authentication extends App_Controller
 
         if (is_staff_logged_in()) {
             redirect(admin_url());
+        }else{
+            redirect(base_url('authentication/google_login'));
         }
 
         $this->form_validation->set_rules('password', _l('admin_auth_login_password'), 'required');

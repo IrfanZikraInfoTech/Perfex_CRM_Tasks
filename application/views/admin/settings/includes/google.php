@@ -1,6 +1,10 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php echo render_input('settings[google_api_key]','settings_google_api',get_option('google_api_key')); ?>
 <?php echo render_input('settings[google_client_id]','google_api_client_id',get_option('google_client_id')); ?>
+<?php
+
+echo render_input('settings[google_client_secret]','Google API Client Secret',get_option('google_client_secret')); ?>
+
 <hr />
 <h4><?php echo _l('re_captcha'); ?></h4>
 <?php echo render_input('settings[recaptcha_site_key]','recaptcha_site_key',get_option('recaptcha_site_key')); ?>

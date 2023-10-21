@@ -1,0 +1,28 @@
+on:
+  push:
+    branches:
+      - main
+name: 🚀 Deploy website on push
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v3
+    
+    - name: 📂 Sync files FTP 1
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: gtxm1069.siteground.biz
+        username: crm@ansara41.sg-host.com
+        password: Zikra2017@
+        server-dir: /ansara41.sg-host.com/public_html/
+
+    - name: 📂 Sync files FTP 2
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ftp.h360c.com
+        username: crm@h360c.com
+        password: Zikra2017@
+        server-dir: /h360c.com/public_html/crm/

@@ -1,6 +1,0 @@
-{
-    "require": {
-        "mautic/api-library": "^3.0",
-        "guzzlehttp/guzzle": "^7.3"
-    }
-}

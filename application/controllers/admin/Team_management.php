@@ -255,7 +255,8 @@ class Team_management extends AdminController {
     public function fetch_kpi_for_date() {
         
         $staffs = $this->db->select('staffid, firstname, lastname')->get('tblstaff')->result();
-        echo $this->db->getLastQuery();
+        $date = $this->input->post('date');
+
         $data = [];
         foreach ($staffs as $staff) {
             $staff_id = $staff->staffid;

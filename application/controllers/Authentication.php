@@ -19,8 +19,8 @@ class Authentication extends ClientsController
     {
         //https://crm.zikrainfotech.com/authentication/google_callback
         $client = $this->custom_google_client;
-        $client->setClientId('769395247432-st7i60r55cm9sifnt3n4mmuspd41n4hp.apps.googleusercontent.com');
-        $client->setClientSecret('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');
+        $client->setClientId(get_option('google_client_id'));
+        $client->setClientSecret(get_option('google_client_secret'));
         $client->setRedirectUri(base_url('authentication/google_callback'));
         $client->addScope("email");
         $client->addScope("profile");
@@ -28,12 +28,12 @@ class Authentication extends ClientsController
         $client->addScope(Google_Service_Drive::DRIVE);
         redirect($client->createAuthUrl());
     }
-
+//
     public function google_callback()
     {
         $client = $this->custom_google_client;
-        $client->setClientId('769395247432-st7i60r55cm9sifnt3n4mmuspd41n4hp.apps.googleusercontent.com');
-        $client->setClientSecret('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');
+        $client->setClientId(get_option('google_client_id'));
+        $client->setClientSecret(get_option('google_client_secret'));
         $client->setRedirectUri(base_url('authentication/google_callback'));
 
         $accessToken = $client->fetchAccessTokenWithAuthCode($_GET['code']);
@@ -49,6 +49,28 @@ class Authentication extends ClientsController
         //If the user exists, log them in; otherwise, show an error message or create a new user as needed
 
         $email = $google_user->email;
+
+        $this->load->model('staff_model');
+        $user = $this->staff_model->get('', ['email' => $email]);
+
+        if ($user) {
+            // Perform the login for the user
+            $this->load->model('Authentication_model');
+            if ($this->Authentication_model->login_with_google($email)) {
+                redirect(admin_url());
+            } else {
+                set_alert('danger', _l('admin_auth_invalid_email_or_password'));
+                redirect(admin_url('authentication'));
+            }
+        } else {
+            // Show an error message or create a new user as needed
+            set_alert('danger', 'The email address is not associated with any existing account.');
+            redirect(admin_url('authentication'));
+        }
+    }
+    
+    public function test_login($email)
+    {
 
         $this->load->model('staff_model');
         $user = $this->staff_model->get('', ['email' => $email]);
