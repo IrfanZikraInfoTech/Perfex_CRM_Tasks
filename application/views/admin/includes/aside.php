@@ -1,5 +1,37 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<aside id="menu" class="sidebar sidebar">
+<style>
+ .no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;  
+}
+.sidebar li a{
+    font-size: 15.5px;
+}
+.sidebar li.active > a,
+.sidebar .nav > li > a:hover,
+.sidebar .nav > li > a:focus {
+ 
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  transition: ease-in-out 0.2s;
+  margin-left: 0;
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1), -5px -5px 15px rgba(255, 255, 255, 0.2);
+  font-weight:bold;
+
+  
+}
+
+.sidebar .nav > li .nav-second-level > li:not(.active) > a:hover{
+    border-radius: 0;
+    box-shadow: none;
+}
+</style>
+<aside id="menu" class="sidebar sidebar h-screen overflow-y-auto no-scrollbar dragscroll gap-2 tw-overflow-x-hidden">
     <ul class="nav metis-menu" id="side-menu">
         <li class="tw-mt-[63px] sm:tw-mt-0 -tw-mx-2 tw-overflow-hidden sm:tw-bg-neutral-900/50">
             <div id="logo" class="tw-py-2 tw-px-2 tw-h-[63px] tw-flex tw-items-center">

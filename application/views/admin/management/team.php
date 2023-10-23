@@ -164,9 +164,7 @@
 
    
 </script>
-
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
 <script type="text/javascript">
   var hierarchyData = <?php echo json_encode($hierarchy); ?>;
 
@@ -178,7 +176,6 @@
     data.addColumn('string', 'Name');
     data.addColumn('string', 'Manager');
 
-    // Function to add data to the chart
     function addData(node, parentId) {
         var name = '<div class="flex flex-col w-max !justify-center !mx-auto">'+node.profile+'<div>' + node.firstname + ' ' + node.lastname + '</div><div class="font-bold">' + (node.staff_title || '') + '</div></div>';
         var id = node.staffid.toString();
@@ -189,74 +186,96 @@
 
         if (node.subordinates) {
             for (var i = 0; i < node.subordinates.length; i++) {
-                addData(node.subordinates[i], id); // recursive call for subordinates
+                addData(node.subordinates[i], id);
             }
         }
     }
 
-    // Assuming hierarchyData is an array of top-level nodes
     for (var i = 0; i < hierarchyData.length; i++) {
         addData(hierarchyData[i], null);
     }
 
-    // Create the chart.
     var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
-    // Draw the chart, setting the allowHtml option to true for the tooltips.
     chart.draw(data, {'allowHtml':true, nodeClass: 'py-3 !text-lg !rounded-[30px] !px-10 !py-2 bg-white transition-all hover:bg-<?= get_option('management_theme_hover')?> !border-none', width: '100%'});
+  }
+
+  const container = document.querySelector('#chart_div');
+  let zoomLevel = 1;
+  const ZOOM_STEP = 0.1;
+  
+  let startY;
+  let startX;
+  let scrollLeft;
+  let scrollTop;
+  let isDown;
+  
+  container.addEventListener('mousedown', e => mouseIsDown(e));
+  container.addEventListener('mouseup', e => mouseUp(e))
+  container.addEventListener('mouseleave', e => mouseLeave(e));
+  container.addEventListener('mousemove', e => mouseMove(e));
+  container.addEventListener('wheel', function(e) {
+    if (e.deltaY < 0) {
+        zoomIn();
+    } else {
+        zoomOut();
     }
+    e.preventDefault();
+  });
+  
+  function mouseIsDown(e) {
+    isDown = true;
+    startY = e.pageY - container.offsetTop;
+    startX = e.pageX - container.offsetLeft;
+    scrollLeft = container.scrollLeft;
+    scrollTop = container.scrollTop; 
+  }
 
+  function mouseUp(e) {
+    isDown = false;
+  }
 
+  function mouseLeave(e) {
+    isDown = false;
+  }
 
-    const container = document.querySelector('#chart_div');
-                
-                let startY;
-                let startX;
-                let scrollLeft;
-                let scrollTop;
-                let isDown;
-                
-                container.addEventListener('mousedown',e => mouseIsDown(e));  
-                container.addEventListener('mouseup',e => mouseUp(e))
-                container.addEventListener('mouseleave',e=>mouseLeave(e));
-                container.addEventListener('mousemove',e=>mouseMove(e));
-                
-                
-                function mouseIsDown(e){
-                  isDown = true;
-                  startY = e.pageY - container.offsetTop;
-                  startX = e.pageX - container.offsetLeft;
-                  scrollLeft = container.scrollLeft;
-                  scrollTop = container.scrollTop; 
-                
-                }
-                function mouseUp(e){
-                  isDown = false;
-                }
-                function mouseLeave(e){
-                  isDown = false;
-                }
-                function mouseMove(e){
-                  if(isDown){
-                    
-                    
-                
-                    e.preventDefault();
-                
-                
-                
-                    //Move vertcally
-                    const y = e.pageY - container.offsetTop;
-                    const walkY = y - startY;
-                    container.scrollTop = scrollTop - walkY;
-                
-                    //Move Horizontally
-                    const x = e.pageX - container.offsetLeft;
-                    const walkX = x - startX;
-                    container.scrollLeft = scrollLeft - walkX;
-                
-                  }
-                }
+  function mouseMove(e) {
+    if(isDown) {
+      e.preventDefault();
+      const y = e.pageY - container.offsetTop;
+      const walkY = y - startY;
+      container.scrollTop = scrollTop - walkY;
+      const x = e.pageX - container.offsetLeft;
+      const walkX = x - startX;
+      container.scrollLeft = scrollLeft - walkX;
+    }
+  }
+
+  function zoomIn() {
+    if (zoomLevel < 2) {
+        zoomLevel += ZOOM_STEP;
+        setZoom();
+    }
+  }
+
+  function zoomOut() {
+    if (zoomLevel > 0.5) {
+        zoomLevel -= ZOOM_STEP;
+        setZoom();
+    }
+  }
+
+  function setZoom() {
+    container.style.transform = `scale(${zoomLevel})`;
+  }
+
 </script>
+
+<style>
+#chart_div {
+    transition: transform 0.3s;
+    transform-origin: 0 0;
+}
+</style>
 
 
 </body>

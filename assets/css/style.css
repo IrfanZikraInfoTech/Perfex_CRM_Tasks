@@ -466,6 +466,7 @@ body.page-small #header {
 .navbar-nav .open > a:focus {
   background: none;
   color: #0f172a;
+  
 }
 
 .navbar-nav.navbar-right {
@@ -513,6 +514,7 @@ body.page-small #header {
   bottom: 0;
   left: 0;
   top: 0;
+
 }
 
 .sidebar > ul > li:nth-child(2) a {
@@ -541,8 +543,8 @@ body.page-small #header {
 .sidebar .nav > li > a:focus {
   color: #f1f5f9;
   background: #334155;
-  border-radius: 5px;
   transition: ease-in-out 0.2s;
+  
 }
 
 .sidebar li.active > a .menu-icon,
