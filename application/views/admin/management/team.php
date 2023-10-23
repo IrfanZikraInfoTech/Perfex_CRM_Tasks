@@ -18,14 +18,17 @@
         <div class="w-full">
         <div class="w-full mb-4 bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all overflow-x-auto xl:cursor-auto cursor-move ">
             <h2 class="text-3xl font-bold text-center">Team</h2>
-            <div class="mt-10 flex flex-row justify-between items-center gap-4 px-4 py-2 cursor-pointer text-lg text-gray-600 transition-all bg-gray-100 rounded-[40px]" onclick="toggleCollapse(this, event, 'chart_div')">
+            <div class="mt-10 flex flex-row justify-between items-center gap-4 px-4 py-2 cursor-pointer text-lg text-gray-600 transition-all bg-gray-100 rounded-[40px]" onclick="toggleCollapse(this, event, 'chart_content')">
         <div class="opacity-0 transform transition-transform duration-300"></div>
             <div>View Chart</div>
             <div class="fas fa-angle-down rotate-[90deg] transform transition-transform duration-300"></div>
         </div>
-        <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-5 xl:text-base text-sm " id="chart_div" style="max-height: 0; overflow: hidden;">
-        <div class="my-4 p-4 rounded-[50px] border border-solid border-gray-100 hover:border-<?= get_option('management_theme_border')?> bg-gray-200">
-                <div class="w-flex justify-center w-full overflow-x-auto py-4" id="chart_div"></div>
+        <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-5 xl:text-base text-sm" style="max-height: 0; overflow: hidden;" id="chart_content">
+        
+        <div class="my-4 p-4 rounded-[50px] border border-solid border-gray-100 hover:border-<?= get_option('management_theme_border')?> bg-gray-200 overflow-auto" id="chart_container">
+              
+                    <div class="w-full justify-center py-4" id="chart_div"></div>
+               
             </div> 
         </div> 
         </div>
@@ -199,7 +202,7 @@
     chart.draw(data, {'allowHtml':true, nodeClass: 'py-3 !text-lg !rounded-[30px] !px-10 !py-2 bg-white transition-all hover:bg-<?= get_option('management_theme_hover')?> !border-none', width: '100%'});
   }
 
-  const container = document.querySelector('#chart_div');
+  const container = document.querySelector('#chart_container');
   let zoomLevel = 1;
   const ZOOM_STEP = 0.1;
   
@@ -265,7 +268,7 @@
   }
 
   function setZoom() {
-    container.style.transform = `scale(${zoomLevel})`;
+    document.querySelector('#chart_div').style.transform = `scale(${zoomLevel})`;
   }
 
 </script>
@@ -273,7 +276,7 @@
 <style>
 #chart_div {
     transition: transform 0.3s;
-    transform-origin: 0 0;
+    transform-origin: 50%;
 }
 </style>
 

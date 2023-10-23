@@ -73,9 +73,9 @@ class App_assets
         return ENVIRONMENT == 'development' ? time() : get_app_version();
     }
 
-    public function core_file($path, $fileName)
+    public function core_file($path, $fileName, $forceDef = false)
     {
-        if (get_option('use_minified_files') == 1) {
+        if (get_option('use_minified_files') == 1 && !$forceDef) {
             $fileName = $this->getMinifiedFileName($fileName, $path);
         }
 
