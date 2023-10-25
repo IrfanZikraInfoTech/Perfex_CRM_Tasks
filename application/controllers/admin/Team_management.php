@@ -13,7 +13,6 @@ class Team_management extends AdminController {
         $this->load->model('tasks_model');
         $this->load->model('projects_model');
         $this->load->library('webhook_library', null, 'webhook_lib');
-
         $this->load->library('kpi_system');
 
         //hooks()->add_action('task_assignee_added', 'notify_task_allocation');
@@ -26,9 +25,10 @@ class Team_management extends AdminController {
   
     public function team()
     {
+        $data['show_ceo_data'] = get_option('show_ceo_data');
         $data['departments'] = $this->team_management_model->get_all_departments();
         $data['hierarchy'] = $this->team_management_model->get_staff_hierarchy();
-
+        // var_dump($data['show_ceo_data']);
         $this->load->view('admin/management/team', $data);
     }
 

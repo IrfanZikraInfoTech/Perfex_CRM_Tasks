@@ -49,6 +49,13 @@
                 ?>
                     <div class="p-5 rounded-[40px] bg-gray-100 grid 2xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 grid-cols-1  gap-10">
                     <?php  foreach ($staff_members as $staff): ?>
+                        <?php 
+                        // Check if staff is CEO
+                        $isCEO = ($staff->report_to === null );
+
+                        // If staff is not CEO or if toggle for CEO data is ON
+                        if (!$isCEO || ($isCEO && $show_ceo_data == 1)): 
+                        ?>
                         <!-- Your staff card code starts here -->
                         <div class="flex flex-col bg-white w-full rounded-[30px] overflow-hidden transition-all duration-500 ease-in-out hover:scale-[0.97] shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?>">
                             <div class="flex justify-center items-center p-4 bg-gray-200">
@@ -59,10 +66,13 @@
 
 
                                 <?php
-                                $report_to_id = $staff->report_to;
-
+                               $report_to_id = $staff->report_to;
                                 $reporting_to_name = id_to_name($report_to_id, 'tblstaff', 'staffid', 'firstname') . ' ' .id_to_name($report_to_id, 'tblstaff', 'staffid', 'lastname');
-                                ?>
+
+                                if ($isCEO || empty($reporting_to_name)) {
+                                    $reporting_to_name = "None";
+                                }
+                              ?>
                                 <p class="text-base text-center">
                                     <span class="font-semibold">Report:</span> 
                                     <span class="font-medium"><?= $reporting_to_name; ?></span>
@@ -100,6 +110,8 @@
                                 <?php }?>
                             </div>
                         </div>
+                        <?php endif; ?>
+
                         <!-- Your staff card code ends here -->
                     <?php endforeach; ?>
                     </div>            

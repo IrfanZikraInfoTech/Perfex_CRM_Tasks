@@ -30,7 +30,7 @@ class Team_management_model extends App_Model
         $this->db->join(''.db_prefix().'staff_departments', ''.db_prefix().'staff.staffid = '.db_prefix().'staff_departments.staffid');
         $this->db->join(''.db_prefix().'departments', ''.db_prefix().'staff_departments.departmentid = '.db_prefix().'departments.departmentid');
         $this->db->where('is_not_staff', 0);
-        $this->db->where(''.db_prefix().'staff.staffid !=', 1);
+        // $this->db->where(''.db_prefix().'staff.staffid !=', 1);
         $this->db->where('active', 1);
         $this->db->where(''.db_prefix().'staff_departments.departmentid', $department_id);
         $this->db->order_by('tblstaff.firstname');
@@ -50,8 +50,8 @@ class Team_management_model extends App_Model
                 $task = $this->get_task_by_taskid($taskId);
                 $staff->currentTaskName = $task->name;
                 if($task->rel_type == "project"){
-                    $this->load->model('projects_model');
-                    $task_project = $this->projects_model->get($task->rel_id);
+                    $CI->load->model('projects_model');
+                    $task_project = $CI->projects_model->get($task->rel_id);
                     $staff->currentTaskProject = $task_project->name;
                 }
                 
@@ -1782,7 +1782,8 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
         $this->db->from('tblstaff');
     
         if ($report_to === null) {
-            $this->db->where('staffid', 1);  // Assuming 'staffid' is an integer
+            $this->db->where('report_to IS NULL', null, false);  // Main admin 
+            // $this->db->where('staffid', 1);  // Assuming 'staffid' is an integer
         } else {
             $this->db->where('report_to', $report_to);
             $this->db->where('staffid !=', 1);  // Correct syntax here

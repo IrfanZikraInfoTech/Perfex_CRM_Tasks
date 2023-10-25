@@ -89,8 +89,11 @@ function interpolateColor($from, $to, $percent) {
                         </p>     
                         <?php
                         $report_to_id = $staff->report_to;
-
                         $reporting_to_name = id_to_name($report_to_id, 'tblstaff', 'staffid', 'firstname') . ' ' .id_to_name($report_to_id, 'tblstaff', 'staffid', 'lastname');
+                            if ($report_to_id === null || $reporting_to_name == "Unknown Unknown") {
+                                $reporting_to_name = "None";
+                            }
+                       
                         ?>
                         <p class="text-lg">
                             <span class="font-semibold">Reporting to:</span> 

@@ -84,3 +84,4 @@ CREATE TABLE tblkudos (
 
 ALTER TABLE tblnewsfeed_posts ADD seen_by TEXT;
 
+ALTER TABLE tblstaff MODIFY report_to INT DEFAULT NULL;

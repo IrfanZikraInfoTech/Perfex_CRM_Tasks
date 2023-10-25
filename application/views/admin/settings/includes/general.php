@@ -95,5 +95,7 @@
 		<?php echo render_input('settings[management_theme_hover]','Management hover',get_option('management_theme_hover'), 'text'); ?>
 
 		<?php render_yes_no_option('enable_webhooks','Enable Webhook'); ?>
+		<?php echo render_yes_no_option('show_ceo_data','Show CEO Data?'); ?>
+		<hr />
 	</div>
 </div>

@@ -157,6 +157,7 @@
                                                 data-live-search="true"
                                                 data-none-selected-text="<?php echo _l('system_default_string'); ?>" data-width="100%"
                                                 name="report_to" id="report_to">
+                                                <option value="">Super Admin</option>
                                                 <?php foreach($staff_members as $staff): ?>
                                                     <option value="<?php echo $staff['staffid']; ?>" 
                                                         <?php 
@@ -465,12 +466,12 @@
                                 <hr />
                                 <h4 class="font-medium mbot15 bold"><?php echo _l('staff_add_edit_permissions'); ?></h4>
                                 <?php
-                     $permissionsData = [ 'funcData' => ['staff_id' => isset($member) ? $member->staffid : null ] ];
-                     if (isset($member)) {
-                         $permissionsData['member'] = $member;
-                     }
-                     $this->load->view('admin/staff/permissions', $permissionsData);
-                     ?>
+                                $permissionsData = [ 'funcData' => ['staff_id' => isset($member) ? $member->staffid : null ] ];
+                                if (isset($member)) {
+                                    $permissionsData['member'] = $member;
+                                }
+                                $this->load->view('admin/staff/permissions', $permissionsData);
+                                ?>
                             </div>
                         </div>
                     </div>

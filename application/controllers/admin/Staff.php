@@ -41,6 +41,18 @@ class Staff extends AdminController
 
             $data['password'] = $this->input->post('password', false);
 
+            
+            if (isset($data['report_to']) && $data['report_to'] == '') {
+                $data['report_to'] = null;
+            }
+            $previous_ceo = $this->db->where('report_to', null)->get('tblstaff')->row();
+
+                if($previous_ceo){
+                    // previous ceo report_to fields update 
+                    $this->db->where('staffid', $previous_ceo->staffid)
+                            ->update('tblstaff', ['report_to' => $id]);
+                }
+
             if ($id == '') {
                 if (!has_permission('staff', '', 'create')) {
                     access_denied('staff');
