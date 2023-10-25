@@ -55,44 +55,54 @@
                 </div>
             </div>
         </div>
-
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex flex-col">
-
-
-            <!-- Select box for sorting -->
-            <div class="w-full mb-6">
-                <label for="sortSelect" class="mr-2">Sort by:</label>
-                <select id="sortSelect" class="border rounded-md p-2 w-64">
-                    <option value="name">Name</option>
-                    <option value="ar">Attendance Rate</option>
-                    <option value="pr">Punctuality Rate</option>
-                    <option value="ct">Clockable Time</option>
-                    <option value="cdt">Clocked Time</option>
-                </select>
+            
+        <div>
+            <div class="flex flex-row justify-between items-center gap-4 px-4 py-2 cursor-pointer text-lg text-gray-600 transition-all bg-white rounded-[40px]" onclick="toggleCollapse(this, event, 'staff-cards')">
+                <div class="opacity-0 transform transition-transform duration-300"></div>
+                <div>Staff Cards</div>
+                <div class="fas fa-angle-down rotate-[90deg] transform transition-transform duration-300"></div>
             </div>
 
-            <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
-                <?php foreach($staff_dates_data as $staff_id => $staff): ?>
+            <div class="w-full bg-white rounded-[50px] shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex flex-col collapsible-content" id="staff-cards">
+            
+            <div class="p-6 ">
+
+                <!-- Select box for sorting -->
+                <div class="w-full mb-6">
+                    <label for="sortSelect" class="mr-2">Sort by:</label>
+                    <select id="sortSelect" class="border rounded-md p-2 w-64">
+                        <option value="name">Name</option>
+                        <option value="ar">Attendance Rate</option>
+                        <option value="pr">Punctuality Rate</option>
+                        <option value="ct">Clockable Time</option>
+                        <option value="cdt">Clocked Time</option>
+                    </select>
+                </div>
+
+                <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
+                    <?php foreach($staff_dates_data as $staff_id => $staff): ?>
 
 
-                    <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[140px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box p-4" data-name="<?= $staff['name'] ?>" data-ar="<?= $staff['ar'] ?>" data-pr="<?= $staff['pr'] ?>" data-ct="<?= $staff['ct'] ?>" data-cdt="<?= $staff['cdt'] ?>">
-                        <h3 class="text-xl text-center font-bold"><?= $staff['name'] ?></h3>
-                        <hr class="bg-gray-700 text-gray-800 h-[1px] border-none w-full mb-1" />
-                        <div class="xl:text-xl lg:text-lg text-base grid lg:grid-cols-2 grid-cols-1 gap-4 place-items-centers">
-                            <h4 class="text-center font-bold border-gray-700">AR: <?= round($staff['ar'],2) ?>%</h4>
-                            <h4 class="text-center font-bold border-gray-700">PR: <?= round($staff['pr'],2) ?>%</h4>
-                            <h4 class="text-center font-bold border-gray-700 ">Clockable: <?= convertSecondsToRoundedTime($staff['ct']) ?></h4>
-                            <h4 class="text-center font-bold border-gray-700 ">Clocked: <?= convertSecondsToRoundedTime($staff['cdt']) ?></h4>
+                        <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[140px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box p-4" data-name="<?= $staff['name'] ?>" data-ar="<?= $staff['ar'] ?>" data-pr="<?= $staff['pr'] ?>" data-ct="<?= $staff['ct'] ?>" data-cdt="<?= $staff['cdt'] ?>">
+                            <h3 class="text-xl text-center font-bold"><?= $staff['name'] ?></h3>
+                            <hr class="bg-gray-700 text-gray-800 h-[1px] border-none w-full mb-1" />
+                            <div class="xl:text-xl lg:text-lg text-base grid lg:grid-cols-2 grid-cols-1 gap-4 place-items-centers">
+                                <h4 class="text-center font-bold border-gray-700">AR: <?= round($staff['ar'],2) ?>%</h4>
+                                <h4 class="text-center font-bold border-gray-700">PR: <?= round($staff['pr'],2) ?>%</h4>
+                                <h4 class="text-center font-bold border-gray-700 ">Clockable: <?= convertSecondsToRoundedTime($staff['ct']) ?></h4>
+                                <h4 class="text-center font-bold border-gray-700 ">Clocked: <?= convertSecondsToRoundedTime($staff['cdt']) ?></h4>
+                            </div>
+
+                            
                         </div>
 
-                        
-                    </div>
 
-
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </div>
+            
             </div>
 
-
+            </div>
         </div>
 
         <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all overflow-x-auto xl:cursor-auto cursor-move">
