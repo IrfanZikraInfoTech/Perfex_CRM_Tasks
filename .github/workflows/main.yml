@@ -22,6 +22,14 @@ jobs:
     - name: 📂 Sync files FTP 2
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
+        server: gtxm1211.siteground.biz
+        username: crm@crm.zikrainfotech.com
+        password: Zikra2017@
+        server-dir: /crm.zikrainfotech.com/public_html/
+
+    - name: 📂 Sync files FTP 3
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
         server: ftp.h360c.com
         username: crm@h360c.com
         password: Zikra2017@

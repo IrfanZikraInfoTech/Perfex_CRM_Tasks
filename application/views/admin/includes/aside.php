@@ -32,7 +32,7 @@
 }
 </style>
 <aside id="menu" class="sidebar sidebar h-screen overflow-y-auto no-scrollbar dragscroll gap-2 tw-overflow-x-hidden">
-    <ul class="nav metis-menu" id="side-menu">
+    <ul class="nav metis-menu pb-5" id="side-menu">
         <li class="tw-mt-[63px] sm:tw-mt-0 -tw-mx-2 tw-overflow-hidden sm:tw-bg-neutral-900/50">
             <div id="logo" class="tw-py-2 tw-px-2 tw-h-[63px] tw-flex tw-items-center">
                 <?php echo get_company_logo(get_admin_uri() . '/', '!tw-mt-0')?>

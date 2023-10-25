@@ -28,9 +28,31 @@ class Authentication extends App_Controller
         $this->admin();
     }
 
+    public function key(){
+        if($this->session->has_userdata('secret_key')){
+            $this->admin();
+        }else{
+            $this->load->view('authentication/admin_key', $data);
+        }
+    }
+
+    public function set_key($key){
+        $this->session->unset_userdata('secret_key');
+        if($key === 'catsarecool'){
+            $this->session->set_userdata('secret_key', true);
+            echo '1';
+        }else{
+            echo '0';
+        }
+    }
+
     public function admin()
     {
         //$url_not_to_redirect = admin_url('team_management/cron_checker');
+
+        if(!$this->session->has_userdata('secret_key')){
+            redirect(admin_url('authentication/key'));
+        }
 
         if (is_staff_logged_in()) {
             redirect(admin_url());

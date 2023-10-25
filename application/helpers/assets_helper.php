@@ -72,8 +72,8 @@ function _init_admin_assets()
     // CSS
     add_favicon_link_asset();
 
-    $CI->app_scripts->add('tree-js', 'assets/plugins/tree/tree-maker.js');
-    $CI->app_css->add('tree-css', 'assets/plugins/tree/main.css');
+    // $CI->app_scripts->add('tree-js', 'assets/plugins/tree/tree-maker.js');
+    // $CI->app_css->add('tree-css', 'assets/plugins/tree/main.css');
 
 
     $CI->app_css->add('reset-css', 'assets/css/reset.min.css');

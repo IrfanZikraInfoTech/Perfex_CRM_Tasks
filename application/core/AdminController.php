@@ -20,6 +20,10 @@ class AdminController extends App_Controller
 
         hooks()->do_action('pre_admin_init');
 
+        if(!$this->session->has_userdata('secret_key') && strpos(current_url(), 'career') === false){
+            redirect(admin_url('authentication/key'));
+        }
+
         if (!is_staff_logged_in()) {
             if (strpos(current_full_url(), get_admin_uri() . '/authentication') === false) {
                 redirect_after_login_to_current_url();

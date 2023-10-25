@@ -50,8 +50,8 @@ class Team_management_model extends App_Model
                 $task = $this->get_task_by_taskid($taskId);
                 $staff->currentTaskName = $task->name;
                 if($task->rel_type == "project"){
-                    $CI->load->model('projects_model');
-                    $task_project = $CI->projects_model->get($task->rel_id);
+                    $this->load->model('projects_model');
+                    $task_project = $this->projects_model->get($task->rel_id);
                     $staff->currentTaskProject = $task_project->name;
                 }
                 

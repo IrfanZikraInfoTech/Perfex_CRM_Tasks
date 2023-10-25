@@ -691,7 +691,7 @@ function getOrSaveStaffSummary(summary = null) {
     var diffInDays = Math.round((today - selectedDate) / (1000 * 60 * 60 * 24));
 
     // If selected date is not yesterday or day before yesterday
-    if (diffInDays > 2) {
+    if (diffInDays > 1) {
         document.getElementById("summary-textarea").readOnly = true;
     } else {
         document.getElementById("summary-textarea").readOnly = false;

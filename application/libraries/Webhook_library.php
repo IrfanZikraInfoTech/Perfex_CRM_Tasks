@@ -4,6 +4,10 @@ class Webhook_library
 {
     public function send_chat_webhook($message, $threadKey) {
 
+        if(!get_option('enable_webhooks')){
+            return;
+        }
+
         $ch = curl_init();
     
         $current_time = date("H:i");

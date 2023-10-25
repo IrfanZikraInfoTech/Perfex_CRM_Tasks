@@ -82,7 +82,7 @@ var chart = new Chart(ctx, {
     type: 'doughnut',
     data: {
         datasets: [{
-            data: [clock_in, total - clock_in],
+            data: [clock_in, ( (clock_in < total) ? (total - clock_in) : 0)],
             backgroundColor: ['#4caf50', '#e5e5e5'],
             borderWidth: 0,
             borderAlign: 'inner'
@@ -106,7 +106,7 @@ var chart = new Chart(ctx, {
 function updateTimerChart(){
     chart.data = {
         datasets: [{
-            data: [clock_in, total - clock_in],
+            data: [clock_in, ( (clock_in < total) ? (total - clock_in) : 0)],
             backgroundColor: ['#4caf50', '#e5e5e5'],
             borderWidth: 0,
             borderAlign: 'inner'

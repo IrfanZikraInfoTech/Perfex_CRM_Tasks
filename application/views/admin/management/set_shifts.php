@@ -161,14 +161,20 @@ function openShiftsModal(date, shiftsData) {
 var calendarEl = document.getElementById('shifts_calendar');
 var shifts = <?php echo json_encode($shifts); ?>;
 
-var events = shifts.map(function(shift) {
-    return {
-    title: 'Shift ' + shift.shift_number + ': ' + shift.shift_start_time + ' - ' + shift.shift_end_time,
-    start: new Date(shift.Year, shift.month - 1, shift.day, shift.shift_start_time.split(':')[0], shift.shift_start_time.split(':')[1]),
-    end: new Date(shift.Year, shift.month - 1, shift.day, shift.shift_end_time.split(':')[0], shift.shift_end_time.split(':')[1]),
-    allDay: false // will make the time show
-    };
-});
+var events = shifts
+    .filter(function(shift) {
+        // Check that both start and end times are not null or undefined
+        return shift.shift_start_time && shift.shift_end_time;
+    })
+    .map(function(shift) {
+        return {
+            title: 'Shift ' + shift.shift_number + ': ' + shift.shift_start_time + ' - ' + shift.shift_end_time,
+            start: new Date(shift.Year, shift.month - 1, shift.day, shift.shift_start_time.split(':')[0], shift.shift_start_time.split(':')[1]),
+            end: new Date(shift.Year, shift.month - 1, shift.day, shift.shift_end_time.split(':')[0], shift.shift_end_time.split(':')[1]),
+            allDay: false // will make the time show
+        };
+    });
+
 
 var calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
@@ -257,7 +263,7 @@ function copyMonthTimings(){
                 },
                 dataType: 'json',
                 success: function(staffStats) {
-                    // location.reload();
+                    location.reload();
                 }
             });
         }
