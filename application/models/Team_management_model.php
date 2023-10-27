@@ -1837,7 +1837,7 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
             $staff->profile = staff_profile_image($staff->staffid, ['border-2 border-solid object-cover w-12 h-12 staff-profile-image-thumb !mx-auto'], 'thumb');;
             $staff->subordinates = $this->get_staff_hierarchy($staff->staffid, $depth + 1);
         }
-    
+    // var_dump($result);
         return $result;
     }
     

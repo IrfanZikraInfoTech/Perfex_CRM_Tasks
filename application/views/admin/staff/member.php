@@ -157,7 +157,7 @@
                                                 data-live-search="true"
                                                 data-none-selected-text="<?php echo _l('system_default_string'); ?>" data-width="100%"
                                                 name="report_to" id="report_to">
-                                                <option value="">Super Admin</option>
+                                                <option value="">None</option>
                                                 <?php foreach($staff_members as $staff): ?>
                                                     <option value="<?php echo $staff['staffid']; ?>" 
                                                         <?php 

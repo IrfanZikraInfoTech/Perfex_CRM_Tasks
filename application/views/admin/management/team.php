@@ -127,7 +127,6 @@
 
 
 <?php init_tail(); ?>
-<script src='https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js'></script>
 <script>
     function toggleCollapse(button, event, elementId) {
     if (event.target.tagName.toLowerCase() === 'button' || event.target.tagName.toLowerCase() === 'input') {
@@ -187,6 +186,8 @@
   google.charts.setOnLoadCallback(drawChart);
 
   function drawChart() {
+    console.log(hierarchyData);
+
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Name');
     data.addColumn('string', 'Manager');
@@ -225,6 +226,7 @@
         initialZoom: 0.8
     });
 </script>
+<script src='https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js'></script>
 
 
 </body>
