@@ -430,7 +430,40 @@
 
                 <?php endforeach; ?>
 
-                
+                <div class="flex flex-row text-base transition-all bg-<?= get_option('management_theme_foreground')?> ease-in-out rounded-[40px] xl:text-xl lg:text-md md:text-md overflow-hidden sticky bottom-4 mt-4 z-10 " >
+
+                    <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold">
+                        Cumulative
+                    </div>
+
+                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                        <?= convertSecondsToRoundedTime($staff['clockable_shift_1']); ?>
+                    </div>
+
+                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                        <?= convertSecondsToRoundedTime($staff['clocked_shift_1']); ?>
+                    </div>
+
+                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                        <?= convertSecondsToRoundedTime($staff['clockable_shift_2']); ?>
+                    </div>
+
+                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                        <?= convertSecondsToRoundedTime($staff['clocked_shift_2']); ?>
+                    </div>
+
+                    <div class="w-[20%] border-l border-solid border-gray-600 text-center flex flex-col font-bold">
+                        <div class="border-b border-solid border-gray-600 py-1">
+                            Rates
+                        </div>
+                        <div class="transition-all text-center flex flex-row">
+                            <button data-toggle="tooltip" data-title="Punctuality Rate" class="py-1 w-1/2 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($staff['pr'],2) ?>%</button>
+                            <button data-toggle="tooltip" data-title="Attenandance Rate" class="py-1 w-1/2 border-l border-solid border-gray-600 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($staff['ar'],2) ?>%</button>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </div>

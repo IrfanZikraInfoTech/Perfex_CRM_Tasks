@@ -50,9 +50,9 @@ class Authentication extends App_Controller
     {
         //$url_not_to_redirect = admin_url('team_management/cron_checker');
 
-        if(!$this->session->has_userdata('secret_key')){
-            redirect(admin_url('authentication/key'));
-        }
+        // if(!$this->session->has_userdata('secret_key')){
+        //     redirect(admin_url('authentication/key'));
+        // }
 
         if (is_staff_logged_in()) {
             redirect(admin_url());

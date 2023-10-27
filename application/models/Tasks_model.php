@@ -449,6 +449,14 @@ class Tasks_model extends App_Model
             unset($data['checklist_items']);
         }
 
+        $manualChecklistItems = [];
+        if (isset($data['manual_checklist_items']) && is_array($data['manual_checklist_items'])) {
+            $manualChecklistItems = array_filter($data['manual_checklist_items']); // Remove empty items
+            unset($data['manual_checklist_items']);
+        }
+
+
+
         if ($clientRequest == false) {
             $defaultStatus = get_option('default_task_status');
             if ($defaultStatus == 'auto') {
@@ -559,6 +567,7 @@ class Tasks_model extends App_Model
         $this->db->insert(db_prefix() . 'tasks', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
+
             foreach ($checklistItems as $key => $chkID) {
                 if ($chkID != '') {
                     $itemTemplate = $this->get_checklist_template($chkID);
@@ -571,6 +580,20 @@ class Tasks_model extends App_Model
                     ]);
                 }
             }
+
+            foreach ($manualChecklistItems as $key => $description) {
+                if ($description != '') {
+                    $checklistData = [
+                        'taskid'      => $insert_id,
+                        'description' => trim($description),
+                    ];
+                    
+                    $this->add_checklist_item($checklistData);
+                }
+            }
+            
+
+
             handle_tags_save($tags, $insert_id, 'task');
             if (isset($custom_fields)) {
                 handle_custom_fields_post($insert_id, $custom_fields);

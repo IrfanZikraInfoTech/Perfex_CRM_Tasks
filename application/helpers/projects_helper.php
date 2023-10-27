@@ -550,7 +550,7 @@ function story($story, $show_epic = false, $href = '') {
     $story_html = '
     <div class="story" data-story-id="'.$story->id.'">
         <div class="border-2 border-solid '.$color_class.' rounded-lg transition-all px-4 py-2 flex justify-between items-center">
-            <a onclick="init_task_modal('.$story->id.');" href="'.$href.'" class="text-gray-800 font-bold flex flex-col "> <div>'.htmlspecialchars($story->name). '</div>'.$epic_html.'</a>
+            <a onclick="init_task_modal('.$story->id.');return false;" href="'.$href.'" class="text-gray-800 font-bold flex flex-col "> <div>'.htmlspecialchars($story->name). '</div>'.$epic_html.'</a>
             <div class="flex items-center">
                 <div class="flex space-x-2">
                     '.$assignee_avatars.'

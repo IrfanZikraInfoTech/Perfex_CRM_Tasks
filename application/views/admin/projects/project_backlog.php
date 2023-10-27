@@ -647,6 +647,15 @@ function updateSprintStatus(button) {
                                     'error'
                                 );
                             }else{
+                                Swal.fire({
+                                title: 'Processing',
+                                html: 'Updating spring summary...',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                    }
+                                });
+
                                 $.ajax({
                                     url: admin_url + 'projects/set_sprint_closing_summary',
                                     type: 'POST',
@@ -705,7 +714,14 @@ function updateSprintStatus(button) {
                         'error'
                     );
                 }else{
-
+                    Swal.fire({
+                                title: 'Processing',
+                                html: 'Adding spring summary...',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                    }
+                                });
                     $.ajax({
                         url: admin_url + 'projects/set_sprint_closing_summary',
                         type: 'POST',

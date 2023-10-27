@@ -25,7 +25,7 @@
         </div>
         <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-5 xl:text-base text-sm" style="max-height: 0; overflow: hidden;" id="chart_content">
         
-        <div class="my-4 p-4 rounded-[50px] border border-solid border-gray-100 hover:border-<?= get_option('management_theme_border')?> bg-gray-200 overflow-auto" id="chart_container">
+        <div class="my-4 p-4 rounded-[50px] border border-solid border-gray-100 hover:border-<?= get_option('management_theme_border')?> bg-gray-200" id="chart_container">
               
                     <div class="w-full justify-center py-4" id="chart_div"></div>
                
@@ -127,7 +127,7 @@
 
 
 <?php init_tail(); ?>
-
+<script src='https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js'></script>
 <script>
     function toggleCollapse(button, event, elementId) {
     if (event.target.tagName.toLowerCase() === 'button' || event.target.tagName.toLowerCase() === 'input') {
@@ -212,85 +212,19 @@
 
     var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
     chart.draw(data, {'allowHtml':true, nodeClass: 'py-3 !text-lg !rounded-[30px] !px-10 !py-2 bg-white transition-all hover:bg-<?= get_option('management_theme_hover')?> !border-none', width: '100%'});
-  }
-
-  const container = document.querySelector('#chart_container');
-  let zoomLevel = 1;
-  const ZOOM_STEP = 0.1;
-  
-  let startY;
-  let startX;
-  let scrollLeft;
-  let scrollTop;
-  let isDown;
-  
-  container.addEventListener('mousedown', e => mouseIsDown(e));
-  container.addEventListener('mouseup', e => mouseUp(e))
-  container.addEventListener('mouseleave', e => mouseLeave(e));
-  container.addEventListener('mousemove', e => mouseMove(e));
-  container.addEventListener('wheel', function(e) {
-    if (e.deltaY < 0) {
-        zoomIn();
-    } else {
-        zoomOut();
     }
-    e.preventDefault();
-  });
-  
-  function mouseIsDown(e) {
-    isDown = true;
-    startY = e.pageY - container.offsetTop;
-    startX = e.pageX - container.offsetLeft;
-    scrollLeft = container.scrollLeft;
-    scrollTop = container.scrollTop; 
-  }
 
-  function mouseUp(e) {
-    isDown = false;
-  }
+    var chart_div = document.querySelector('#chart_div');
 
-  function mouseLeave(e) {
-    isDown = false;
-  }
-
-  function mouseMove(e) {
-    if(isDown) {
-      e.preventDefault();
-      const y = e.pageY - container.offsetTop;
-      const walkY = y - startY;
-      container.scrollTop = scrollTop - walkY;
-      const x = e.pageX - container.offsetLeft;
-      const walkX = x - startX;
-      container.scrollLeft = scrollLeft - walkX;
-    }
-  }
-
-  function zoomIn() {
-    if (zoomLevel < 2) {
-        zoomLevel += ZOOM_STEP;
-        setZoom();
-    }
-  }
-
-  function zoomOut() {
-    if (zoomLevel > 0.5) {
-        zoomLevel -= ZOOM_STEP;
-        setZoom();
-    }
-  }
-
-  function setZoom() {
-    document.querySelector('#chart_div').style.transform = `scale(${zoomLevel})`;
-  }
-
+    // And pass it to panzoom
+    panzoom(chart_div,{
+        maxZoom: 1,
+        minZoom: 0.1,
+        initialX: -19000,
+        initialY: 0,
+        initialZoom: 0.8
+    });
 </script>
-
-<style>
-#chart_div {
-    transition: transform 0.3s;
-    transform-origin: 50%;
-}
-</style>
 
 
 </body>

@@ -39,7 +39,7 @@ $(function() {
 
 
         $(document).ready(function() {
-            $('a[href="' + base_url+'career' + '"]').attr('target', '_blank');
+            $('a[href="<?=base_url()?>career"]').attr('target', '_blank');
         });
 
     </script>

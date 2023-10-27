@@ -610,10 +610,20 @@ if($from == $to){
 ?>
 <script>
 
+<?php
+if($clock_in_entries){
+    foreach($clock_in_entries as &$entry){
+        if(!$entry['clock_out']){
+            $entry['clock_out'] = date("Y-m-d H:i:s");
+        }
+    }
+}
+
+?>
     
 function getCurrentTimeInAsiaKolkata() {
     const now = new Date();
-    const timeZone = 'Asia/Kolkata';
+    const timeZone = '<?= get_option('default_timezone') ?>';
     const localTimeString = now.toLocaleString('en-US', { timeZone });
   
     return new Date(localTimeString);
@@ -703,7 +713,7 @@ var timeline = new vis.Timeline(container, items, options);
 
 // Setting the timeline to focus on our startDate to endDate
 timeline.setWindow(startDate, endDate);
-// timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
+timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
 
 </script>
 

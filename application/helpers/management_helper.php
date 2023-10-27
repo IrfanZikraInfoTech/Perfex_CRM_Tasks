@@ -192,7 +192,7 @@ function notify_task_status_changed($data) {
     $message_content .= "-----------------------\n";
     $message_content .= "*By:* <users/" . $tag . "> \n";
     $message_content .= "*Task Name:* " . $task->name . "\n";
-    $message_content .= "*Time Taken:* " . secondsToReadableTime($total_task_time) . "\n";
+    $message_content .= "*Time Taken:* " . convertSecondsToRoundedTime($total_task_time) . "\n";
     $message_content .= "*Task Link:* " . admin_url() . 'tasks/view/' . $task_id . "\n";
 
     $CI->webhook_library->send_chat_webhook($message_content, "tasks-activity");

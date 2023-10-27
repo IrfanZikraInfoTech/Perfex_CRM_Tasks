@@ -246,11 +246,11 @@ function addLeave(staffId, reason, startDate, endDate, shift) {
         $("#leaves-table > tbody").prepend(`
 
         <tr id="leave-${leaveId}" class="bg-white">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${reason}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">`+durationTxt+`</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Today</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">`+shiftTxt+`</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <td class="px-6 py-4 text-sm font-medium text-gray-900">${reason}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">`+durationTxt+`</td>
+            <td class="px-6 py-4 text-sm text-gray-500">Today</td>
+            <td class="px-6 py-4 text-sm text-gray-500">`+shiftTxt+`</td>
+            <td class="px-6 py-4 text-right text-sm font-medium">
                 <button
                 onclick="deleteLeave(${leaveId})"
                 class="text-indigo-600 hover:text-indigo-900"
@@ -312,11 +312,11 @@ function fetchLeaves(staffId) {
             const row = `
             
             <tr class="bg-white" id="leave-${leave.id}">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${leave.reason}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${durationStr}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${leave.created_at}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shiftTxt}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td class="px-6 py-4 text-sm font-medium text-gray-900">${leave.reason}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">${durationStr}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">${leave.created_at}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">${shiftTxt}</td>
+                <td class="px-6 py-4 text-right text-sm font-medium">
                     <button
                     onclick="deleteLeave(${leave.id})"
                     class="text-indigo-600 hover:text-indigo-900"

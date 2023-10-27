@@ -50,8 +50,8 @@ class Team_management_model extends App_Model
                 $task = $this->get_task_by_taskid($taskId);
                 $staff->currentTaskName = $task->name;
                 if($task->rel_type == "project"){
-                    $CI->load->model('projects_model');
-                    $task_project = $CI->projects_model->get($task->rel_id);
+                    $this->load->model('projects_model');
+                    $task_project = $this->projects_model->get($task->rel_id);
                     $staff->currentTaskProject = $task_project->name;
                 }
                 
@@ -112,7 +112,7 @@ class Team_management_model extends App_Model
     }
     
     public function getProjectsByStaffId($staff_id) {
-        $query = $this->db->query('SELECT p.* FROM ' . db_prefix() . 'projects p JOIN ' . db_prefix() . 'project_members pm ON p.id = pm.project_id WHERE pm.staff_id = ?', array($staff_id));
+        $query = $this->db->query('SELECT p.* FROM ' . db_prefix() . 'projects p JOIN ' . db_prefix() . 'project_members pm ON p.id = pm.project_id WHERE pm.staff_id = ? AND p.status = 2', array($staff_id));
         // var_dump(result_array);
         return $query->result_array();
     }
@@ -436,7 +436,7 @@ class Team_management_model extends App_Model
         $this->db->select_sum('TIMESTAMPDIFF(SECOND, start_time, IFNULL(end_time, "'.$nowDate.'"))', 'total_time')
         ->where('staff_id', $staff_id)
         ->where('DATE(start_time)', $date)
-        ->where_in('status', ['AFK', 'Offline']);
+        ->where_in('status', ['AFK']);
         $result = $this->db->get(''.db_prefix().'_staff_status_entries')->row();
 
         return $result->total_time;
@@ -549,8 +549,48 @@ class Team_management_model extends App_Model
             return array('status' => 'success', 'message' => 'Shifts copied successfully');
         }
     }
-    
 
+    public function save_staff_shifts($staff_id, $dateObj, $repeat, $shift_1_start, $shift_1_end, $shift_2_start, $shift_2_end) {
+        // Depending on $repeat, calculate the array of dates for which the shifts need to be set
+        $dates = $this->calculate_dates($dateObj, $repeat);
+
+        // Prepare data for insertion
+        $shiftsData = [];
+        foreach ($dates as $date) {
+            // If records for this date already exist, delete them
+            $this->db->delete('tbl_staff_shifts', ['staff_id' => $staff_id, 'Year' => $date->format('Y'), 'month' => $date->format('m'), 'day' => $date->format('d')]);
+
+            // Prepare the new records
+            if (!empty($shift_1_start) && !empty($shift_1_end)) {
+                $shiftsData[] = [
+                    'staff_id' => $staff_id,
+                    'Year' => $date->format('Y'),
+                    'month' => $date->format('m'),
+                    'day' => $date->format('d'),
+                    'shift_number' => 1,
+                    'shift_start_time' => $shift_1_start,
+                    'shift_end_time' => $shift_1_end,
+                ];
+            }
+            if (!empty($shift_2_start) && !empty($shift_2_end)) {
+                $shiftsData[] = [
+                    'staff_id' => $staff_id,
+                    'Year' => $date->format('Y'),
+                    'month' => $date->format('m'),
+                    'day' => $date->format('d'),
+                    'shift_number' => 2,
+                    'shift_start_time' => $shift_2_start,
+                    'shift_end_time' => $shift_2_end,
+                ];
+            }
+        }
+
+        // Insert the new shift records
+        if (!empty($shiftsData)) {
+            $this->db->insert_batch('tbl_staff_shifts', $shiftsData);
+        }
+        return ['status' => 'success', 'message' => 'Shifts saved successfully.'];
+    }
     
 
     private function calculate_dates($dateObj, $repeat) {
@@ -1779,6 +1819,7 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
         if ($depth > $maxDepth) return [];  // Limiting recursion depth
     
         $this->db->select('firstname, lastname, staffid, report_to, staff_title');
+        $this->db->where('active', 1);
         $this->db->from('tblstaff');
     
         if ($report_to === null) {

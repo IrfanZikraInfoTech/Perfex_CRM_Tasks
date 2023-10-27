@@ -62,7 +62,6 @@
                 <?php //hooks()->do_action('before_start_render_dashboard_content'); ?>
 
                 <div class="clearfix"></div> 
-                
                 <div class="col-md-12 my-4" data-container="middle-left-6">
                     <?php $this->load->view('admin/management/dashboard_widget' ); ?>
                     <?php render_dashboard_widgets('middle-left-6'); ?>
@@ -244,13 +243,13 @@
                             
                             <div class="w-1/2 p-4">
                                     <!-- <h4><b>DUMMY SUMMARY </b></h4> -->
-                                    <textarea class="w-full h-full transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-hidden text-lg border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>" readonly ><?= get_option('dummy_summary'); ?></textarea>
+                                    <textarea class="w-full h-full transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-scroll text-lg border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?> myscrollbar" readonly ><?= get_option('dummy_summary'); ?></textarea>
                             </div>
                             
                             
                             <!-- Right Box for writing summary -->
                             <div class="w-1/2 p-4 flex flex-col gap-3">
-                                <textarea id="summary-textarea" class="w-full flex-grow transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-hidden text-lg border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>" placeholder="Write your summary here..."></textarea>
+                                <textarea id="summary-textarea" class="w-full flex-grow transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-scroll text-lg border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?> myscrollbar" placeholder="Write your summary here..."></textarea>
 
                                 <div class="flex flex-row w-full justify-end">
                                     <button onclick="getOrSaveStaffSummary(document.getElementById('summary-textarea').value)" class="w-full bg-blue-500/90 text-white font-semibold py-2 px-4 rounded-3xl shadow-sm hover:shadow-xl  transition-all border border-blue-200 border-solid hover:border-blue-700">Submit</button>
@@ -584,10 +583,20 @@ function markPostAsSeen(postId) {
 
 <script>
 
+<?php
+if($clock_in_entries){
+    foreach($clock_in_entries as &$entry){
+        if(!$entry['clock_out']){
+            $entry['clock_out'] = date("Y-m-d H:i:s");
+        }
+    }
+}
+
+?>
     
 function getCurrentTimeInAsiaKolkata() {
     const now = new Date();
-    const timeZone = 'Asia/Kolkata';
+    const timeZone = '<?= get_option('default_timezone') ?>';
     const localTimeString = now.toLocaleString('en-US', { timeZone });
   
     return new Date(localTimeString);

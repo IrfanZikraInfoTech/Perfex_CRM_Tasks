@@ -1248,6 +1248,10 @@ taskAttachmentDropzone = new Dropzone("#task-attachment", appCreateDropzoneOptio
     }
 }));
 
+<?php 
+if($task->rel_type=='project'){
+?>
+
 $('#task-modal').find('.gpicker').googleDrivePicker({
     onPick: function(pickData) {
         taskExternalFileUpload(pickData, 'gdrive', <?php echo $task->id; ?>);
@@ -1259,12 +1263,12 @@ $('#task-modal').find('.gpicker').googleDrivePicker({
 function saveProjectExternalFile(files, externalType) {
   $.post(admin_url + "projects/add_external_file", {
     files: files,
-    project_id: <?= $task->rel_id ?>,
+    project_id: <?= ($task->rel_id)  ?>,
     external: externalType,
     visible_to_customer: false,
   });
 }
-
+<?php }?>
 
 $('.edit-timesheet-cancel').click(function() {
     $('.timesheet-edit').addClass('hide');

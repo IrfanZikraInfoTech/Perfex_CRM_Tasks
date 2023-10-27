@@ -237,6 +237,7 @@ class Projects extends AdminController
             $percent         = $this->projects_model->calc_progress($id);
             $data['members'] = $this->projects_model->get_project_members($id, true);
 
+
             foreach ($data['members'] as $key => $member) {
                 $data['members'][$key]['total_logged_time'] = 0;
                 $member_timesheets                          = $this->tasks_model->get_unique_member_logged_task_ids($member['staff_id'], ' AND task_id IN (SELECT id FROM ' . db_prefix() . 'tasks WHERE rel_type="project" AND rel_id="' . $this->db->escape_str($id) . '")');
@@ -429,8 +430,7 @@ class Projects extends AdminController
 
                 
 
-            }
-            elseif($group == 'project_dashboard'){
+            }elseif($group == 'project_dashboard'){
 
                 $data['epics'] = $this->projects_model->get_epics($id);
                 foreach ($data['epics'] as $epic) {
@@ -1333,7 +1333,7 @@ class Projects extends AdminController
     public function create_epic() {
         $epic_name = $this->input->post('name');
         $project_id = $this->input->post('project_id');
-        $epic_id = $this->projects_model->create_epic($project_id, $epic_name);
+        $epic_id = $this->projects_model->create_epic($project_id,$epic_name);
         echo json_encode(['epic_id' => $epic_id]);
     }
 
@@ -1355,7 +1355,7 @@ class Projects extends AdminController
         $sprint_start_date = $this->input->post('start_date');
         $sprint_end_date = $this->input->post('end_date');
         $story_ids = $this->input->post('story_ids');
-
+    
         $data = [
             'name' => $sprint_name,
             'project_id' => $project_id,
@@ -1363,13 +1363,44 @@ class Projects extends AdminController
             'end_date' => $sprint_end_date,
             'created_at' => date("Y-m-d H:i:s")
         ];
-
+    
         $new_sprint_id = $this->projects_model->create_new_sprint($data);
-
+    
         $success = $this->projects_model->update_stories_sprint($story_ids, $new_sprint_id);
-
+    
+        // Load required models and libraries
+        $this->load->model('clients_model');
+        $project = $this->projects_model->get($project_id);
+        $client = $this->clients_model->get_contact($project->client_data->userid);
+        $members = $this->projects_model->get_project_members($project_id, true);
+        $this->load->library('email');
+    
+        // Email content
+        $subject = 'New Sprint "'.$sprint_name.'" Created | '. get_option('companyname');
+        $template = 'Hey '.$client->firstname . ' ' . $client->lastname . ', <br> A new sprint named <b>'.$sprint_name.'</b> has been created for project <a href="'.base_url('clients/project/'.$project_id).'">' . $project->name.'</a>';
+        
+        // Send email to client
+        $this->email->from(get_option('smtp_email'), get_option('companyname'));
+        $this->email->to($client->email);
+        $this->email->subject($subject);
+        $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
+        $this->email->send();
+    
+        // Send email to project members
+        foreach ($members as $member) {
+            $template = 'Hey '.$member['firstname'] . ' ' . $member['lastname'] . ', <br> A new sprint named <b>'.$sprint_name.'</b> has been created for project <a href="'.admin_url('projects/view/'.$project_id).'">' . $project->name.'</a>';
+    
+            $this->email->clear();  // clear previous email details
+            $this->email->from(get_option('smtp_email'), get_option('companyname'));
+            $this->email->to($member['email']);
+            $this->email->subject($subject);
+            $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
+            $this->email->send();
+        }
+    
         echo json_encode(['new_sprint_id' => $new_sprint_id, 'success' => $success]);
     }
+    
 
     public function update_sprint_name() {
         $sprint_id = $this->input->post('sprint_id');
@@ -1418,6 +1449,47 @@ class Projects extends AdminController
     
         // Update the sprint status
         $success = $this->projects_model->update_sprint_status($sprint_id, $new_status);
+        // $success = 1;
+
+        if($success) {
+            $this->load->model('clients_model');
+            $project = $this->projects_model->get($project_id);
+            $client = $this->clients_model->get_contact($project->client_data->userid);
+            $members = $this->projects_model->get_project_members($project_id, true);
+        
+            // Load the email library
+            $this->load->library('email');
+
+            $sprint_name = id_to_name($sprint_id, 'tblsprints', 'id', 'name');
+            $sprint_status = ($new_status == 1) ? 'In Progress' : (($new_status == 2) ? 'Completed' : '');
+        
+            // Email content
+            $subject = 'Sprint "'.$sprint_name.'" Status Updated | '. get_option('companyname');
+            
+            $template = 'Hey '.$client->firstname . ' ' . $client->lastname . ', <br> Sprint status of <b>'.$sprint_name.'</b> has been updated to <i>' . $sprint_status .'</i> for project <a href="'.base_url('clients/project/'.$project_id).'">' . $project->name.'</a>';
+            
+            // Send email to client
+            $this->email->from(get_option('smtp_email'), get_option('companyname'));
+            $this->email->to($client->email);
+            $this->email->subject($subject);
+            $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
+            $this->email->send();
+            
+        
+            // Send email to project members
+            foreach ($members as $member) {
+
+                $template = 'Hey '.$member['firstname'] . ' ' . $member['lastname'] . ', <br> Sprint status of <b>'.$sprint_name.'</b> has been updated to <i>' . $sprint_status .'</i> for project <a href="'.admin_url('projects/view/'.$project_id).'">' . $project->name.'</a>';
+
+
+                $this->email->clear();  // clear previous email details
+                $this->email->from(get_option('smtp_email'), get_option('companyname'));
+                $this->email->to($member['email']);
+                $this->email->subject($subject);
+                $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
+                $this->email->send();
+            }
+        }
     
         echo json_encode(array('success' => $success));
     }
@@ -1425,12 +1497,51 @@ class Projects extends AdminController
     public function set_sprint_closing_summary() {
         $sprint_id = $this->input->post('sprint_id');
         $summary = $this->input->post('summary');
-
-        // Update the sprint status
+    
+        // Update the sprint summary
         $success = $this->projects_model->update_sprint_summary($sprint_id, $summary);
+        
+        if($success) {
+            // Load required models and libraries
+            $this->load->model('clients_model');
+            
+            $project_id = id_to_name($sprint_id, 'tblsprints', 'id', 'project_id'); // Assuming there's a function to get project_id using sprint_id
+            
+            $project = $this->projects_model->get($project_id);
+            $client = $this->clients_model->get_contact($project->client_data->userid);
+            $members = $this->projects_model->get_project_members($project_id, true);
+            $this->load->library('email');
+    
+            // Email content
+            $sprint_name = id_to_name($sprint_id, 'tblsprints', 'id', 'name'); // Assuming the same function is available as before
+            $subject = 'Sprint "'.$sprint_name.'" Closing Summary Updated | '. get_option('companyname');
+            $template = 'Hey '.$client->firstname . ' ' . $client->lastname . ', <br> The closing summary for sprint <b>'.$sprint_name.'</b> has been updated for project <a href="'.base_url('clients/project/'.$project_id).'">' . $project->name.'</a>.';
+
+            $template .= '<br><br>'.$summary;
+            
+            // Send email to client
+            $this->email->from(get_option('smtp_email'), get_option('companyname'));
+            $this->email->to($client->email);
+            $this->email->subject($subject);
+            $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
+            $this->email->send();
+    
+            // Send email to project members
+            foreach ($members as $member) {
+                $template = 'Hey '.$member['firstname'] . ' ' . $member['lastname'] . ', <br> The closing summary for sprint <b>'.$sprint_name.'</b> has been updated for project <a href="'.admin_url('projects/view/'.$project_id).'">' . $project->name.'</a>';
+                $template .= '<br><br>'.$summary;
+                $this->email->clear();  // clear previous email details
+                $this->email->from(get_option('smtp_email'), get_option('companyname'));
+                $this->email->to($member['email']);
+                $this->email->subject($subject);
+                $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
+                $this->email->send();
+            }
+        }
     
         echo json_encode(array('success' => $success));
     }
+    
 
     public function get_sprint() {
         $sprint_id = $this->input->post('sprint_id');

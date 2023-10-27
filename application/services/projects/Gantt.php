@@ -30,10 +30,12 @@ class Gantt extends AbstractGantt
             $sprints = json_decode(json_encode($this->ci->projects_model->get_sprints($this->id)), true);
 
             foreach ($sprints as $m) {
-                $type_data[] = array_merge($m, [
-                    'dep_id'       => 'sprint_' . $m['id'],
-                    'sprint_id' => $m['id'],
-                ]);
+                $type_data[] = [
+                    'dep_id'       => $m['id'],
+                    'name' => $m['name'],
+                    'start' => $m['start_date'],
+                    'end' => $m['end_date']
+                ];
             }
         } elseif ($this->type == 'members') {
             $type_data[] = [
@@ -62,16 +64,18 @@ class Gantt extends AbstractGantt
         foreach ($type_data as $data) {
             if ($this->type == 'sprints') {
                 
-                $tasks = $this->ci->projects_model->get_tasks($this->id, 'sprint_id=' . $this->ci->db->escape_str($data['id']) . ($this->taskStatus ? ' AND ' . db_prefix() . 'tasks.status=' . $this->ci->db->escape_str($this->taskStatus) : ''), true);
+                $tasks = $this->ci->projects_model->get_tasks($this->id, 'sprint_id=' . $this->ci->db->escape_str($data['dep_id']) . ($this->taskStatus ? ' AND ' . db_prefix() . 'tasks.status=' . $this->ci->db->escape_str($this->taskStatus) : ''), true);
 
-                if (isset($data['start_date'])) {
-                    $data['start'] = $data['start_date'];
-                }
+                // print_r($data);
 
-                if (isset($data['due_date'])) {
-                    $data['end'] = $data['due_date'];
-                }
-                unset($data['description']);
+                // if (isset($data['start_date'])) {
+                //     $data['start'] = $data['start_date'];
+                // }
+
+                // if (isset($data['due_date'])) {
+                //     $data['end'] = $data['due_date'];
+                // }
+                // unset($data['description']);
             } elseif ($this->type == 'members') {
                 if ($data['staff_id'] != 0) {
                     $tasks = $this->ci->projects_model->get_tasks($this->id, db_prefix() . 'tasks.id IN (SELECT taskid FROM ' . db_prefix() . 'task_assigned WHERE staffid=' . $data['staff_id'] . ')' . ($this->taskStatus ? ' AND ' . db_prefix() . 'tasks.status=' . $this->taskStatus : ''), true);
@@ -98,6 +102,8 @@ class Gantt extends AbstractGantt
                     $gantt_data[] = static::tasks_array_data($task, $data['id']);
                 }
             }
+
+            // print_r($gantt_data);
         }
 
         return $gantt_data;

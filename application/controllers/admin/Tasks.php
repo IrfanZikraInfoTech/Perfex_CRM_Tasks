@@ -965,7 +965,7 @@ class Tasks extends AdminController
             redirect(admin_url('tasks'));
         } elseif (preg_match("/projects\/view\/[1-9]+/", $_SERVER['HTTP_REFERER'])) {
             $project_url = explode('?', $_SERVER['HTTP_REFERER']);
-            redirect($project_url[0] . '?group=project_tasks');
+            redirect($project_url[0] . '?group=project_backlog');
         } else {
             redirect($_SERVER['HTTP_REFERER']);
         }

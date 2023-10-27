@@ -325,13 +325,32 @@ class Team_management extends AdminController {
         
 
         $data['dates'] = [];
+        $data['totals'] = [
+            'allocation_shift_1' => 0,
+            'actual_shift_1' => 0,
+            'allocation_shift_2' => 0,
+            'actual_shift_2' => 0,
+            'pr' => 0,
+            'ar' => 0,
+        ];
+
         foreach ($date_range as $date) {
             $formatted_date = $date->format('Y-m-d');
 
             $date_data = $this->fetch_attendance_for_date($formatted_date, $staffs);
 
             $data['dates'][$formatted_date] = $date_data;
+
+            $data['totals']['allocation_shift_1'] += $dateTotals['clockable_shift_1'];
+            $data['totals']['actual_shift_1'] += $dateTotals['clocked_shift_1'];
+            $data['totals']['allocation_shift_2'] += $dateTotals['clockable_shift_2'];
+            $data['totals']['actual_shift_2'] += $dateTotals['clocked_shift_2'];
+            $data['totals']['pr'] += $dateTotals['pr'];
+            $data['totals']['ar'] += $dateTotals['ar'];
         }
+
+        $data['totals']['pr'] = ($data['totals']['pr'] / count($data['dates'])) * 100;
+        $data['totals']['ar'] = ($data['totals']['ar'] / count($data['dates'])) * 100;
 
         
 
@@ -1063,6 +1082,12 @@ class Team_management extends AdminController {
         header('Content-Type: application/json');
     
         echo json_encode($output);
+    }
+
+    public function json(){
+        echo json_encode(array(
+            "text" => " 🙄"
+        ));
     }
 
     public function submit_application() {

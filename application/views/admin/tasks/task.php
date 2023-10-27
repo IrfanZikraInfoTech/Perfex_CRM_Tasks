@@ -164,7 +164,7 @@
                             <div class="form-group">
                                 <label for="epic_id" class="control-label">Epic</label>
                                 <select name="epic_id" id="epic_id" class="selectpicker" data-width="100%" data-width="100%"
-                                    data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
+                                    data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" required>
 
                                     <option value=""></option>
                                 <?php
@@ -257,7 +257,7 @@
                                         }?>
 
                                     <div class="input-group">
-                                        <input type="number" id="estimated_hours" name="estimated_hours" class="form-control " min="1" value="<?= htmlspecialchars($hours); ?>" aria-invalid="false">
+                                        <input type="number" id="estimated_hours" name="estimated_hours" class="form-control " min="0.5" value="<?= htmlspecialchars($hours); ?>" aria-invalid="false">
                                         <div class="input-group-addon">Hours</div>
                                     </div>
 
@@ -464,6 +464,25 @@
                                 <?php } ?>
                             </select>
                         </div>
+
+                        <div class="form-group <?php if (isset($task)) {
+                   echo ' hide';
+               }  ?>">
+                            <div class="flex flex-row h-10 items-center">
+                                <label class="w-full block text-gray-700 text-sm font-bold">
+                                    Checklist Items
+                                </label>
+                                <button class="px-4 py-2 flex justify-center items-center bg-green-500 text-white rounded-lg transition-all hover:bg-green-600 ease-in-out duration-300 font-xl" type="button" onclick="addTempChecklistItem()">+</button>
+                            </div>
+                        
+                            <div class="mt-2 flex flex-col gap-2" id="temp-checklist-items">
+
+
+                            </div>
+
+                        </div>
+
+
                         <div class="form-group">
                             <div id="inputTagsWrapper">
                                 <label for="tags" class="control-label"><i class="fa fa-tag" aria-hidden="true"></i>
@@ -682,4 +701,36 @@
         $duedate.datetimepicker('destroy');
         init_datepicker($duedate);
     }
+
+    function addTempChecklistItem(item = '') {
+        const checklistContainer = document.getElementById('temp-checklist-items');
+
+        // Create the div element
+        const divElement = document.createElement('div');
+        divElement.className = 'flex flex-row gap-2 checklist-item';
+
+        // Create the input element
+        const inputElement = document.createElement('input');
+        inputElement.className = 'checklist-item shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline';
+        inputElement.name = 'manual_checklist_items[]';
+        inputElement.type = 'text';
+        inputElement.placeholder = 'Enter checklist item';
+        inputElement.value = item;  // Set the value property instead of embedding in HTML
+
+        // Create the button element
+        const buttonElement = document.createElement('button');
+        buttonElement.className = 'px-4 flex justify-center items-center bg-rose-500 text-white rounded-lg transition-all hover:bg-rose-600 ease-in-out duration-300';
+        buttonElement.innerHTML = '<span>&times;</span>';
+        buttonElement.onclick = function() {
+            this.parentNode.remove();
+        };
+
+        // Append the input and button elements to the div element
+        divElement.appendChild(inputElement);
+        divElement.appendChild(buttonElement);
+
+        // Append the div element to the checklist container
+        checklistContainer.appendChild(divElement);
+    }
+
     </script>

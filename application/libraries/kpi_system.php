@@ -71,7 +71,7 @@ class kpi_system
     
         // Initialize counters
         $completedTasksWithinDue = 0;
-        $completedTasksPastDue = 0;
+        $totalTasksPastDue = 0;
 
         // Initialize counters for total estimated hours and total spent hours
         $totalEstimatedHours = 0;
@@ -83,16 +83,25 @@ class kpi_system
         // Iterate through each task
         foreach($tasks as $task){
 
+            $dueConsideration = ($task->duedate) ? $task->duedate : $task->startdate;
+
             // Completion KPIS
             if(isset($task->datefinished) && $task->status == 5){
 
-                if(strtotime(date("Y-m-d", strtotime($task->datefinished))) <= strtotime($task->duedate) ){
+
+                if(strtotime(date("Y-m-d", strtotime($task->datefinished))) <= strtotime($dueConsideration) ){
                     $completedTasksWithinDue++;
                 }else{
-                    $completedTasksPastDue++;
+                    $totalTasksPastDue++;
                 }
 
             }
+
+            // if(!isset($task->datefinished) || (strtotime(date("Y-m-d", strtotime($task->datefinished))) > strtotime($dueConsideration) )){
+            //     $totalTasksPastDue++;
+            // }
+
+
 
             //Timer KPIS
             $estimatedHours = $task->estimated_hours;
@@ -111,7 +120,7 @@ class kpi_system
         $taskCount = count($tasks);
         if($taskCount > 0) {
             $taskCompletionRate = ($completedTasksWithinDue / $taskCount) * 100;
-            $taskEfficiencyRate = (1 - ($completedTasksPastDue / $taskCount)) * 100;
+            $taskEfficiencyRate = (1 - ($totalTasksPastDue / $taskCount)) * 100;
         } else {
             $taskCompletionRate = 0; // To handle edge case where taskCount is 0
             $taskEfficiencyRate = 0;
@@ -127,7 +136,7 @@ class kpi_system
             $taskTimeAdherenceRate = 0; // To handle edge case where totalSpentHours is 0
         }
     
-        return ['completed_tasks_past_due'=>$completedTasksPastDue, 'completed_tasks_within_due' => $completedTasksWithinDue, 'total_tasks'=>$taskCount, 'completion_rate'=> $taskCompletionRate, 'efficiency_rate'=>$taskEfficiencyRate,'esimate_hours'=>$totalEstimatedHours , 'spent_hours'=>$totalSpentHours,'timer_adherence_rate'=>$taskTimeAdherenceRate];
+        return ['completed_tasks_past_due'=>$totalTasksPastDue, 'completed_tasks_within_due' => $completedTasksWithinDue, 'total_tasks'=>$taskCount, 'completion_rate'=> $taskCompletionRate, 'efficiency_rate'=>$taskEfficiencyRate,'esimate_hours'=>$totalEstimatedHours , 'spent_hours'=>$totalSpentHours,'timer_adherence_rate'=>$taskTimeAdherenceRate];
     }
 
     

@@ -56,29 +56,39 @@
             </div>
         </div>
 
-        <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex flex-col">
-
-
-            <!-- Select box for sorting -->
-            <div class="w-full mb-6">
-                <label for="sortSelect" class="mr-2">Sort by:</label>
-                <select id="sortSelect" class="border rounded-md p-2 w-64">
-                    <option value="name">Name</option>
-                    <option value="ops">OPS</option>
-                </select>
+        <div>
+            <div class="flex flex-row justify-between items-center gap-4 px-4 py-2 cursor-pointer text-lg text-gray-600 transition-all bg-white rounded-[40px]" onclick="toggleCollapse(this, event, 'staff-cards', true)">
+                <div class="opacity-0 transform transition-transform duration-300"></div>
+                <div>Staff Cards</div>
+                <div class="fas fa-angle-down rotate-[90deg] transform transition-transform duration-300"></div>
             </div>
 
-            <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
-                <?php foreach($staff_kpi_data as $staff_id => $staff): ?>
-                    <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[100px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box" data-name="<?= $staff['name'] ?>" data-ops="<?= $staff['ops'] ?>">
-                        <h3 class="text-xl font-bold"><?= $staff['name'] ?></h3>
-                        <h4 class="text-2xl font-bold"><?= round($staff['ops']/10,2) ?>/10</h4>
+            <div class="w-full bg-white rounded-[50px] shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex flex-col collapsible-content" id="staff-cards">
+
+                <div class="p-6 ">
+                    <!-- Select box for sorting -->
+                    <div class="w-full mb-6">
+                        <label for="sortSelect" class="mr-2">Sort by:</label>
+                        <select id="sortSelect" class="border rounded-md p-2 w-64">
+                            <option value="name">Name</option>
+                            <option value="ops">OPS</option>
+                        </select>
                     </div>
-                <?php endforeach; ?>
+
+                    <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
+                        <?php foreach($staff_kpi_data as $staff_id => $staff): ?>
+                            <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[100px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box" data-name="<?= $staff['name'] ?>" data-ops="<?= $staff['ops'] ?>">
+                                <h3 class="text-xl font-bold"><?= $staff['name'] ?></h3>
+                                <h4 class="text-2xl font-bold"><?= round($staff['ops']/10,2) ?>/10</h4>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+
+                </div>
             </div>
-
-
+        
         </div>
+
 
         <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex flex-col">  
 
@@ -241,7 +251,7 @@ function redirectToKpiBoard() {
     window.location.href = url;
 }
 
-function toggleCollapse(button, event, elementId) {
+function toggleCollapse(button, event, elementId, notStaffRow = false) {
     if (event.target.tagName.toLowerCase() === 'button' || event.target.tagName.toLowerCase() === 'input') {
         return;
     }
@@ -252,7 +262,7 @@ function toggleCollapse(button, event, elementId) {
 
     var hasData = $(button).next().find('.flex.flex-row.text-base.transition-all').length > 0;
 
-    if (!hasData) {
+    if (!hasData && !notStaffRow) {
         // Fetch data using AJAX and only then expand the content
         fetchKpiDataForDate(button, function() {
             // Once AJAX is done, expand the content
