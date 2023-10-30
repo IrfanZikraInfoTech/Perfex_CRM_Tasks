@@ -189,8 +189,8 @@ function app_init_admin_sidebar_menu_items()
     }
 
     
-    if(has_staff_under()){
-
+    if(has_staff_under() || has_permission('team_management', '', 'admin')){
+        
         $applicationsCounter = get_pending_applications_counter();
         $applicationsCounter = ($applicationsCounter > 9) ? '9+' : $applicationsCounter;
         $applicationsHTML = ($applicationsCounter) ? '<div class="flex flex-row justify-between"><div>Applications</div><div class="px-1 rounded-full bg-white text-black">'.$applicationsCounter.'</div></div>' : 'Applications';

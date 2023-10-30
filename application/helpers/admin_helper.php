@@ -229,7 +229,7 @@ function get_staff_under($staff_id){
 
     if(is_admin($staff_id)){
         
-        $staff_under = $CI->staff_model->get('', ['staffid !=' => $staff_id, 'staffid !=' => 1, 'admin' => 1]);
+        $staff_under = $CI->staff_model->get('', ['staffid !=' => $staff_id, 'report_to !=' => 'none']);
 
     }else if($is_hr){
         $staff_under = $CI->staff_model->get('', ['active' => 1, 'staffid !=' => $staff_id , 'admin' => 0]);

@@ -594,8 +594,10 @@ class Team_management extends AdminController {
 
     public function all_applications()
     {
-        if (!has_permission('team_management', '', 'admin')) {
-            //access_denied('You do not have permission to access this page.');
+        if (has_permission('team_management', '', 'admin')) {
+            // access_denied('You do not have permission to access this page.');
+            $staff_id = get_staff_user_id();
+
         }
 
         $current_staff_id = get_staff_user_id();
