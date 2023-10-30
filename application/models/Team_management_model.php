@@ -19,7 +19,11 @@ class Team_management_model extends App_Model
         $this->db->select('departmentid,name');
         $this->db->order_by('name');
         $query = $this->db->get('tbldepartments');
+        
+        // print_r($query->result());
+
         return $query->result();
+
     }
 
     public function get_staff_by_department($department_id){
@@ -1405,10 +1409,16 @@ class Team_management_model extends App_Model
                 
                 if(count($entries) > 0){
 
-                    // In case of consecutive shifts without clock_out, use the last clock_in and clock_out
-                    $clock_in = new DateTime(end($entries)->clock_in);
-                    $clock_out = isset(end($entries)->clock_out) ? new DateTime(end($entries)->clock_out) : null;
-                    $clock_status = 'last';
+                    $clock_out_consideration = end($entries)->clock_out ? strtotime(end($entries)->clock_out) : time();
+
+                    if($clock_out_consideration < strtotime($shift->shift_start_time)){
+                        $clock_status = 'null';
+                    }else{
+                        // In case of consecutive shifts without clock_out, use the last clock_in and clock_out
+                        $clock_in = new DateTime(end($entries)->clock_in);
+                        $clock_out = isset(end($entries)->clock_out) ? new DateTime(end($entries)->clock_out) : null;
+                        $clock_status = 'last';
+                    }
                     
                 }else{
                     //No clock in found for the day
@@ -1529,11 +1539,19 @@ class Team_management_model extends App_Model
         }
 
         if(count($shifts) > 0){
-            if(count($entries) < 1){
-                $status = 'absent';
+
+            if($overall_leaves == count($shifts)){
+                $status = 'leave';
             }else{
-                $status = ($overall_leaves == (count($shifts) + 1)) ? 'leave' : ($overall_late ? 'late' : 'present');
+                if(count($entries) < 1){
+                    $status = 'absent';
+                }else{
+                    $status = ($overall_late ? 'late' : 'present');
+                }
             }
+
+            
+
         }else{
             $status = 'no-shifts';
         }

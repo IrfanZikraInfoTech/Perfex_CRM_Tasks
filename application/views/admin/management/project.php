@@ -69,9 +69,8 @@
 
                 <?php
                 }
- ?>
- <?php
-if (has_staff_under(get_staff_user_id())) {
+
+else if (has_staff_under(get_staff_user_id())) {
     $subordinate_ids = get_staff_under(get_staff_user_id());
     $subordinates_details = [];
    
