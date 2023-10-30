@@ -238,9 +238,9 @@ class Team_management_model extends App_Model
 
         if (isset($row)) {
             $clock_in_date = date("Y-m-d", strtotime($row->clock_in));
-            if (!$this->team_management_model->get_staff_summary($staff_id, $clock_in_date) && !$is_force) {
-                return ['success' => false, 'message' => "Please add your summary first."];
-            }
+            // if (!$this->team_management_model->get_staff_summary($staff_id, $clock_in_date) && !$is_force) {
+            //     return ['success' => false, 'message' => "Please add your summary first."];
+            // }
         }
 
         // Stop the task timer for the staff member if there's any active timer

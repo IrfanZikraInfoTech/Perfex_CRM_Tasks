@@ -30,12 +30,16 @@ class Tasks_model extends App_Model
     {
         $this->db->select('tbltasks.*, GROUP_CONCAT(tbltask_assigned.staffid) as assignees');
         $this->db->from('tbltasks');
-        $this->db->join('tbltask_assigned', 'tbltasks.id = tbltask_assigned.taskid');
-        $this->db->where('tbltask_assigned.staffid', $staff_id);
+        $this->db->join('tbltask_assigned', 'tbltasks.id = tbltask_assigned.taskid', 'left');
+        $this->db->join(db_prefix() . 'task_followers', 'tbltasks.id = ' . db_prefix() . 'task_followers.taskid', 'left');
+        $this->db->group_start();
+            $this->db->where('tbltask_assigned.staffid', $staff_id);
+            $this->db->or_where(db_prefix() . 'task_followers.staffid', $staff_id);
+        $this->db->group_end();
         $this->db->group_by('tbltasks.id');
         $this->db->order_by('tbltasks.startdate');
         $query = $this->db->get();
-
+    
         return $query->result();
     }
 
