@@ -151,7 +151,22 @@ function app_init_admin_sidebar_menu_items()
         'icon'     => 'fa fa-user-friends', // Font awesome icon
     ]);
 
-    $name = (has_permission('team_management', '', 'admin')) ? 'Staff Dashboard' : 'My Dashboard';
+    // $name = (has_permission('team_management', '', 'admin')) ? 'Staff Dashboard' : 'My Dashboard';
+
+    // $CI->app_menu->add_sidebar_children_item('team_management', [
+    //     'slug'     => 'my_dashboard', // Required ID/slug UNIQUE for the child menu
+    //     'name'     => $name, // The name if the item
+    //     'href'     => admin_url('team_management/individual_dashboard'), // URL of the item
+    //     'position' => 2, // The menu position
+    //     'icon'     => 'fa fa-user', // Font awesome icon
+    // ]);
+
+
+    // dashoard
+    $isAdmin = has_permission('team_management', '', 'admin');
+    // check if the staff has subordinates or not
+    $hasStaffUnder = has_staff_under();
+    $name = ($isAdmin || $hasStaffUnder) ? 'Staff Dashboard' : 'My Dashboard';
 
     $CI->app_menu->add_sidebar_children_item('team_management', [
         'slug'     => 'my_dashboard', // Required ID/slug UNIQUE for the child menu
@@ -161,6 +176,8 @@ function app_init_admin_sidebar_menu_items()
         'icon'     => 'fa fa-user', // Font awesome icon
     ]);
     
+
+
     if(get_staff_user_id() != 1){
         $CI->app_menu->add_sidebar_children_item('team_management', [
             'slug'     => 'applications', // Required ID/slug UNIQUE for the child menu
@@ -170,14 +187,14 @@ function app_init_admin_sidebar_menu_items()
             'icon'     => 'fa fa-plane-departure', // Font awesome icon
         ]);
     }
-    
+
     
     if(has_staff_under()){
 
         $applicationsCounter = get_pending_applications_counter();
         $applicationsCounter = ($applicationsCounter > 9) ? '9+' : $applicationsCounter;
         $applicationsHTML = ($applicationsCounter) ? '<div class="flex flex-row justify-between"><div>Applications</div><div class="px-1 rounded-full bg-white text-black">'.$applicationsCounter.'</div></div>' : 'Applications';
-    
+        
         $CI->app_menu->add_sidebar_children_item('team_management', [
             'slug'     => 'all_applications', // Required ID/slug UNIQUE for the child menu
             'name'     => $applicationsHTML, // The name if the item
@@ -230,9 +247,8 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 
-    if (has_permission('team_management', '', 'admin')) {
+    if (has_permission('team_management', '', 'admin') || has_staff_under()) {
 
-        
         $CI->app_menu->add_sidebar_children_item('team_management', [
             'slug'     => 'attendance_board', // Required ID/slug UNIQUE for the child menu
             'name'     => 'Attendance', // The name if the item
@@ -240,7 +256,7 @@ function app_init_admin_sidebar_menu_items()
             'position' => 0, // The menu position
             'icon'     => 'fa fa-calendar', // Font awesome icon
         ]);
- 
+     
         $CI->app_menu->add_sidebar_children_item('team_management', [
             'slug'     => 'kpi_board', // Required ID/slug UNIQUE for the child menu
             'name'     => 'KPI Board', // The name if the item
@@ -249,6 +265,7 @@ function app_init_admin_sidebar_menu_items()
             'icon'     => 'fa fa-chart-bar', // Font awesome icon
         ]);
     }
+    
 
     
 

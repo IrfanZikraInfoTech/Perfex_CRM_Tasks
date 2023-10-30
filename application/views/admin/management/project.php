@@ -69,7 +69,40 @@
 
                 <?php
                 }
-                ?>
+ ?>
+ <?php
+if (has_staff_under(get_staff_user_id())) {
+    $subordinate_ids = get_staff_under(get_staff_user_id());
+    $subordinates_details = [];
+   
+    // Fetch details of the current staff
+    $current_staff = $this->staff_model->get(get_staff_user_id());
+
+    // Adding the current staff details to the array
+    if($current_staff) {
+        $subordinates_details[] = $current_staff;
+    }
+
+    // Fetching details for each subordinate and adding to the array
+    foreach ($subordinate_ids as $id) {
+        $subordinates_details[] = $this->staff_model->get($id);
+    }
+?>
+<select id="subordinateStaff" data-live-search="true" class="selectpicker text-2xl font-bold mb-2 text-uppercase" onchange="window.location.href=admin_url+'team_management/projects/'+this.value">
+    <?php 
+    foreach($subordinates_details as $subordinate) {
+        $selected = ($subordinate->staffid == $staff_id) ? 'selected' : '';
+        echo '<option ' . $selected . ' value="' . $subordinate->staffid . '">' . $subordinate->full_name . '</option>';
+    }
+    // print_r($selected);
+    ?>
+</select>
+
+
+<?php
+}
+?>
+
             </div>
 
         
@@ -135,7 +168,7 @@ $("select[name='task_filter']").on('change', function(e) {
 
     // Get the value from the dropdown
     let taskFilterValue = $(this).val();
-
+console.log(taskFilterValue);
     // Get all the task blocks
     let allTasks = $('.task-block');
 

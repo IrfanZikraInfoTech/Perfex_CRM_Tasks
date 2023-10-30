@@ -257,9 +257,8 @@ function has_staff_under(){
 
     $staff = get_staff_under($staff_id);
 
-    // print_r($staff);
-
-    if(count($staff) > 0){
+    //  var_dump($staff);
+    if(count($staff) > 0 ){
         return true;
     }else{
         return false;

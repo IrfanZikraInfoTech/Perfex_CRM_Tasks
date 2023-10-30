@@ -108,34 +108,63 @@ function interpolateColor($from, $to, $percent) {
                         <input type="date" id="from" class="w-full py-2 px-4 border !rounded-3xl text-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="From" value="<?= $from ?>">
 
                         <input type="date" id="to" class="w-full py-2 px-4 border !rounded-3xl text-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="To" value="<?= $to ?>">
-
                         <?php
-                        if(has_permission('team_management', '', 'admin')){
-
-                            $staff_members = $this->staff_model->get();
-
-                        ?>
-                            
-                            <select data-width="100%" id="staff" data-live-search="true" class="selectpicker text-2xl font-bold mb-2 text-uppercase">
-                                <?php 
-                                foreach($staff_members as $staff_member){
-                                    $selected = '';
-                                    if($staff_member['staffid'] == $staff->staffid){
-                                        $selected = 'selected';
-                                    }
-                                    echo '<option '.$selected.' value="'.$staff_member['staffid'].'">'.$staff_member['full_name'].'</option>';
-                                }
+                            if (has_permission('team_management', '', 'admin')) 
+                            {
+                                $staff_members = $this->staff_model->get();
+                                // Admin  dropdown code
                                 ?>
+                                <select data-width="100%" id="staff" data-live-search="true" class="selectpicker text-2xl font-bold mb-2 text-uppercase">
+                                    <?php 
+                                    foreach($staff_members as $staff_member){
+                                        $selected = '';
+                                        if($staff_member['staffid'] == $staff->staffid){
+                                            $selected = 'selected';
+                                        }
+                                        echo '<option '.$selected.' value="'.$staff_member['staffid'].'">'.$staff_member['full_name'].'</option>';
+                                    }
+                                    ?>
+                                </select>
+                                <?php
+                            }
+                            else {
+                                $current_staff_id = get_staff_user_id();
+                                $subordinate_ids = get_staff_under($current_staff_id);
+                                $subordinate_ids[] = $current_staff_id;
+
+                                if(!empty($subordinate_ids)) { // check if staff has subordinates or not
+                                    $staff_members = [];
+                                    foreach ($subordinate_ids as $id) {
+                                        $staff_members[] = $this->staff_model->get($id);
+                                    }
                                 
-                            </select>
-
-                        <?php
-                        }
+                                    ?>
+                                    <select data-width="100%" id="staff" data-live-search="true" class="selectpicker text-2xl font-bold mb-2 text-uppercase">
+                                        <?php 
+                                        foreach($staff_members as $staff_member){
+                                            $selected = '';
+                                            if(isset($staff) && $staff_member->staffid == $staff->staffid){
+                                                $selected = 'selected';
+                                            }
+                                            echo '<option '.$selected.' value="'.$staff_member->staffid.'">'.$staff_member->full_name.'</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                    <?php
+                                }
+                            }
+                    
                         ?>
-
-                        <button class="px-4 py-2 bg-<?= get_option('management_theme_background')?> border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="window.location.href=admin_url+'team_management/individual_dashboard/'+document.getElementById('from').value + '/' + document.getElementById('to').value <?= (has_permission('team_management', '', 'admin')) ? (" +'/' + document.getElementById('staff').value") : '' ?>">
+                    <?php if (has_permission('team_management', '', 'admin') || !empty($subordinate_ids)): ?>
+                    <button class="px-4 py-2 bg-<?= get_option('management_theme_background')?> border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="window.location.href=admin_url+'team_management/individual_dashboard/'+document.getElementById('from').value + '/' + document.getElementById('to').value +'/' + document.getElementById('staff').value">
                         <i class="fa fa-search" aria-hidden="true"></i>
-                        </button>
+                    </button>
+                    <?php endif; ?>
+
+
+                        <!-- <button class="px-4 py-2 bg-<?= get_option('management_theme_background')?> border border-blue-600 rounded-[50px] text-blue-600 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 hover:text-white focus:ring-opacity-50 transition-all duration-300 mt-2" onclick="window.location.href=admin_url+'team_management/individual_dashboard/'+document.getElementById('from').value + '/' + document.getElementById('to').value <?= (has_permission('team_management', '', 'admin')) ? (" +'/' + document.getElementById('staff').value") : '' ?>">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        </button> -->
                     </div>
 
                         

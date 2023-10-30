@@ -392,7 +392,6 @@ function staffDetails(staffId, name) {
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-
             $("#leaveModalLabel").text("Leave details of "+name);
 
             let paidLeavesAllowed = <?= get_option('paid_leaves') ?>;

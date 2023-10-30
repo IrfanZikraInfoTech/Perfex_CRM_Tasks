@@ -34,10 +34,15 @@ class Team_management extends AdminController {
 
     public function projects($staff_id = null) {
 
-        if($staff_id && !has_permission('team_management', '', 'admin')){
+        // if($staff_id && !has_permission('team_management', '', 'admin' )){
+        //     $staff_id = get_staff_user_id();
+        // }
+        $current_user_id = get_staff_user_id();
+
+        $subordinates = get_staff_under($current_user_id);
+        if (!has_permission('team_management', '', 'admin') && !in_array($staff_id, $subordinates)) {
             $staff_id = get_staff_user_id();
         }
-
         $staff_id = $staff_id ?? get_staff_user_id();
 
         $data['staff_id'] = $staff_id;
@@ -55,9 +60,29 @@ class Team_management extends AdminController {
 
     public function individual_dashboard($from = null, $to = null, $staff_id = null){
 
-        if($staff_id && !has_permission('team_management', '', 'admin')){
-            $staff_id = get_staff_user_id();
+        // if($staff_id && !has_permission('team_management', '', 'admin')){
+        //     $staff_id = get_staff_user_id();
+        // }
+        $current_staff_id = get_staff_user_id();
+
+        // If the logged-in user does not have admin permission for team_management
+        if (!has_permission('team_management', '', 'admin')) {
+            $subordinates = get_staff_under($current_staff_id);
+        
+            if (!is_array($subordinates)) {
+                throw new Exception('Expected subordinates to be an array');
+            }
+        
+            // Now, since $subordinates is just an array of staff IDs, we don't need to map it anymore
+            $subordinate_ids = $subordinates;
+        
+            // If staff_id is provided and it's not in the subordinates list of the current user
+            // OR if staff_id is not provided, then default to the current user.
+            if (($staff_id && !in_array($staff_id, $subordinate_ids)) || !$staff_id) {
+                $staff_id = $current_staff_id;
+            }
         }
+        // var_dump($subordinates);
 
         $from = $from ?? date("Y-m-d");
         $to = $to ?? date("Y-m-d");
@@ -124,6 +149,7 @@ class Team_management extends AdminController {
     public function kpi_board($from = null, $to = null, $exclude_ids = ''){
         $from = $from ?? date("Y-m-d");
         $to = $to ?? date("Y-m-d");
+        
 
         $data['from'] = $from;
         $data['to'] = $to;
@@ -144,19 +170,58 @@ class Team_management extends AdminController {
             $exclude_ids = explode('e', $exclude_ids);
         }
 
-        if(!empty($exclude_ids) && is_array($exclude_ids)){
-            // Fetch staff data excluding the ones with IDs in the $exclude_ids array
-            $this->db->select('staffid, firstname, lastname');
-            $this->db->where_not_in('staffid', $exclude_ids); // Exclude the IDs from the query
-            $this->db->order_by('firstname');
-            $staffs = $this->db->get('tblstaff')->result();
+        $current_staff_id = get_staff_user_id();
 
-            $data['exclude_ids'] = $exclude_ids;
+        // Agar user admin hai:
+        if (has_permission('team_management', '', 'admin')) {
+        
+            // if(!empty($exclude_ids) && is_array($exclude_ids)){
+            //     $this->db->select('staffid, firstname, lastname');
+            //     $this->db->where_not_in('staffid', $exclude_ids); // Exclude the IDs from the query
+            //     $this->db->order_by('firstname');
+            //     $staffs = $this->db->get('tblstaff')->result();
+        
+            //     $data['exclude_ids'] = $exclude_ids;
+        
+            // } else {
+            //     $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+            // }
+            if (!empty($exclude_ids) && is_array($exclude_ids)) {
+                $this->db->select('staffid, firstname, lastname');
+                $this->db->where('active', 1);
 
-        } else {
-            // If $exclude_ids is empty, just fetch all staff data
-            $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
-        }
+                // Sirf un staff members ko select karo jinke IDs $exclude_ids mein hain.
+                $this->db->where_not_in('staffid', $exclude_ids);
+                $this->db->order_by('firstname');
+                $staffs = $this->db->get('tblstaff')->result();
+                
+                $data['selected_ids'] = $exclude_ids; // Yahan pe naam badal diya 'exclude_ids' se 'selected_ids' tak.
+            } else {
+                $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+            }
+        
+                // Agar user admin nahi hai:
+            } else {
+                $subordinate_ids = get_staff_under($current_staff_id);
+                
+                if (!empty($subordinate_ids)) {
+                    array_push($subordinate_ids, $current_staff_id); // Add current user ID to the list
+                    
+                    // If $exclude_ids is set, exclude the selected subordinate
+                    if(!empty($exclude_ids) && is_array($exclude_ids)){
+                        $this->db->where('active', 1);
+                        $this->db->where_not_in('staffid', $exclude_ids);
+                        $this->db->where_in('staffid', $subordinate_ids);
+                    } else {
+                        $this->db->where_in('staffid', $subordinate_ids);
+                    }
+                } else {
+                    $this->db->where('staffid', $current_staff_id); // Only the current user's data
+                }
+                $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+            }
+
+        
 
         $staff_kpi_data = [];
 
@@ -295,23 +360,65 @@ class Team_management extends AdminController {
         $from = $from ?? date("Y-m-d");
         $to = $to ?? date("Y-m-d");
 
+        $current_staff_id = get_staff_user_id();
+
         if($exclude_ids){
             $exclude_ids = explode('e', $exclude_ids);
         }
+        // Agar user admin hai:
+        if (has_permission('team_management', '', 'admin')) {
+            if (!empty($exclude_ids) && is_array($exclude_ids)) {
+                $this->db->select('staffid, firstname, lastname');
+                
+                // Sirf un staff members ko select karo jinke IDs $exclude_ids mein hain.
+                $this->db->where_not_in('staffid', $exclude_ids);
+                $this->db->where('active', 1);
 
-        if(!empty($exclude_ids) && is_array($exclude_ids)){
-            // Fetch staff data excluding the ones with IDs in the $exclude_ids array
-            $this->db->select('staffid, firstname, lastname');
-            $this->db->where_not_in('staffid', $exclude_ids); // Exclude the IDs from the query
-            $this->db->order_by('firstname');
-            $staffs = $this->db->get('tblstaff')->result();
+                $this->db->order_by('firstname');
+                $staffs = $this->db->get('tblstaff')->result();
+                
+                $data['selected_ids'] = $exclude_ids; // Yahan pe naam badal diya 'exclude_ids' se 'selected_ids' tak.
+            } else {
+                $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+            }
+            // if(!empty($exclude_ids) && is_array($exclude_ids)){
+            //     $this->db->select('staffid, firstname, lastname');
+            //     $this->db->where_not_in('staffid', $exclude_ids); // Exclude the IDs from the query
+            //     $this->db->order_by('firstname');
+            //     echo $this->db->last_query();
 
-            $data['exclude_ids'] = $exclude_ids;
+            //     $staffs = $this->db->get('tblstaff')->result();
+        
+            //     $data['exclude_ids'] = $exclude_ids;
+            //     print_r($exclude_ids);
+        
+            // } else {
+            //     $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+            // }
+        
+                        // Agar user admin nahi hai:
+                    } else {
+                        $subordinate_ids = get_staff_under($current_staff_id);
+    
+                        if (!empty($subordinate_ids)) {
+                            array_push($subordinate_ids, $current_staff_id); // Add current user ID to the list
+                            
+                            // If $exclude_ids is set, exclude the selected subordinate
+                            if(!empty($exclude_ids) && is_array($exclude_ids)){
+                                $this->db->where('active', 1);
 
-        } else {
-            // If $exclude_ids is empty, just fetch all staff data
-            $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
-        }
+                                $this->db->where_not_in('staffid', $exclude_ids);
+                                $this->db->where_in('staffid', $subordinate_ids);
+                            } else {
+                                $this->db->where_in('staffid', $subordinate_ids);
+                            }
+                        } else {
+                            $this->db->where('staffid', $current_staff_id); // Only the current user's data
+                        }
+        
+                        $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+                    }
+        
 
         $data['from'] = $from;
         $data['to'] = $to;
@@ -322,7 +429,14 @@ class Team_management extends AdminController {
         $interval = new DateInterval('P1D');
         $date_range = new DatePeriod($start_date, $interval, $end_date);
         
-        
+        // $subordinate_ids = get_staff_under($current_staff_id);
+        // if (!empty($subordinate_ids)) {
+        //     $this->db->where_in('staffid', $subordinate_ids);
+        // } else {
+        //     $this->db->where('staffid', $current_staff_id);
+        // }
+        // $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+  
 
         $data['dates'] = [];
         $data['totals'] = [
