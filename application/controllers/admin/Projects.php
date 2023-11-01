@@ -366,21 +366,22 @@ class Projects extends AdminController
                 // Completed tasks are excluded from this list because you can't add timesheet on completed task.
                 $data['tasks']                = $this->projects_model->get_tasks($id, 'status != ' . Tasks_model::STATUS_COMPLETE . ' AND billed=0');
                 $data['timesheets_staff_ids'] = $this->projects_model->get_distinct_tasks_timesheets_staff($id);
-            }elseif ($group == 'project_backlog'){
+            }
+            elseif ($group == 'project_backlog'){
 
                 $this->load->model('tasks_model');
-
+                $sort = $this->input->get('sort');
+                // print_r($sort);
                 $data['epics'] = $this->projects_model->get_epics($id);
                 foreach ($data['epics'] as $epic) {
-                    $epic->stories = $this->projects_model->get_stories('epic', $epic->id);
+                    $epic->stories = $this->projects_model->get_stories('epic', $epic->id , false, $sort);
                     foreach($epic->stories as &$story){
                         $story = $this->tasks_model->get($story->id);
                     }
                 }
-
                 $data['sprints'] = $this->projects_model->get_sprints($id);
                 foreach ($data['sprints'] as $sprint) {
-                    $sprint->stories = $this->projects_model->get_stories('sprint', $sprint->id);
+                    $sprint->stories = $this->projects_model->get_stories('sprint', $sprint->id , false, $sort);
                     
                     $sprint->not_started_count = 0;
                     $sprint->in_progress_count = 0;
@@ -400,7 +401,10 @@ class Projects extends AdminController
                     }
                 }
 
-            }elseif ($group == 'project_board'){
+
+
+            }
+            elseif ($group == 'project_board'){
                 $sprint = $this->projects_model->is_active_sprint_exists($id)['sprint'];
 
                 if($sprint){
