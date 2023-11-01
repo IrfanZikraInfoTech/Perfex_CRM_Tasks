@@ -41,7 +41,7 @@
                 background:none;
                 -webkit-appearance:none;
                 appearance:none;
-                " class=" z-20  px-2 text-xl transition-all hover:shadow-lg rounded-full font-semibold text-center w-auto mx-auto " onchange="statusSelectColors(this);" id="status">
+                " class=" z-20  px-2 text-xl transition-all shadow-lg rounded-full font-semibold text-center w-auto mx-auto " onchange="statusSelectColors(this);" id="status">
                 <option id="Online" value="Online" class="text-lime-500">Online</option>
                 <option id="AFK" value="AFK" class="text-blue-500">AFK</option>
                 <option id="Offline" value="Offline" class="text-pink-500">Offline</option>

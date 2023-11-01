@@ -116,7 +116,7 @@
 
                         <div class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">Assigned Task</div>
                         
-                        <div class="flex flex-col bg-<?= get_option('management_theme_background')?> px-4 py-2 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar max-h-[300px]">
+                        <div class="flex flex-col bg-<?= get_option('management_theme_background')?> px-4 py-2 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar h-[300px]">
                                 <?php
                                     $tasks = $this->tasks_model->get_user_tasks_assigned($GLOBALS['current_user']->staffid);
                                     $total_tasks = 0;
@@ -164,7 +164,7 @@
                         <div class="lg:w-1/2 w-full  border-l border-gray-200 flex flex-col p-5 bg-white rounded-[50px] shadow-lg">
                             <div class="panel-body p-0 m-0">
                                 <div class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5 ">Announcements</div>
-                                <div class="bg-<?= get_option('management_theme_background')?> p-4 py-3 shadow-inner rounded-[50px] overflow-y-scroll myscrollbar max-h-[300px]">
+                                <div class="bg-<?= get_option('management_theme_background')?> p-4 py-3 shadow-inner rounded-[50px] overflow-y-scroll myscrollbar h-[300px]">
                                         
                                     <?php $count = 0;
                                     $currentUserId = get_staff_user_id(); // Get the current user ID
