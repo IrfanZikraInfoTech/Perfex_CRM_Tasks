@@ -207,47 +207,72 @@
         put: true,
     };
     
-    function handleStoryMove(evt){
+    function handleStoryMove(evt) {
+    var story_id = evt.item.getAttribute('data-story-id');
+    var estimated_hours = evt.item.getAttribute('data-estimated-hours'); // Ensure this attribute is set correctly in the HTML
+    var origin_issue_type = evt.from.getAttribute('data-issue-type'); // Check the attribute is set in HTML
+    var target_issue_type = evt.to.getAttribute('data-issue-type'); // Check the attribute is set in HTML
 
-        var story_id = evt.item.getAttribute('data-story-id');
-        var new_issue_id = evt.to.getAttribute('data-issue-id');
-        var new_issue_type = evt.to.getAttribute('data-issue-type');
-        
+    // Function to move the story back to the epic
+    function moveStoryBack() {
+        evt.from.appendChild(evt.item); // Move back to the original list
+    }
 
-        updateMaxHeight(evt.to.parentElement, true);
-
+    // Check if we're moving from 'epic' to 'sprint' and if estimated hours are not set or zero
+    if (origin_issue_type === 'epic' && target_issue_type === 'sprint' && (!estimated_hours || parseFloat(estimated_hours) === 0)) {
+        // Show Swal with input for estimated hours
         Swal.fire({
-            title: 'Processing',
-            html: 'Moving story...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-                
-                $.ajax({
-                    url: admin_url + 'projects/move_story',
-                    type: 'POST',
-                    data: {
-                        story_id: story_id,
-                        new_issue_id: new_issue_id,
-                        new_issue_type: new_issue_type,
-                    },
-                    success: function(response) {
-                        Swal.close();
-                        response = JSON.parse(response);
-                        if (response.success) {
-                            Swal.fire('Success!', 'Story moved successfully.', 'success');
-                        } else {
-                            Swal.fire('Error!', 'Failed to move story.', 'error');
-                        }
-                    },
-                    error: function() {
-                        Swal.close();
-                        Swal.fire('Error!', 'Failed to move story.', 'error');
-                    }
-                });
+            title: 'Estimated Hours Required',
+            input: 'number',
+            inputAttributes: {
+                min: '0.5',
+                step: '0.5'
+            },
+            inputValue: '0.5', // Default if estimated hours are not set
+            showCancelButton: true,
+            confirmButtonText: 'Update Hours',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value || parseFloat(value) <= 0) {
+                    return 'You must enter estimated hours greater than 0!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                // User entered a valid number, now update the story with the estimated hours
+                updateStoryEstimatedHours(story_id, result.value);
+                // Continue with the story move operation if needed
+            } else {
+                // No valid hours entered; move the story back to the epic
+                moveStoryBack();
             }
         });
+
+        // Cancel the current move operation
+        return false;
     }
+
+    // Other conditions: move the story normally
+    // ...
+}
+
+function updateStoryEstimatedHours(story_id, hours) {
+    // Update the estimated hours for the story on the server
+    $.ajax({
+        url: 'your-endpoint-to-update-hours', // Replace with your actual endpoint
+        type: 'POST',
+        data: {
+            story_id: story_id,
+            estimated_hours: hours
+        },
+        success: function(response) {
+            // Handle the success, update the UI accordingly
+        },
+        error: function() {
+            // Handle the error, you may want to move the story back in this case as well
+        }
+    });
+}
 
     function initializeSortable(epicList) {
         new Sortable(epicList, {

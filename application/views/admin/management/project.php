@@ -132,8 +132,9 @@ else if (has_staff_under(get_staff_user_id())) {
 
                             
                             foreach($project['active_sprint']->stories as $story): 
-
-
+                                if($story->status === '5'){
+                                    continue;
+                                }
                                 $isAssigned = in_array($staff_id, $story->assignees_ids) ? 'true' : 'false';
                     ?>
                             <button class="task-block bg-white px-3 py-2 rounded-xl cursor-pointer border border-gray-200 border-solid transition-all hover:border-<?= get_option('management_theme_border')?> hover:shadow-lg mb-4" data-task-id="<?= $story->id ?>" data-assigned="<?= $isAssigned ?>" onclick="init_task_modal(<?= $story->id ?>)">
