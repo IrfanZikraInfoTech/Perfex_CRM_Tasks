@@ -23,11 +23,22 @@
 
         <?php foreach ($sprints as $sprint):  ?>
 
-            
-
             <?php 
                 $color = $sprint->status == 0 ? 'bg-slate-100 border-slate-100' : ($sprint->status == 1 ? 'bg-sky-100 border-sky-100' : 'bg-teal-100 border-teal-100');
             ?>
+                   <div class="flex justify-end mb-2">
+                        <div class="relative inline-flex">
+                            <span class="mr-2 mt-2">Sort by:</span>
+
+                            <select id="storySortOrder" onchange="sortStories(this.value)" class="rounded-lg border border-gray-300 bg-white py-2 pl-2 pr-8 text-md leading-5">
+                                <option value="alphabetical" <?php echo ($_GET['sort'] === 'alphabetical' ? 'selected' : ''); ?>>Alphabetical Order</option>
+                                <option value="startDate" <?php echo ($_GET['sort'] === 'startDate' ? 'selected' : ''); ?>>Story Start Date</option>
+                                <option value="endDate" <?php echo ($_GET['sort'] === 'endDate' ? 'selected' : ''); ?>>Story End Date</option>
+                                <option value="estimatedHours" <?php echo ($_GET['sort'] === 'estimatedHours' ? 'selected' : ''); ?>>Estimated Hours</option>
+                                <option value="totalLoggedTime" <?php echo ($_GET['sort'] === 'totalLoggedTime' ? 'selected' : ''); ?>>Total Logged Time in Story</option>
+                            </select>
+                        </div>
+                    </div>
 
             <!-- Existing Sprint -->
             <div class="border-2 border-solid <?= $color ?> rounded-lg mb-4 transition-all hover:shadow-lg ease-in-out duration-300" style="background:white;">
@@ -45,6 +56,7 @@
                             <div>To</div>
                             <input type="date" placeholder="End Date" class="bg-transparent hover:bg-white rounded-lg p-2 border-none transition-all hover:border-blue-500 duration-300" value="<?= htmlspecialchars($sprint->end_date); ?>" onchange="updateSprintDate('end_date',this.value, <?= $sprint->id ?>)">
                         </div>
+                      
 
                         <div class="flex flex-row gap-1">
                             <div class="w-5 h-5 text-xs bg-gray-200 text-black rounded-full flex justify-center items-center" data-toggle="tooltip" data-placement="top" title="Not Started: <?= $sprint->not_started_count ?>"><?= $sprint->not_started_count ?></div>
@@ -938,5 +950,24 @@ function debounce(func, wait) {
         timeout = setTimeout(() => func.apply(context, args), wait);
     };
 }
+function sortStories(value) {
+    var currentURL = window.location.href;
+    var newURL;
+
+    // Check if URL already has parameters
+    if (currentURL.includes('?')) {
+        // If 'sort' parameter already exists in URL, replace its value. Otherwise, add the 'sort' parameter.
+        if (currentURL.includes('sort=')) {
+            newURL = currentURL.replace(/(sort=)[^\&]+/, '$1' + value);
+        } else {
+            newURL = currentURL + '&sort=' + value;
+        }
+    } else {
+        newURL = currentURL + '?sort=' + value;
+    }
+// console.log(value)
+    location.href = newURL;
+}
+
 
 </script>

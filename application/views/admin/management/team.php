@@ -226,7 +226,6 @@
         initialZoom: 0.8
     });
 </script>
-<script src='https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js'></script>
 
 
 </body>

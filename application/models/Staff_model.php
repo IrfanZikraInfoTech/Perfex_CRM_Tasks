@@ -349,7 +349,7 @@ class Staff_model extends App_Model
 
         $this->db->select($select_str);
         $this->db->where($where);
-
+        $this->db->where('active', 1);
         if (is_numeric($id)) {
             $this->db->where('staffid', $id);
             $staff = $this->db->get(db_prefix() . 'staff')->row();
