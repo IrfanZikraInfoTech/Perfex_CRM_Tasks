@@ -677,11 +677,31 @@ getOrSaveStaffSummary();
 fetchStats();
 updateAttendanceStatus();
 
-function statusSelectColors(element){
+const colorMap = {
+    'text-lime-500': '#4caf50',
+    'text-blue-500': '#2196F3',
+    'text-pink-500': '#E91E63'
+};
+
+function statusSelectColors(element) {
+    // Remove existing color classes
     element.classList.remove('text-lime-500');
     element.classList.remove('text-blue-500');
     element.classList.remove('text-pink-500');
-    element.classList.add(element.options.namedItem(element.value).classList.item(0));
+    
+    // Get the new color class
+    let selectedClass = element.options.namedItem(element.value).classList.item(0);
+    
+    // Add the new color class to the element
+    element.classList.add(selectedClass);
+    
+    // Update the chart color based on the new class
+    updateChartColor(colorMap[selectedClass]);
+}
+
+function updateChartColor(color) {
+    chart.data.datasets[0].backgroundColor[0] = color;
+    chart.update('none');
 }
 
 

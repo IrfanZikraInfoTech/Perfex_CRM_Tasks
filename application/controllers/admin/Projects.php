@@ -370,18 +370,19 @@ class Projects extends AdminController
             elseif ($group == 'project_backlog'){
 
                 $this->load->model('tasks_model');
-                $sort = $this->input->get('sort');
-                // print_r($sort);
+
+
+
                 $data['epics'] = $this->projects_model->get_epics($id);
                 foreach ($data['epics'] as $epic) {
-                    $epic->stories = $this->projects_model->get_stories('epic', $epic->id , false, $sort);
+                    $epic->stories = $this->projects_model->get_stories('epic', $epic->id , false);
                     foreach($epic->stories as &$story){
                         $story = $this->tasks_model->get($story->id);
                     }
                 }
                 $data['sprints'] = $this->projects_model->get_sprints($id);
                 foreach ($data['sprints'] as $sprint) {
-                    $sprint->stories = $this->projects_model->get_stories('sprint', $sprint->id , false, $sort);
+                    $sprint->stories = $this->projects_model->get_stories('sprint', $sprint->id , false);
                     
                     $sprint->not_started_count = 0;
                     $sprint->in_progress_count = 0;
@@ -1388,7 +1389,7 @@ class Projects extends AdminController
         $this->email->to($client->email);
         $this->email->subject($subject);
         $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
-        $this->email->send();
+        // $this->email->send();
     
         // Send email to project members
         foreach ($members as $member) {
@@ -1477,7 +1478,7 @@ class Projects extends AdminController
             $this->email->to($client->email);
             $this->email->subject($subject);
             $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
-            $this->email->send();
+            // $this->email->send();
             
         
             // Send email to project members
@@ -1528,7 +1529,7 @@ class Projects extends AdminController
             $this->email->to($client->email);
             $this->email->subject($subject);
             $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
-            $this->email->send();
+            // $this->email->send();
     
             // Send email to project members
             foreach ($members as $member) {
@@ -1673,6 +1674,17 @@ class Projects extends AdminController
 
 
         echo json_encode(['success' => $success, 'message' => $message]);
+    }
+
+    public function estimate_story() {
+        $story_id = $this->input->post('story_id');
+        $estimated_hours = $this->input->post('estimated_hours');
+        
+        // Call the model function to update the database
+        $success = $this->projects_model->estimate_story($story_id, $estimated_hours);
+        
+        // Return a JSON response
+        echo json_encode(array('success' => $success));
     }
 
 

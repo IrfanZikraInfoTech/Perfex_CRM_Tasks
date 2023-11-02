@@ -149,6 +149,7 @@ class Team_management extends AdminController {
     public function kpi_board($from = null, $to = null, $exclude_ids = ''){
         $from = $from ?? date("Y-m-d");
         $to = $to ?? date("Y-m-d");
+
         
 
         $data['from'] = $from;
@@ -174,6 +175,7 @@ class Team_management extends AdminController {
         $this->db->where('active', 1);
         // Agar user admin hai:
         if (has_permission('team_management', '', 'admin')) {
+
             
             if (!empty($exclude_ids) && is_array($exclude_ids)) {
                 $this->db->select('staffid, firstname, lastname');
@@ -190,28 +192,28 @@ class Team_management extends AdminController {
                 $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
             }
         
-            } else {
-                $subordinate_ids = get_staff_under($current_staff_id);
+                // Agar user admin nahi hai:
+        } else {
+            $subordinate_ids = get_staff_under($current_staff_id);
+            
+            if (!empty($subordinate_ids)) {
+                array_push($subordinate_ids, $current_staff_id); // Add current user ID to the list
                 
-                if (!empty($subordinate_ids)) {
-                   
-                    array_push($subordinate_ids, $current_staff_id); // Add current user ID to the list
-                    
-                    // If $exclude_ids is set, exclude the selected subordinate
-                    if(!empty($exclude_ids) && is_array($exclude_ids)){
-                        
-                        $this->db->where_not_in('staffid', $exclude_ids);
-                        $this->db->where_in('staffid', $subordinate_ids);
-                    } else {
-                        $this->db->where('active', 1);
-                        $this->db->where_in('staffid', $subordinate_ids);
-                    }
+                // If $exclude_ids is set, exclude the selected subordinate
+                if(!empty($exclude_ids) && is_array($exclude_ids)){
+                    $this->db->where('active', 1);
+                    $this->db->where_not_in('staffid', $exclude_ids);
+                    $this->db->where_in('staffid', $subordinate_ids);
                 } else {
-                    $this->db->where('staffid', $current_staff_id); // Only the current user's data
+                    $this->db->where_in('staffid', $subordinate_ids);
                 }
-                $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+            } else {
+                $this->db->where('staffid', $current_staff_id); // Only the current user's data
             }
-
+            $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+        }
+        
+      
         
 
         $staff_kpi_data = [];
@@ -229,9 +231,12 @@ class Team_management extends AdminController {
         $total_staff_members = 0;
 
 
+
         foreach ($staffs as $staff) {
             $total_staff_members++;
             $staff_id = $staff->staffid;
+
+         
 
             // Fetch KPIs for the staff member for the given date range
             $punctuality_rate = $this->kpi_system->kpi_punctuality_rate($staff_id, $from, $to);
@@ -239,6 +244,8 @@ class Team_management extends AdminController {
             $summary_adherence_rate = $this->kpi_system->kpi_summary_adherence_rate($staff_id, $from, $to);
             $afk_adherence_rate = $this->kpi_system->kpi_afk_adherence_rate($staff_id, $from, $to);
             $shift_productivity_rate = $this->kpi_system->kpi_shift_productivity_rate($staff_id, $from, $to);
+
+            
 
             //Cumulative KPI
             $ar += $punctuality_rate['present_percentage'];
@@ -250,6 +257,7 @@ class Team_management extends AdminController {
             $adr += $afk_adherence_rate['percentage'];
             $spr += $shift_productivity_rate['percentage'];
 
+            
 
             // Calculate OPS for the staff member
             $ops = $this->kpi_system->calculate_ops(
@@ -263,6 +271,7 @@ class Team_management extends AdminController {
             );
 
             $total_ops += $ops;
+            
 
             // Store the OPS in the array
             $staff_kpi_data[$staff_id] = [
@@ -277,8 +286,13 @@ class Team_management extends AdminController {
                 'adr' => $afk_adherence_rate['percentage'],
                 'spr' => $shift_productivity_rate['percentage']
             ];
+
+            
         }
 
+        
+        // return;
+        
         $average_ar = $ar / $total_staff_members;
         $average_pr = $pr / $total_staff_members;
         $average_tcr = $tcr / $total_staff_members;
@@ -309,8 +323,10 @@ class Team_management extends AdminController {
     }
 
     public function fetch_kpi_for_date() {
-        
+
+        $this->db->where('active', 1);
         $staffs = $this->db->select('staffid, firstname, lastname')->get('tblstaff')->result();
+
         $date = $this->input->post('date');
 
         $data = [];
@@ -347,6 +363,7 @@ class Team_management extends AdminController {
         echo json_encode($data);
     }
 
+
     public function attendance_board($from = null, $to = null, $exclude_ids = ''){
         $from = $from ?? date("Y-m-d");
         $to = $to ?? date("Y-m-d");
@@ -355,6 +372,7 @@ class Team_management extends AdminController {
         $this->db->where('active', 1);
         if($exclude_ids){
             $exclude_ids = explode('e', $exclude_ids);
+            $data['exclude_ids'] = $exclude_ids;
         }
         if (has_permission('team_management', '', 'admin')) 
         {
@@ -369,26 +387,33 @@ class Team_management extends AdminController {
                 $data['selected_ids'] = $exclude_ids; 
             } else {
                 $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
-            }     
-            } else {
-                $subordinate_ids = get_staff_under($current_staff_id);
 
-                if (!empty($subordinate_ids)) {
-                    array_push($subordinate_ids, $current_staff_id); // Add current user ID to the list
-                    
-                    // If $exclude_ids is set, exclude the selected subordinate
-                    if(!empty($exclude_ids) && is_array($exclude_ids)){
-                        $this->db->where_not_in('staffid', $exclude_ids);
-                        $this->db->where_in('staffid', $subordinate_ids);
-                    } else {
-                        $this->db->where_in('staffid', $subordinate_ids);
-                    }
+            }
+
+        } else {
+            $subordinate_ids = get_staff_under($current_staff_id);
+    
+            if (!empty($subordinate_ids)) {
+                array_push($subordinate_ids, $current_staff_id); // Add current user ID to the list
+                
+                // If $exclude_ids is set, exclude the selected subordinate
+                if(!empty($exclude_ids) && is_array($exclude_ids)){
+                    $this->db->where('active', 1);
+
+                    $this->db->where_not_in('staffid', $exclude_ids);
+                    $this->db->where_in('staffid', $subordinate_ids);
                 } else {
-                    $this->db->where('staffid', $current_staff_id); // Only the current user's data
+                    $this->db->where_in('staffid', $subordinate_ids);
                 }
-
-                $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
+            } else {
+                $this->db->where('staffid', $current_staff_id); // Only the current user's data
+            }
+    
+            $staffs = $this->db->select('staffid, firstname, lastname')->order_by('firstname')->get('tblstaff')->result();
         }
+        
+        
+
         $data['from'] = $from;
         $data['to'] = $to;
 
@@ -485,14 +510,14 @@ class Team_management extends AdminController {
                     $clockableShift1 += $shifts_data['shifts'][0]['clockable_seconds'];
                 }
                 if(isset($shifts_data['shifts'][0]['clocked_seconds'])){
-                    $clockableShift1 += $shifts_data['shifts'][0]['clocked_seconds'];
+                    $clockedShift1 += $shifts_data['shifts'][0]['clocked_seconds'];
                 }
 
                 if(isset($shifts_data['shifts'][1]['clockable_seconds'])){
                     $clockableShift2 += $shifts_data['shifts'][1]['clockable_seconds'];
                 }
                 if(isset($shifts_data['shifts'][1]['clocked_seconds'])){
-                    $clockableShift2 += $shifts_data['shifts'][1]['clocked_seconds'];
+                    $clockedShift2 += $shifts_data['shifts'][1]['clocked_seconds'];
                 }
 
                 if($shifts_data['status'] != "leave"){
@@ -557,8 +582,6 @@ class Team_management extends AdminController {
     {
         if (has_permission('team_management', '', 'admin')) {
             // access_denied('You do not have permission to access this page.');
-            $staff_id = get_staff_user_id();
-
         }
 
         $current_staff_id = get_staff_user_id();
@@ -592,7 +615,8 @@ class Team_management extends AdminController {
         $data = array(
             'start_date' => $start_date,
             'end_date' => $end_date,
-            'reason' => $reason
+            'reason' => $reason,
+            'created_at' => date("Y-m-d H:i:s")
         );
     
         // Save the global leave data
@@ -1659,6 +1683,21 @@ class Team_management extends AdminController {
 
         $data['is_admin'] = has_permission('team_management', '', 'admin');
         $data['is_editable'] = ($data['is_admin']) ? 1 : ((date('d') < 3) ? 1 : 0);
+
+        $days_in_month = date('t', mktime(0, 0, 0, $month, 1, date('Y')));
+        $leave_dates = [];
+        for($day = 1; $day <= $days_in_month; $day++) {
+
+            $date = date('Y') . '-' . $month . '-' . sprintf('%02d', $day) .' '. date("H:i:s");
+
+            if($this->team_management_model->is_on_leave($id, $date)) {
+                $date = explode(' ', $date)[0];
+                $leave_dates[] = $date;
+            }
+        }
+
+
+        $data['leave_dates'] = $leave_dates;
 
         $this->load->view('admin/management/set_shifts',$data);
     }

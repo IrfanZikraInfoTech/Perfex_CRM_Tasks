@@ -1364,8 +1364,9 @@ class Team_management_model extends App_Model
 
 
         // First, fetch the shifts for the given staff and date
-        $query = "SELECT * FROM tbl_staff_shifts WHERE staff_id = ? AND Year = YEAR(?) AND month = MONTH(?) AND day = DAY(?) ORDER BY shift_number ASC";
+        $query = "SELECT * FROM tbl_staff_shifts WHERE staff_id = ? AND Year = YEAR(?) AND month = MONTH(?) AND day = DAY(?) AND shift_start_time IS NOT NULL AND shift_end_time IS NOT NULL ORDER BY shift_number ASC";
         $shifts = $this->db->query($query, [$staff_id, $date, $date, $date])->result();
+        
 
         
         // Fetch clock_in times for the given staff and date
@@ -1409,11 +1410,14 @@ class Team_management_model extends App_Model
                 
                 if(count($entries) > 0){
 
-                    $clock_out_consideration = end($entries)->clock_out ? strtotime(end($entries)->clock_out) : time();
+                    $clock_out_consideration_time = end($entries)->clock_out ? strtotime(end($entries)->clock_out) : time();
 
-                    if($clock_out_consideration < strtotime($shift->shift_start_time)){
+                    $shift_start_time_only = strtotime($shift->Year.'-'.$shift->month.'-'.$shift->day.' '. $shift->shift_start_time);
+
+                    if($clock_out_consideration_time < $shift_start_time_only){
                         $clock_status = 'null';
-                    }else{
+                    }
+                    else{
                         // In case of consecutive shifts without clock_out, use the last clock_in and clock_out
                         $clock_in = new DateTime(end($entries)->clock_in);
                         $clock_out = isset(end($entries)->clock_out) ? new DateTime(end($entries)->clock_out) : null;
@@ -1540,20 +1544,18 @@ class Team_management_model extends App_Model
 
         if(count($shifts) > 0){
 
-            if($overall_leaves == count($shifts)){
+            if(count($entries) < 1){
+                $status = 'absent';
+            }else{
+                $status = ($overall_late ? 'late' : 'present');
+            }
+            
+        }else{
+            if($this->team_management_model->is_on_leave($staff_id, $date)){
                 $status = 'leave';
             }else{
-                if(count($entries) < 1){
-                    $status = 'absent';
-                }else{
-                    $status = ($overall_late ? 'late' : 'present');
-                }
+                $status = 'no-shifts';
             }
-
-            
-
-        }else{
-            $status = 'no-shifts';
         }
         
 
