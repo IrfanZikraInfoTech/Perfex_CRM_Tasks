@@ -583,8 +583,13 @@ function importScrum(){
             
             // Build the HTML for the buttons
             var buttonsHtml = '';
+            
+
             templates.forEach(function(template, index){
-                buttonsHtml += '<button class="template-button px-4 py-2 bg-blue-500 hover:bg-blue-600 shadow rounded text-white" data-template-id="' + template.id + '" data-template-json=\'' + template.epics_and_stories + '\'>Template ' + (index + 1) + ': ' + template.name + '</button>';
+    
+                let templateJsonString = JSON.stringify(template.epics_and_stories).replace(/'/g, "&#39;");
+    
+                buttonsHtml += '<button class="template-button px-4 py-2 bg-blue-500 hover:bg-blue-600 shadow rounded text-white" data-template-id="' + template.id + '" data-template-json=\'' + templateJsonString + '\'>Template ' + (index + 1) + ': ' + template.name + '</button>';
             });
             
             // Display the buttons in a SweetAlert

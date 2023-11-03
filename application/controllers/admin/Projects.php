@@ -1582,7 +1582,7 @@ class Projects extends AdminController
     public function save_template() {
 
         $template_name = $this->input->post('template_name');
-        $template_data = $this->input->post('template_data');
+        $template_data = $_POST['template_data'];
 
         $template_id = $this->input->post('template_id');
 

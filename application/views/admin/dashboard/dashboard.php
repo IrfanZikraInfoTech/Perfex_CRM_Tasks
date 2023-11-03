@@ -200,23 +200,30 @@ if ($todayIsBirthday) : ?>
                         <div class="flex flex-col bg-<?= get_option('management_theme_background')?> px-4 py-2 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar h-[300px]">
                                 <?php
                                     $tasks = $this->tasks_model->get_user_tasks_assigned($GLOBALS['current_user']->staffid);
+
                                     $total_tasks = 0;
                                     $completed_tasks = 0;
 
                                     $current_date = date('Y-m-d'); 
 
-                                    if(count($tasks) > 0){
+                                    foreach ($tasks as $task) {
+                                        if ($task->status != 5) {
+                                            $total_tasks++;
+                                        }
+                                    }
+
+                                    if($total_tasks > 0){
                                 ?>
                         
                                 <div class="p-4 flex flex-col mt-4 gap-2">         
                                     
                                     <?php
                                         foreach ($tasks as $task) {
-                                            $current_time = time();
-                                            $start_time = strtotime($task->startdate);
-                                            $due_time = strtotime($task->duedate ? $task->duedate : $task->startdate);
 
-                                            if ($task->status == 5 && $due_time < $current_time) {
+                                            // $start_time = strtotime($task->startdate);
+                                            // $due_time = strtotime($task->duedate ? $task->duedate : $task->startdate);
+
+                                            if ($task->status == 5) {
                                                 continue; 
                                             }
 
@@ -233,7 +240,7 @@ if ($todayIsBirthday) : ?>
                                     }
                                     echo '</div>';
                                 }else{
-                                    echo 'No Task!';
+                                    echo '<div class="p-4 w-full h-full flex flex-col justify-center items-center text-lg">No Stories!</div>';
                                 }
                                    
                                     ?>

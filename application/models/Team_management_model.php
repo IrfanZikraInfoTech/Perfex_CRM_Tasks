@@ -1544,12 +1544,15 @@ class Team_management_model extends App_Model
 
         if(count($shifts) > 0){
 
-            if(count($entries) < 1){
-                $status = 'absent';
+            if($overall_leaves == count($shifts)){
+                $status = 'leave';
             }else{
-                $status = ($overall_late ? 'late' : 'present');
+                if(count($entries) < 1){
+                    $status = 'absent';
+                }else{
+                    $status = ($overall_late ? 'late' : 'present');
+                }
             }
-            
         }else{
             if($this->team_management_model->is_on_leave($staff_id, $date)){
                 $status = 'leave';

@@ -2829,7 +2829,9 @@ class Projects_model extends App_Model
     }
 
     public function add_template($template_name, $template_data) {
-        $data = [
+        // echo $template_data;
+        // return;
+         $data = [
             'name' => $template_name,
             'epics_and_stories' => $template_data,
             'created_at' => date("Y-m-d H:i:s")
@@ -2845,6 +2847,9 @@ class Projects_model extends App_Model
     }
 
     public function edit_template($id, $template_name, $template_data) {
+
+        
+
         $data = [
             'name' => $template_name,
             'epics_and_stories' => $template_data,
