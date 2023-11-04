@@ -545,10 +545,14 @@ function story($story, $show_epic = false, $href = '') {
         $epic_html = '<div class="text-fuchsia-900/70 text-xs epic_'.$story->epic->id.'_name">'.htmlspecialchars($story->epic->name). '</div>';
     }
 
+    $CI = & get_instance();
+    $CI->load->model('tasks_model');
+
+    $logged = $CI->tasks_model->calc_task_total_time($story->id);
 
     // Construct and return the story HTML
     $story_html = '
-    <div class="story" data-story-id="'.$story->id.'">
+    <div class="story" data-name="'. htmlspecialchars($story->name).'" data-start-date="'.$story->startdate.'" data-due-date="'.$story->duedate.'" data-estimated-hours="'.$story->estimated_hours.'" data-logged-hours="'.$logged.'" data-story-id="'.$story->id.'">
         <div class="border-2 border-solid '.$color_class.' rounded-lg transition-all px-4 py-2 flex justify-between items-center">
             <a onclick="init_task_modal('.$story->id.');return false;" href="'.$href.'" class="text-gray-800 font-bold flex flex-col "> <div>'.htmlspecialchars($story->name). '</div>'.$epic_html.'</a>
             <div class="flex items-center">

@@ -2674,37 +2674,11 @@ class Projects_model extends App_Model
         return $query->row();
     }
     
-    public function get_stories($type, $type_id, $all_epics = false, $sort = null) {
+    public function get_stories($type, $type_id, $all_epics = false) {
 
         $this->db->select('id');
         $this->db->where($type.'_id', $type_id);
-    
-        switch($sort) {
-            case 'alphabetical':
-                $this->db->order_by('name', 'ASC');
-                break;
-            case 'startDate':
-                $this->db->order_by('startdate', 'ASC');
-                break;
-            case 'endDate':
-                $this->db->order_by('duedate', 'ASC');
-                break;
-            case 'estimatedHours':
-                $this->db->order_by('estimated_hours', 'ASC'); // Adjust column name if needed
-                break;
-                case 'totalLoggedTime':
-                    $this->db->order_by('(SELECT SUM(CASE
-                            WHEN end_time is NULL THEN ' . time() . '-start_time
-                            ELSE end_time-start_time
-                            END) FROM ' . db_prefix() . 'taskstimers WHERE task_id=' . db_prefix() . 'tasks.id)', 'DESC');
-                    break;
-                
-            default:
-                // Default sorting by id
-                $this->db->order_by('id', 'DESC');
-                break;
-        }
-    
+        $this->db->order_by('name', 'ASC');
         if(!$all_epics){
             ($type == "epic") ? $this->db->where('sprint_id IS NULL') : '';
         }
@@ -2808,6 +2782,14 @@ class Projects_model extends App_Model
         }
     }
 
+    public function estimate_story($story_id, $estimated_hours) {
+
+        $data = ['estimated_hours' => $estimated_hours];
+
+        $this->db->where('id', $story_id);
+        return $this->db->update('tbltasks', $data);
+    }
+
 
 
     public function is_active_sprint_exists($project_id)
@@ -2847,7 +2829,9 @@ class Projects_model extends App_Model
     }
 
     public function add_template($template_name, $template_data) {
-        $data = [
+        // echo $template_data;
+        // return;
+         $data = [
             'name' => $template_name,
             'epics_and_stories' => $template_data,
             'created_at' => date("Y-m-d H:i:s")
@@ -2863,6 +2847,9 @@ class Projects_model extends App_Model
     }
 
     public function edit_template($id, $template_name, $template_data) {
+
+        
+
         $data = [
             'name' => $template_name,
             'epics_and_stories' => $template_data,

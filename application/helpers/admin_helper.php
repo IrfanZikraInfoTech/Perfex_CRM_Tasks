@@ -217,6 +217,7 @@ function get_staff_under($staff_id){
     $CI->load->model('team_management_model');
 
     $is_hr = false;
+    $CI->db->reset_query();
     $department = $CI->db->select('departmentid')
                           ->from('tblstaff_departments')
                           ->where('staffid', $staff_id)

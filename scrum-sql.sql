@@ -85,3 +85,14 @@ CREATE TABLE tblkudos (
 ALTER TABLE tblnewsfeed_posts ADD seen_by TEXT;
 
 ALTER TABLE tblstaff MODIFY report_to INT DEFAULT NULL;
+
+CREATE TABLE `tbl_global_leaves` (
+  `id` int(11) NOT NULL,
+  `application_type` varchar(255) NOT NULL,
+  `status` varchar(50) NOT NULL DEFAULT 'Pending',
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `reason` text DEFAULT NULL,
+  `created_at` timestamp NULL,
+  `updated_at` timestamp NULL
+);

@@ -614,7 +614,7 @@ function is_task_created_by_staff($taskId, $staffId = null)
     return $CI->db->count_all_results(db_prefix() . 'tasks') > 0 ? true : false;
 }
 
-function get_tasks_in_date_range($staff_id, $from, $to){
+function get_tasks_in_date_range($staff_id, $from, $to, $forKPI = false){
     $CI = &get_instance();
 
     $tasks = $CI->tasks_model->get_user_tasks_assigned($staff_id);
@@ -630,7 +630,19 @@ function get_tasks_in_date_range($staff_id, $from, $to){
         $dueConsideration = ($task->duedate) ? new DateTime($task->duedate) : $startConsideration;
 
         if($startConsideration <= $endDate && $dueConsideration >= $startDate){
-            $filteredTasks[] = $task;
+            if($forKPI) {
+                // Return only the selected properties when forKPI is true
+                $filteredTask = new stdClass();
+                $filteredTask->duedate = $task->duedate;
+                $filteredTask->startdate = $task->startdate;
+                $filteredTask->status = $task->status;
+                $filteredTask->datefinished = $task->datefinished;
+                $filteredTask->estimated_hours = $task->estimated_hours;
+                $filteredTask->id = $task->id;
+                $filteredTasks[] = $filteredTask;
+            } else {
+                $filteredTasks[] = $task;
+            }
         }
     }
 

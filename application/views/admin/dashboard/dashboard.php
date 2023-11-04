@@ -93,6 +93,85 @@ function displayTasks($tasks) {
 
 </style>
 
+<style>
+
+    .confetti {
+    width: 15px;
+    height: 15px;
+    background-color: #f2d74e;
+    position: absolute;
+    left: 50%;
+    animation: confetti 5s ease-in-out -2s infinite;
+    transform-origin: left top;
+    }
+    .confetti:nth-child(1) {
+    background-color: #f2d74e; left: 10%; animation-delay: 0;
+    }
+    .confetti:nth-child(2) {
+    background-color: #95c3de; left: 20%; animation-delay: -5s;
+    }
+    .confetti:nth-child(3) {
+    background-color: #ff9a91; left: 30%; animation-delay: -3s;
+    }
+    .confetti:nth-child(4) {
+    background-color: #f2d74e; left: 40%; animation-delay: -2.5s;
+    }
+    .confetti:nth-child(5) {
+    background-color: #95c3de; left: 50%; animation-delay: -4s;
+    }
+    .confetti:nth-child(6) {
+    background-color: #ff9a91; left: 60%; animation-delay: -6s;
+    }
+    .confetti:nth-child(7) {
+    background-color: #f2d74e; left: 70%; animation-delay: -1.5s;
+    }
+    .confetti:nth-child(8) {
+    background-color: #95c3de; left: 80%; animation-delay: -2s;
+    }
+    .confetti:nth-child(9) {
+    background-color: #ff9a91; left: 90%; animation-delay: -3.5s;
+    }
+    .confetti:nth-child(10) {
+    background-color: #f2d74e; left: 100%; animation-delay: -2.5s;
+    }
+
+    @keyframes confetti {
+    0% { transform: rotateZ(15deg) rotateY(0deg) translate(0,0); }
+    25% { transform: rotateZ(5deg) rotateY(360deg) translate(-5vw,20vh); }
+    50% { transform: rotateZ(15deg) rotateY(720deg) translate(5vw,60vh); }
+    75% { transform: rotateZ(5deg) rotateY(1080deg) translate(-10vw,80vh); }
+    100% { transform: rotateZ(15deg) rotateY(1440deg) translate(10vw,110vh); }
+    }
+
+
+</style>
+
+<?php
+$todayIsBirthday = false;
+foreach($upcoming_birthdays as $staff) {
+    $dob = DateTime::createFromFormat('Y-m-d', $staff['date_of_birth']);
+    $birthdayThisYear = new DateTime(date('Y') . '-' . date('m', strtotime($staff['date_of_birth'])) . '-' . date('d', strtotime($staff['date_of_birth'])));
+    
+    $currentDate = new DateTime(date('Y-m-d'));
+    if ($currentDate == $birthdayThisYear) {
+        $todayIsBirthday = true;
+        break;
+    }
+}
+if ($todayIsBirthday) : ?>
+<div class="fixed w-full h-full inset z-10 mt-[-60px] pointer-events-none">
+       <div class="confetti"></div>
+       <div class="confetti"></div>
+       <div class="confetti"></div>
+       <div class="confetti"></div>
+       <div class="confetti"></div>
+       <div class="confetti"></div>
+       <div class="confetti"></div>
+       <div class="confetti"></div>
+       <div class="confetti"></div>
+       <div class="confetti"></div>
+</div>
+<?php endif; ?>
 <div id="wrapper">
 
     <div class="content">
@@ -100,6 +179,8 @@ function displayTasks($tasks) {
                 <?php //$this->load->view('admin/includes/alerts'); ?>
 
                 <?php //hooks()->do_action('before_start_render_dashboard_content'); ?>
+
+                
 
                 <div class="clearfix"></div> 
                 <div class="col-md-12 my-4" data-container="middle-left-6">
@@ -176,13 +257,7 @@ function displayTasks($tasks) {
                             displayTasks($tasks);  // Refactored task displaying logic into a function
                             ?>
                         </div>
-
-                        <!-- Followed Tasks Section -->
-                        <div id="followedTasksDiv" class="custom_theme flex flex-col bg-<?= get_option('management_theme_background')?> px-4 py-2 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar h-[300px]" style="display:none;">
-                            <?php
-                                $tasks = $this->tasks_model->get_followed_tasks($GLOBALS['current_user']->staffid);
-                                displayTasks($tasks);  // Refactored task displaying logic into a function
-                            ?>
+                            
                         </div>
                     </div>
 
@@ -302,44 +377,47 @@ function displayTasks($tasks) {
 
             <!-- Upcoming Birthdays -->
             <div class="col-md-12">
-                    <?php
+                <?php
+                if (isset($upcoming_birthdays) && !empty($upcoming_birthdays)) : ?>
+                    <div class="upcoming-birthdays bg-white p-6 rounded-[50px] shadow-lg">
+                        <h3 class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">Upcoming Birthdays</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <?php foreach ($upcoming_birthdays as $staff) : ?>
+                                <?php
+                                $dob = DateTime::createFromFormat('Y-m-d', $staff['date_of_birth']);
+                                $formattedDob = $dob->format('F j');
+                                $currentDate = new DateTime(date('Y-m-d'));
+                                $birthdayThisYear = new DateTime(date('Y') . '-' . date('m', strtotime($staff['date_of_birth'])) . '-' . date('d', strtotime($staff['date_of_birth'])));
+                                $daysRemaining = 0;
 
-                    if(isset($upcoming_birthdays) && !empty($upcoming_birthdays)): ?>
-                        <div class="upcoming-birthdays bg-white p-6 rounded-[50px] shadow-lg">
-                            <h3 class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">Upcoming Birthdays</h3>
-                            <div class="grid grid-cols-2 gap-6">
-                                <?php foreach($upcoming_birthdays as $staff): ?>
-                                    <?php
-                                        // Extract month and day from date_of_birth
-                                        $dob = DateTime::createFromFormat('Y-m-d', $staff['date_of_birth']);
-                                        $formattedDob = $dob->format('F j');
+                                if ($currentDate > $birthdayThisYear) {
+                                    $birthdayThisYear->modify('+1 year');
+                                }
 
-                                        $currentDate = new DateTime(date('Y-m-d'));
-                                        $birthdayThisYear = new DateTime(date('Y') . '-' . date('m', strtotime($staff['date_of_birth'])) . '-' . date('d', strtotime($staff['date_of_birth'])));
+                                $interval = $currentDate->diff($birthdayThisYear);
+                                $daysRemaining = $interval->days;
 
-                                        if ($currentDate > $birthdayThisYear) {
-                                            $birthdayThisYear->modify('+1 year');
-                                        }
+                                $isTodayBirthday = ($daysRemaining == 0) ? true : false;
+                                ?>
+                                <div class="staff-profile bg-<?= $isTodayBirthday ? get_option('management_theme_border').'/70' : get_option('management_theme_background') ?> p-4 rounded-[40px] shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= $isTodayBirthday ? get_option('management_theme_background') : get_option('management_theme_border') ?> transition-all flex justify-between items-center">
 
-                                        $interval = $currentDate->diff($birthdayThisYear);
-
-
-                                        $daysRemaining = $interval->days;
-                                    ?>
-                                        <div class="custom_theme custom_border staff-profile bg-<?= get_option('management_theme_background')?> p-4 rounded-[40px] shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex justify-between items-center">
-
-                                        <?= staff_profile_image($staff['staffid'], ['border-4 border-gradient-to-r from-teal-400 to-blue-500 object-cover w-20 h-20 rounded-full staff-profile-image-thumb mr-4'], 'thumb'); ?>
-                                        <div class="staff-details flex-grow flex flex-col">
-                                            <span class="staff-name text-xl font-semibold text-gray-800 my-2"><?= $staff['full_name'] ?></span>
+                                    <?= staff_profile_image($staff['staffid'], ['border-4 border-gradient-to-r from-teal-400 to-blue-500 object-cover w-20 h-20 rounded-full staff-profile-image-thumb mr-4'], 'thumb'); ?>
+                                    <div class="staff-details flex-grow flex flex-col">
+                                        <span class="staff-name text-xl font-semibold text-gray-800 my-2"><?= $staff['full_name'] ?></span>
+                                        <?php if ($isTodayBirthday) : ?>
+                                            <span class="days-left text-gray-700 font-semibold">Today is their birthday!</span>
+                                        <?php else : ?>
                                             <span class="days-left text-gray-700 font-semibold">Remaining Days: <span class="text-blue-600"><?= $daysRemaining ?> days</span></span>
-                                        </div>
-                                        <span class="staff-dob text-gray-600 font-light"><?= $formattedDob ?></span>
+                                        <?php endif; ?>
                                     </div>
-                                <?php endforeach; ?>
-                            </div>
+                                    <span class="staff-dob text-gray-600 font-light"><?= $formattedDob ?></span>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
-                    <?php endif; ?>
+                    </div>
+                <?php endif; ?>
             </div>
+
 
             <!-- Calendar/Todo -->
             <div class="col-md-12 mt-7">
