@@ -240,10 +240,10 @@ if ($todayIsBirthday) : ?>
                             </button>
                             <div id="taskDropdown" style="display: none;" class="absolute left-0 right-0 mx-auto w-40 bg-white rounded-md shadow-xl mt-2">
                                 <ul class="text-sm text-gray-700">
-                                <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                <li class=" py-2 hover:bg-gray-100 cursor-pointer">
                                         <a href="javascript:showAssignedTasks();">ASSIGNED TASKS</a>
                                     </li>
-                                    <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                    <li class=" py-2 hover:bg-gray-100 cursor-pointer">
                                         <a href="javascript:showFollowedTasks();">FOLLOWED TASKS</a>
                                     </li>
                                 </ul>
@@ -257,7 +257,13 @@ if ($todayIsBirthday) : ?>
                             displayTasks($tasks);  // Refactored task displaying logic into a function
                             ?>
                         </div>
-                            
+
+                        <!-- Followed Tasks Section -->
+                        <div id="followedTasksDiv" class="custom_theme flex flex-col bg-<?= get_option('management_theme_background')?> px-4 py-2 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar h-[300px]" style="display:none;">
+                            <?php
+                                $tasks = $this->tasks_model->get_followed_tasks($GLOBALS['current_user']->staffid);
+                                displayTasks($tasks);  // Refactored task displaying logic into a function
+                            ?>
                         </div>
                     </div>
 
