@@ -30,19 +30,16 @@ class Tasks_model extends App_Model
     {
         $this->db->select('tbltasks.*, GROUP_CONCAT(tbltask_assigned.staffid) as assignees');
         $this->db->from('tbltasks');
-        $this->db->join('tbltask_assigned', 'tbltasks.id = tbltask_assigned.taskid', 'left');
-        $this->db->join(db_prefix() . 'task_followers', 'tbltasks.id = ' . db_prefix() . 'task_followers.taskid', 'left');
-        $this->db->group_start();
-            $this->db->where('tbltask_assigned.staffid', $staff_id);
-            $this->db->or_where(db_prefix() . 'task_followers.staffid', $staff_id);
-        $this->db->group_end();
+        $this->db->join('tbltask_assigned', 'tbltasks.id = tbltask_assigned.taskid');
+        $this->db->where('tbltask_assigned.staffid', $staff_id);
+        $this->db->where('tbltasks.sprint_id IS NOT NULL');
         $this->db->group_by('tbltasks.id');
         $this->db->order_by('tbltasks.startdate');
         $query = $this->db->get();
-    
+
         return $query->result();
     }
-
+    
     public function get_statuses()
     {
         $statuses = hooks()->apply_filters('before_get_task_statuses', [
@@ -1116,6 +1113,7 @@ class Tasks_model extends App_Model
 
         return false;
     }
+    
 
     /**
      * Assign task to staff
@@ -1361,6 +1359,18 @@ class Tasks_model extends App_Model
         $this->db->where('taskid', $id);
 
         return $this->db->get()->result_array();
+    }
+
+    public function get_followed_tasks($staff_id)
+    {
+        $this->db->select('tbltasks.*');
+        $this->db->from('tbltasks');
+        $this->db->join('tbltask_followers', 'tbltasks.id = tbltask_followers.taskid');
+        $this->db->where('tbltask_followers.staffid', $staff_id);
+        $this->db->group_by('tbltasks.id');
+        $this->db->order_by('tbltasks.startdate');
+    
+        return $this->db->get()->result();
     }
 
     /**

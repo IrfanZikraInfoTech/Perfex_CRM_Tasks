@@ -78,7 +78,7 @@
                                 </div>
                                 <div class="mb-5">
                                     <label class="block text-lg font-medium bg-<?= get_option('management_theme_background')?>">Remarks:</label>
-                                    <textarea id="remarks" rows="4" class=" rounded-[20px] p-4 w-full border rounded focus:outline-none focus:border-blue-500"></textarea>
+                                    <textarea id="remarks" rows="4" class="rounded-[20px] p-4 w-full border rounded focus:outline-none focus:border-blue-500"></textarea>
                                 </div>
                                 <button type="submit" id="btnform" class="rounded-[20px] w-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-semibold px-6 py-3 shadow-md hover:from-blue-600 hover:to-indigo-700 hover:shadow-lg transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 active:scale-95">
                                     Submit
@@ -313,6 +313,16 @@
             return; // This will exit the function, preventing any further code from executing
         }
 
+        var editorContent = tinyMCE.get('remarks').getContent();
+        if (editorContent == '')
+        {
+            Swal.fire({
+                icon: 'info',
+                title: 'Info',
+                text: 'Give some remarks please!'
+            });
+            return; // This will exit the function, preventing any further code from executing
+        }
         if ($("#principles").val() == "") {
             Swal.fire({
                 icon: 'warning',

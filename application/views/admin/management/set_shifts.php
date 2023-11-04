@@ -4,6 +4,14 @@ $dateObj   = DateTime::createFromFormat('!m', $month);
 $monthName = $dateObj->format('F');
 ?>
 
+<style>
+.leave-day {
+    background-color: #ff9f89; /* Or any color you want */
+    /* You might need additional styles depending on your layout */
+}
+
+</style>
+
 <div id="wrapper" class="wrapper">
     <div class="content flex flex-col">
         <div class="w-full rounded-[40px] bg-<?= get_option('management_theme_background')?> text-gray-700 p-6 flex flex-row justify-between border border-solid border-sky-100 hover:border-<?= get_option('management_theme_border')?> transition-all items-center text-xl">
@@ -112,31 +120,27 @@ $monthName = $dateObj->format('F');
 
 function openShiftsModal(date, shiftsData) {
 
-    const day = date.toLocaleString('en-us', {  weekday: 'long' }); 
+    const day = date.toLocaleString('en-us', { weekday: 'long' });
 
+    // Clear previous values
+    document.querySelector('#s1s').value = '';
+    document.querySelector('#s1e').value = '';
+    document.querySelector('#s2s').value = '18:00'; // Default values for shift 2 start
+    document.querySelector('#s2e').value = '22:00'; // Default values for shift 2 end
 
-    if(shiftsData[0]){
-        document.querySelector('#s1s').value = shiftsData[0].shiftStart.toISOString().substring(11,16);
-    }else{
-        document.querySelector('#s1s').value = '';
-    }
-    if(shiftsData[0]){
-        document.querySelector('#s1e').value = shiftsData[0].shiftEnd.toISOString().substring(11,16) ;
-    }else{
-        document.querySelector('#s1e').value = '';
-    }
+    // Iterate through shiftsData to fill the respective inputs based on shift number
+    shiftsData.forEach(shiftData => {
+        if (shiftData.shiftNumber === "1") {
+            document.querySelector('#s1s').value = shiftData.shiftStart.toISOString().substring(11,16);
+            document.querySelector('#s1e').value = shiftData.shiftEnd.toISOString().substring(11,16);
+        } else if (shiftData.shiftNumber === "2") {
+            document.querySelector('#s2s').value = shiftData.shiftStart.toISOString().substring(11,16);
+            document.querySelector('#s2e').value = shiftData.shiftEnd.toISOString().substring(11,16);
+            // console.log(shiftData.shiftEnd.toISOString());
+        }
+    });
 
-    if(shiftsData[1]){
-        document.querySelector('#s2s').value = shiftsData[1].shiftStart.toISOString().substring(11,16);
-    }else{
-        document.querySelector('#s2s').value = '18:00';
-    }
-    if(shiftsData[1]){
-        document.querySelector('#s2e').value = shiftsData[1].shiftEnd.toISOString().substring(11,16) ;
-    }else{
-        document.querySelector('#s2e').value = '22:00';
-    }
-    
+    // Show the modal
     $('#shiftsModal').modal('show');
 
     var localDateString = FullCalendar.formatDate(date, {
@@ -149,7 +153,6 @@ function openShiftsModal(date, shiftsData) {
         timeZoneName: 'short'
     });
 
-    console.log(localDateString);
 
     document.getElementById('weekdayOption').innerHTML = 'All '+day+'s';
     document.getElementById('dateInput').value = localDateString.split(',')[0];
@@ -171,7 +174,10 @@ var events = shifts
             title: 'Shift ' + shift.shift_number + ': ' + shift.shift_start_time + ' - ' + shift.shift_end_time,
             start: new Date(shift.Year, shift.month - 1, shift.day, shift.shift_start_time.split(':')[0], shift.shift_start_time.split(':')[1]),
             end: new Date(shift.Year, shift.month - 1, shift.day, shift.shift_end_time.split(':')[0], shift.shift_end_time.split(':')[1]),
-            allDay: false // will make the time show
+            allDay: false, // will make the time show
+            shiftNumber: shift.shift_number,
+            shiftStart: new Date(Date.UTC(shift.Year, shift.month - 1, shift.day, shift.shift_start_time.split(':')[0], shift.shift_start_time.split(':')[1])),
+            shiftEnd: new Date(Date.UTC(shift.Year, shift.month - 1, shift.day, shift.shift_end_time.split(':')[0], shift.shift_end_time.split(':')[1])),
         };
     });
 
@@ -186,8 +192,10 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
     eventClick: function(info) {
        handleClick(info.event.start); 
     },
-    initialDate: <?= strtotime(date('Y') . '-' . $month . '-' . '03') * 1000 ?>
+    initialDate: <?= strtotime(date('Y') . '-' . $month . '-' . '03') * 1000 ?>,
 });
+
+
 calendar.render();
 
 function handleClick(info){
@@ -203,14 +211,17 @@ function handleClick(info){
 
         var shiftsData = events.map(function(event) {
             return {
-                shiftStart: event._instance.range.start,
-                shiftEnd: event._instance.range.end
+                shiftStart: event.extendedProps.shiftStart,
+                shiftEnd: event.extendedProps.shiftEnd,
+                shiftNumber: event.extendedProps.shiftNumber
             };
         });
-        
 
+        console.log(shiftsData);
+        
         openShiftsModal(clickedDate, shiftsData);
 }
+
 var staff_id = <?= $staff->staffid ?>;
 function setShifts(){
     var shift_1_start = $("#s1s").val();
@@ -269,5 +280,10 @@ function copyMonthTimings(){
         }
     });
 }
-
+<?php
+foreach($leave_dates as $date){
+    echo '$(`.fc-day[data-date="2023-11-11"]`).css(`background`, `#fff28f`);
+    ';
+}
+?>
 </script>

@@ -21,29 +21,31 @@
         <!-- Sprints Section -->
         <div class="mt-4">
 
+        <div class="flex justify-end mb-2">
+            <div class="relative inline-flex">
+                <span class="mr-2 mt-2">Sort by:</span>
+
+                <select id="storySortOrder" onchange="sortStories(this.value)" class="rounded-lg border border-gray-300 bg-white py-2 pl-2 pr-8 text-md leading-5">
+                    <option value="alphabetical">Alphabetical Order</option>
+                    <option value="startDate">Story Start Date</option>
+                    <option value="endDate">Story End Date</option>
+                    <option value="estimatedHours">Estimated Hours</option>
+                    <option value="totalLoggedTime">Total Logged Time in Story</option>
+                </select>
+            </div>
+        </div>
+
         <?php foreach ($sprints as $sprint):  ?>
 
             <?php 
                 $color = $sprint->status == 0 ? 'bg-slate-100 border-slate-100' : ($sprint->status == 1 ? 'bg-sky-100 border-sky-100' : 'bg-teal-100 border-teal-100');
             ?>
-                   <div class="flex justify-end mb-2">
-                        <div class="relative inline-flex">
-                            <span class="mr-2 mt-2">Sort by:</span>
-
-                            <select id="storySortOrder" onchange="sortStories(this.value)" class="rounded-lg border border-gray-300 bg-white py-2 pl-2 pr-8 text-md leading-5">
-                                <option value="alphabetical" <?php echo ($_GET['sort'] === 'alphabetical' ? 'selected' : ''); ?>>Alphabetical Order</option>
-                                <option value="startDate" <?php echo ($_GET['sort'] === 'startDate' ? 'selected' : ''); ?>>Story Start Date</option>
-                                <option value="endDate" <?php echo ($_GET['sort'] === 'endDate' ? 'selected' : ''); ?>>Story End Date</option>
-                                <option value="estimatedHours" <?php echo ($_GET['sort'] === 'estimatedHours' ? 'selected' : ''); ?>>Estimated Hours</option>
-                                <option value="totalLoggedTime" <?php echo ($_GET['sort'] === 'totalLoggedTime' ? 'selected' : ''); ?>>Total Logged Time in Story</option>
-                            </select>
-                        </div>
-                    </div>
+                   
 
             <!-- Existing Sprint -->
             <div class="border-2 border-solid <?= $color ?> rounded-lg mb-4 transition-all hover:shadow-lg ease-in-out duration-300" style="background:white;">
                 
-                <div class="flex justify-between items-center py-2 px-4 <?= $color ?> rounded-t-lg cursor-pointer" onclick="toggleCollapse(event, 'sprint-<?= $sprint->id ?>-content')">
+                <div class="flex justify-between items-center py-2 px-4 <?= $color ?> rounded-t-lg cursor-pointer sprint-anchor" onclick="toggleCollapse(event, 'sprint-<?= $sprint->id ?>-content')">
                     <div class="flex items-center text-black font-bold text-base gap-2 w-1/3" >
                         <div class="fas fa-angle-down transform transition-transform duration-300"></div>
                         <input class="text-black font-bold text-base bg-transparent w-full px-2 py-1" value="<?= htmlspecialchars($sprint->name); ?>" onchange="updateSprintName(this.value, <?= $sprint->id ?>)" placeholder="Sprint Name" />
@@ -212,6 +214,10 @@
         updateMaxHeight(element, true);
     });
 
+    document.querySelectorAll('.sprint-anchor').forEach(function(element) {
+        // element.click();
+    });
+
 
     var storyGroup = {
         name: 'shared',
@@ -219,47 +225,122 @@
         put: true,
     };
     
-    function handleStoryMove(evt){
+    function handleStoryMove(evt) {
+    var story_id = evt.item.getAttribute('data-story-id');
+    var estimated_hours = evt.item.getAttribute('data-estimated-hours'); // Ensure this attribute is set correctly in the HTML
+    var origin_issue_type = evt.from.getAttribute('data-issue-type'); // Check the attribute is set in HTML
+    var target_issue_type = evt.to.getAttribute('data-issue-type'); // Check the attribute is set in HTML
 
-        var story_id = evt.item.getAttribute('data-story-id');
-        var new_issue_id = evt.to.getAttribute('data-issue-id');
-        var new_issue_type = evt.to.getAttribute('data-issue-type');
-        
+    var target_issue_id = evt.to.getAttribute('data-issue-id'); // Check the attribute is set in HTML
 
-        updateMaxHeight(evt.to.parentElement, true);
+    // Function to move the story back to the epic
+    function moveStoryBack() {
+        evt.from.appendChild(evt.item); // Move back to the original list
+    }
 
+    // Check if we're moving from 'epic' to 'sprint' and if estimated hours are not set or zero
+    if (origin_issue_type === 'epic' && target_issue_type === 'sprint' && (!estimated_hours || parseFloat(estimated_hours) === 0)) {
+        // Show Swal with input for estimated hours
         Swal.fire({
-            title: 'Processing',
-            html: 'Moving story...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-                
-                $.ajax({
-                    url: admin_url + 'projects/move_story',
-                    type: 'POST',
-                    data: {
-                        story_id: story_id,
-                        new_issue_id: new_issue_id,
-                        new_issue_type: new_issue_type,
-                    },
-                    success: function(response) {
-                        Swal.close();
-                        response = JSON.parse(response);
-                        if (response.success) {
-                            Swal.fire('Success!', 'Story moved successfully.', 'success');
-                        } else {
-                            Swal.fire('Error!', 'Failed to move story.', 'error');
-                        }
-                    },
-                    error: function() {
-                        Swal.close();
-                        Swal.fire('Error!', 'Failed to move story.', 'error');
-                    }
+            title: 'Estimated Hours Required',
+            input: 'number',
+            inputAttributes: {
+                min: '0.5',
+                step: '0.5'
+            },
+            inputValue: '0.5', // Default if estimated hours are not set
+            showCancelButton: true,
+            confirmButtonText: 'Update Hours',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value || parseFloat(value) <= 0) {
+                    return 'You must enter estimated hours greater than 0!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+
+                updateStoryEstimatedHours(story_id, result.value)
+                .then(result => {
+                    moveStory(story_id, target_issue_id, target_issue_type, evt.to.parentElement);
+                })
+                .catch(error => {
+                    console.error(error); // 'No' or 'Error' if not successful
                 });
+
+            } else {
+                // No valid hours entered; move the story back to the epic
+                moveStoryBack();
             }
         });
+
+        // Cancel the current move operation
+        return false;
+    }else{
+        moveStory(story_id, target_issue_id, target_issue_type, evt.to.parentElement);
     }
+
+}
+
+function moveStory(story_id, new_issue_id, new_issue_type, new_issue){
+    updateMaxHeight(new_issue, true);
+    Swal.fire({
+        title: 'Processing',
+        html: 'Moving story...',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+            
+            $.ajax({
+                url: admin_url + 'projects/move_story',
+                type: 'POST',
+                data: {
+                    story_id: story_id,
+                    new_issue_id: new_issue_id,
+                    new_issue_type: new_issue_type,
+                },
+                success: function(response) {
+                    Swal.close();
+                    response = JSON.parse(response);
+                    if (response.success) {
+                        Swal.fire('Success!', 'Story moved successfully.', 'success');
+                    } else {
+                        Swal.fire('Error!', 'Failed to move story.', 'error');
+                    }
+                },
+                error: function() {
+                    Swal.close();
+                    Swal.fire('Error!', 'Failed to move story.', 'error');
+                }
+            });
+        }
+    });
+}
+
+function updateStoryEstimatedHours(story_id, hours) {
+    // Return a new Promise
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: admin_url + "projects/estimate_story", // Replace with your actual endpoint
+            type: 'POST',
+            data: {
+                story_id: story_id,
+                estimated_hours: hours
+            },
+            success: function(response) {
+                var data = JSON.parse(response);
+                if (data.success) {
+                    resolve('Yes'); // Resolve the Promise with 'Yes'
+                } else {
+                    reject('No'); // Reject the Promise
+                }
+            },
+            error: function() {
+                reject('Error'); // Reject the Promise
+            }
+        });
+    });
+}
 
     function initializeSortable(epicList) {
         new Sortable(epicList, {
@@ -728,7 +809,7 @@ function updateSprintStatus(button) {
                 }else{
                     Swal.fire({
                                 title: 'Processing',
-                                html: 'Adding spring summary...',
+                                html: 'Adding sprint summary...',
                                 allowOutsideClick: false,
                                 didOpen: () => {
                                     Swal.showLoading();
@@ -950,23 +1031,54 @@ function debounce(func, wait) {
         timeout = setTimeout(() => func.apply(context, args), wait);
     };
 }
-function sortStories(value) {
-    var currentURL = window.location.href;
-    var newURL;
 
-    // Check if URL already has parameters
-    if (currentURL.includes('?')) {
-        // If 'sort' parameter already exists in URL, replace its value. Otherwise, add the 'sort' parameter.
-        if (currentURL.includes('sort=')) {
-            newURL = currentURL.replace(/(sort=)[^\&]+/, '$1' + value);
-        } else {
-            newURL = currentURL + '&sort=' + value;
-        }
-    } else {
-        newURL = currentURL + '?sort=' + value;
-    }
-// console.log(value)
-    location.href = newURL;
+
+function sortStories(value) {
+    // Iterate over all sprint lists
+    $(".sprint-list").each(function() {
+        var stories = $(this).children('.story').toArray();
+        // Sort the stories based on the selected value
+        stories.sort(function(a, b) {
+            var aValue, bValue;
+
+            switch(value) {
+                case 'alphabetical':
+                    aValue = $(a).data('name').toLowerCase();
+                    bValue = $(b).data('name').toLowerCase();
+                    return aValue.localeCompare(bValue);
+                case 'startDate':
+                    aValue = new Date($(a).data('start-date'));
+                    bValue = new Date($(b).data('start-date'));
+                    break;
+                case 'endDate':
+                    aValue = new Date($(a).data('due-date'));
+                    bValue = new Date($(b).data('due-date'));
+                    break;
+                case 'estimatedHours':
+                    aValue = Number($(a).data('estimated-hours'));
+                    bValue = Number($(b).data('estimated-hours'));
+                    break;
+                case 'totalLoggedTime':
+                    aValue = Number($(a).data('logged-hours'));
+                    bValue = Number($(b).data('logged-hours'));
+                    break;
+                default:
+                    return 0;
+            }
+
+            // For dates that are empty strings, we'll consider them as '0' so they end up last after sorting
+            if (aValue === '' || isNaN(aValue)) aValue = 0;
+            if (bValue === '' || isNaN(bValue)) bValue = 0;
+
+            // Descending order comparison
+            if(aValue > bValue) return -1;
+            if(aValue < bValue) return 1;
+            return 0;
+        });
+
+        // Detach the sorted stories from DOM and reattach in the new order
+        $(this).empty().append(stories);
+    });
 }
 
 

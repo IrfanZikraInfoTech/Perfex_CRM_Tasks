@@ -2,6 +2,9 @@
 <?php init_head(); ?>
 <?php
     $templateData = json_decode($template->epics_and_stories, true);
+
+    // print_r($template->epics_and_stories);
+
     $epic_count = count($templateData);
     $story_count = 0;
 ?>
@@ -484,7 +487,7 @@ function saveProject() {
                             if (result.isConfirmed) {
                                 
                             }else{
-                                window.location.href = admin_url + "projects/templates";
+                                // window.location.href = admin_url + "projects/templates";
                             }
                         });
                     } else {

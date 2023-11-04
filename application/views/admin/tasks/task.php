@@ -250,14 +250,9 @@
                                 <div class="form-group">
                                     <label for="estimated_hours" class="control-label">Estimated Hours</label>
 
-                                    <?php if (isset($task)) {
-                                            $hours = _d($task->estimated_hours);
-                                        }else{
-                                            $hours = 0;
-                                        }?>
 
                                     <div class="input-group">
-                                        <input type="number" id="estimated_hours" name="estimated_hours" class="form-control " min="0.5" value="<?= htmlspecialchars($hours); ?>" aria-invalid="false">
+                                        <input type="number" id="estimated_hours" name="estimated_hours" class="form-control " min="0" value="<?= (isset($task) ? $task->estimated_hours : 0); ?>" aria-invalid="false">
                                         <div class="input-group-addon">Hours</div>
                                     </div>
 

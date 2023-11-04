@@ -347,7 +347,7 @@
 
                                 </div>
 
-                                <div class="w-[10%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center">
+                                <div class="w-[10%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center font-bold">
                                     <?php
 
                                         $attendance = $staff['data']['status'];
@@ -355,27 +355,27 @@
                                         if($attendance == 'absent')
                                         {
                                             $attendance = 'Absent';
-                                            $class = 'text-red-400 p-2 rounded';
+                                            $class = 'text-red-500 p-2 rounded';
                                         }
                                         else if($attendance == 'present')
                                         {
                                             $attendance = 'On Time';
-                                            $class = 'text-green-400 p-2 rounded';
+                                            $class = 'text-green-500 p-2 rounded';
                                         }
                                         else if($attendance == 'late')
                                         {
                                             $attendance = 'Late';
-                                            $class = 'text-orange-400 p-2 rounded';
+                                            $class = 'text-orange-500 p-2 rounded';
                                         }
                                         else if($attendance == 'leave')
                                         {
                                             $attendance = 'Leave';
-                                            $class = 'text-yellow-400 p-2 rounded';
+                                            $class = 'text-yellow-500 p-2 rounded';
                                         }
                                         else if($attendance == 'no-shifts')
                                         {
                                             $attendance = 'No Shifts';
-                                            $class = 'text-gray-400 p-2 rounded';
+                                            $class = 'text-gray-500 p-2 rounded';
                                         }
                                         
                                         echo '<span class="'.$class.'">'.$attendance.'</span>';
@@ -383,17 +383,17 @@
                                     ?>
                                 </div>
                                 
-                                <div class="w-[10%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center">
+                                <div class="w-[10%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center font-bold">
                                     <?php
 
                                         $status = $staff['data']['status'];
                                         if($status != "absent" && $status != "leave" && $status != "no-shifts"){
                                             if($staff['data']['day_status'] == 0){
                                                 $completion = 'Incompleted';
-                                                $class = 'text-red-400';
+                                                $class = 'text-red-500';
                                             }else if($staff['data']['day_status'] == 1){
                                                 $completion = 'Completed';
-                                                $class = 'text-green-400';
+                                                $class = 'text-green-500';
                                             }else if($staff['data']['day_status'] == 2){
                                                 $completion = 'Overtime';
                                                 $class = 'text-lime-700';
