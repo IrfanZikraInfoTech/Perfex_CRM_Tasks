@@ -1112,6 +1112,7 @@ class Tasks_model extends App_Model
 
         return false;
     }
+    
 
     /**
      * Assign task to staff
@@ -1357,6 +1358,18 @@ class Tasks_model extends App_Model
         $this->db->where('taskid', $id);
 
         return $this->db->get()->result_array();
+    }
+
+    public function get_followed_tasks($staff_id)
+    {
+        $this->db->select('tbltasks.*');
+        $this->db->from('tbltasks');
+        $this->db->join('tbltask_followers', 'tbltasks.id = tbltask_followers.taskid');
+        $this->db->where('tbltask_followers.staffid', $staff_id);
+        $this->db->group_by('tbltasks.id');
+        $this->db->order_by('tbltasks.startdate');
+    
+        return $this->db->get()->result();
     }
 
     /**

@@ -1,5 +1,35 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head(); 
+
+function displayTasks($tasks) {
+    $total_tasks = 0;
+    $completed_tasks = 0;
+    $current_date = date('Y-m-d');
+    if (count($tasks) > 0) {
+        echo '<div id="taskList" class="p-4 flex flex-col mt-4 gap-2">';
+        foreach ($tasks as $task) {
+            $current_time = time();
+            $start_time = strtotime($task->startdate);
+            $due_time = strtotime($task->duedate ? $task->duedate : $task->startdate);
+            if ($task->status == 5 && $due_time < $current_time) {
+                continue;
+            }
+            ?>
+            <button class="custom_border task-block bg-white px-4 py-2 rounded-xl cursor-pointer border border-gray-200 border-solid transition-all hover:border-<?= get_option('management_theme_border')?> hover:shadow-lg" data-task-id="<?= $task->id ?>" onclick="init_task_modal(<?= $task->id ?>)">
+                <div class="flex items-center justify-between">
+                    <span class="font-semibold"><?= $task->name ?></span>
+                    <span><?= format_task_status($task->status); ?></span>
+                </div>
+            </button>
+            <?php
+        }
+        echo '</div>';
+    } else {
+        echo 'No Task!';
+    }
+}
+
+?>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css"/>
 
 <style>
@@ -51,6 +81,16 @@
 .not-seen {
     background-color: #fffcca;
 }
+/* .custom_theme{
+    background: #f2e9e4;
+}
+.custom_border:hover{
+    border: black !important;
+} */
+#taskToggle:hover + #taskDropdown, #taskDropdown:hover {
+    display: block;
+}
+
 </style>
 
 <div id="wrapper">
@@ -71,7 +111,7 @@
 
                     <div class="flex lg:flex-row flex-col gap-4">
                         
-                        <div class="myscrollbar bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all rounded-[50px] p-6 lg:w-1/4 w-full mx-auto  overflow-y-auto">
+                        <div class="custom_border myscrollbar bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all rounded-[50px] p-6 lg:w-1/4 w-full mx-auto  overflow-y-auto">
                             <h5 class="attendance text-xl font-semibold mb-2 text-center text-gray-700 border-b pb-2 capitalize">ATTENDENCE</h1>
                             <div class="mt-4 flex flex-col space-y-3">
 
@@ -98,7 +138,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all rounded-[50px] p-7 flex md:flex-row flex-col justify-between h-full lg:w-3/4 w-full">
+                        <div class="custom_border bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all rounded-[50px] p-7 flex md:flex-row flex-col justify-between h-full lg:w-3/4 w-full">
                             <div id="visualization"  class="relative w-full rounded-[50px]" >
                             </div>
                         </div>
@@ -113,59 +153,45 @@
             <div class="col-md-12 my-4 flex lg:flex-row flex-col gap-10">
                     <!-- Assigned Tasks -->
                     <div class="lg:w-1/2 w-full transition-all rounded-[50px] overflow-hidden p-5 bg-white shadow-xl">
+                        <div class="relative uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">
+                        <button onclick="toggleDropdown()" id="taskToggle" class="focus:outline-none">
+                                ASSIGNED TASKS
+                            </button>
+                            <div id="taskDropdown" style="display: none;" class="absolute left-0 right-0 mx-auto w-40 bg-white rounded-md shadow-xl mt-2">
+                                <ul class="text-sm text-gray-700">
+                                <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                        <a href="javascript:showAssignedTasks();">ASSIGNED TASKS</a>
+                                    </li>
+                                    <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                        <a href="javascript:showFollowedTasks();">FOLLOWED TASKS</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
 
-                        <div class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">Assigned Task</div>
-                        
-                        <div class="flex flex-col bg-<?= get_option('management_theme_background')?> px-4 py-2 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar h-[300px]">
-                                <?php
-                                    $tasks = $this->tasks_model->get_user_tasks_assigned($GLOBALS['current_user']->staffid);
-                                    $total_tasks = 0;
-                                    $completed_tasks = 0;
+                        <!-- Assigned Tasks Section -->
+                        <div id="assignedTasksDiv" class="custom_theme flex flex-col bg-<?= get_option('management_theme_background')?> px-4 py-2 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar h-[300px]">
+                            <?php
+                            $tasks = $this->tasks_model->get_user_tasks_assigned($GLOBALS['current_user']->staffid);
+                            displayTasks($tasks);  // Refactored task displaying logic into a function
+                            ?>
+                        </div>
 
-                                    $current_date = date('Y-m-d'); 
-
-                                    if(count($tasks) > 0){
-                                ?>
-                        
-                                <div class="p-4 flex flex-col mt-4 gap-2">         
-                                    
-                                    <?php
-                                        foreach ($tasks as $task) {
-                                            $current_time = time();
-                                            $start_time = strtotime($task->startdate);
-                                            $due_time = strtotime($task->duedate ? $task->duedate : $task->startdate);
-
-                                            if ($task->status == 5 && $due_time < $current_time) {
-                                                continue; 
-                                            }
-
-                                        ?>
-                                        <button class="task-block bg-white px-4 py-2 rounded-xl cursor-pointer border border-gray-200 border-solid transition-all hover:border-<?= get_option('management_theme_border')?> hover:shadow-lg" data-task-id="<?= $task->id ?>" onclick="init_task_modal(<?= $task->id ?>)">
-                                            <div class="flex items-center justify-between">
-                                                <span class="font-semibold"><?= $task->name ?></span>
-                                                <span><?= format_task_status($task->status);  ?></span>
-                                            </div>
-                                        </button>
-
-                                        <?php
-
-                                    }
-                                    echo '</div>';
-                                }else{
-                                    echo 'No Task!';
-                                }
-                                   
-                                    ?>
-                            
+                        <!-- Followed Tasks Section -->
+                        <div id="followedTasksDiv" class="custom_theme flex flex-col bg-<?= get_option('management_theme_background')?> px-4 py-2 rounded-[50px] shadow-inner overflow-y-scroll myscrollbar h-[300px]" style="display:none;">
+                            <?php
+                                $tasks = $this->tasks_model->get_followed_tasks($GLOBALS['current_user']->staffid);
+                                displayTasks($tasks);  // Refactored task displaying logic into a function
+                            ?>
                         </div>
                     </div>
+
      
 
                         <!-- Newsfeed Panel Section -->
-                        <div class="lg:w-1/2 w-full  border-l border-gray-200 flex flex-col p-5 bg-white rounded-[50px] shadow-lg">
-                            <div class="panel-body p-0 m-0">
+                            <div class="panel-body p-0 m-0 lg:w-1/2 w-full  border-l border-gray-200 flex flex-col p-5 bg-white rounded-[50px] shadow-lg">
                                 <div class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5 ">Announcements</div>
-                                <div class="bg-<?= get_option('management_theme_background')?> p-4 py-3 shadow-inner rounded-[50px] overflow-y-scroll myscrollbar h-[300px]">
+                                <div class="custom_theme bg-<?= get_option('management_theme_background')?> p-4 py-3 shadow-inner rounded-[50px] overflow-y-scroll myscrollbar h-[300px]">
                                         
                                     <?php $count = 0;
                                     $currentUserId = get_staff_user_id(); // Get the current user ID
@@ -193,7 +219,7 @@
                                             $timeString = 'just now';
                                         }
                                     ?>
-                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-<?= get_option('management_theme_border')?>  <?= $postClass ?>" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this);">
+                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="custom_border dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-<?= get_option('management_theme_border')?>  <?= $postClass ?>" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this);">
                                             <div class="flex justify-between items-center">
                                                 <div class="font-bold text-xl"><?= $post["creator_name"] ?></div>
                                                 <div class="text-gray-500 text-sm italic"><?= $timeString ?></div>
@@ -220,7 +246,7 @@
 
                                         ?>
                                     </div>    
-                            </div>    
+   
                         </div>    
                     </div>
     
@@ -239,17 +265,17 @@
                             <input type="date" value="<?=date("Y-m-d")?>" id="summary_date" class="rounded p-2 mr-4" onchange="getOrSaveStaffSummary();">
                         </div>
 
-                        <div class="flex flex-row p-4 bg-<?= get_option('management_theme_background')?> min-h-[300px] rounded-[50px]">
+                        <div class=" custom_theme flex flex-row p-4 bg-<?= get_option('management_theme_background')?> min-h-[300px] rounded-[50px]">
                             <!-- Left Box with dummy summary -->
                             
                             <div class="w-1/2 p-4">
                                     <!-- <h4><b>DUMMY SUMMARY </b></h4> -->
-                                    <textarea class="w-full h-full transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-scroll text-lg border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?> myscrollbar" readonly ><?= get_option('dummy_summary'); ?></textarea>
+                                    <textarea class="custom_border w-full h-full transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-scroll text-lg border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?> myscrollbar" readonly ><?= get_option('dummy_summary'); ?></textarea>
                             </div>
                             
                             
                             <!-- Right Box for writing summary -->
-                            <div class="w-1/2 p-4 flex flex-col gap-3">
+                            <div class="custom_border w-1/2 p-4 flex flex-col gap-3">
                                 <textarea id="summary-textarea" class="w-full flex-grow transition-all shadow-sm hover:shadow-xl shadow-inner p-5 bg-white rounded-[40px] focus:outline-none focus:ring-2 resize-none focus:ring-blue-400 overflow-y-scroll text-lg border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?> myscrollbar" placeholder="Write your summary here..."></textarea>
 
                                 <div class="flex flex-row w-full justify-end">
@@ -300,7 +326,7 @@
 
                                         $daysRemaining = $interval->days;
                                     ?>
-                                        <div class="staff-profile bg-<?= get_option('management_theme_background')?> p-4 rounded-[40px] shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex justify-between items-center">
+                                        <div class="custom_theme custom_border staff-profile bg-<?= get_option('management_theme_background')?> p-4 rounded-[40px] shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex justify-between items-center">
 
                                         <?= staff_profile_image($staff['staffid'], ['border-4 border-gradient-to-r from-teal-400 to-blue-500 object-cover w-20 h-20 rounded-full staff-profile-image-thumb mr-4'], 'thumb'); ?>
                                         <div class="staff-details flex-grow flex flex-col">
@@ -321,7 +347,7 @@
                 <div class="flex flex-row w-full gap-10 rounded-lg">
 
                     <!-- Calendar Section -->
-                    <div class="w-2/3 rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
+                    <div class="custom_border w-2/3 rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
 
                         <div class="p-4 ">
 
@@ -333,7 +359,7 @@
                     </div>
 
                     <!-- To do Section -->
-                    <div class="w-1/3 flex md:flex-row flex-col rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
+                    <div class="custom_border w-1/3 flex md:flex-row flex-col rounded-[50px] bg-white p-4 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
 
                             <div class="panel_s todo-panel h-full p-5 w-full shadow-inner rounded-[50px]">
                                 <div class="tw-flex tw-justify-between tw-items-center">
@@ -688,6 +714,36 @@ var timeline = new vis.Timeline(container, items, options);
 timeline.setWindow(startDate, endDate);
 timeline.setCurrentTime(getCurrentTimeInAsiaKolkata());
 </script>
+
+<script>
+
+// Close the dropdown if clicked outside
+
+
+function toggleDropdown() {
+    var dropdown = document.getElementById('taskDropdown');
+    if (dropdown.style.display === "none" || dropdown.style.display === "") {
+        dropdown.style.display = "block";
+    } else {
+        dropdown.style.display = "none";
+    }
+}
+
+function showAssignedTasks() {
+    document.getElementById('assignedTasksDiv').style.display = 'block';
+    document.getElementById('followedTasksDiv').style.display = 'none';
+    document.getElementById('taskToggle').innerText = 'ASSIGNED TASKS';
+    toggleDropdown();
+}
+
+function showFollowedTasks() {
+    document.getElementById('assignedTasksDiv').style.display = 'none';
+    document.getElementById('followedTasksDiv').style.display = 'block';
+    document.getElementById('taskToggle').innerText = 'FOLLOWED TASKS';
+    toggleDropdown();
+}
+</script>
+
 
 <?php init_tail(); ?>
 <?php $this->load->view('admin/utilities/calendar_template'); ?>
