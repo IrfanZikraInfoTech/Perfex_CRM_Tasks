@@ -407,6 +407,16 @@ class Staff_model extends App_Model
         // var_dump($result);
         return $result;
     }
+    public function get_todays_birthdays() {
+        $today = date('Y-m-d'); //Current date
+        
+        $this->db->select('*,CONCAT(firstname,\' \',lastname) as full_name');
+        $this->db->where('DATE_FORMAT(date_of_birth, "%m-%d") = DATE_FORMAT(NOW(), "%m-%d")'); // Compare only month and day
+        $birthdaysToday = $this->db->get(db_prefix() . 'staff')->result_array();
+        
+        return $birthdaysToday;
+    }
+    
     
     
     

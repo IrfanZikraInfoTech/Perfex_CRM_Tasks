@@ -1,28 +1,108 @@
+
+ <style>
+    .staff-profile-image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.birthday-cap {
+  width: 0;
+  height: 0;
+  border-left: 35px solid transparent;
+  border-right: 35px solid transparent;
+  border-bottom: 50px solid #00b4d8;
+  position: absolute;
+  top: -25px;
+  left: 15%;
+  transform: translateX(-50%) rotate(-35deg); /* Tilt the cap to the left */
+  z-index: 1;
+  /* Improved gradient for a fabric effect */
+  background-image: linear-gradient(to bottom right, #00b4d8, #48cae4,#90e0ef); /* Pink gradient for a festive look */
+  /* Subtle inner shadow for a plush look */
+}
+
+.birthday-cap::before {
+  content: '';
+  position: absolute;
+  top: 50px; /* Adjust if necessary to align with the bottom of the cap */
+  left: 50%; /* Center under the cap */
+  transform: translateX(-50%) rotate(-2deg); /* Tilt to match the cap */
+  width: 70px; /* Adjust to match the width of the cap */
+  height: 10px; /* Height of the brim */
+  background-color: gold; /* The color of the brim */
+  z-index: 2;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), 0 2px 4px rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to right, #f1c40f, #f39c12); /* Shiny effect */
+}
+
+.birthday-cap::after {
+  content: '';
+  position: absolute;
+  top: -15px; /* Position it above the cap */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px; /* Size of the pom-pom */
+  height: 30px; /* Size of the pom-pom */
+  background-color: #fff;
+  border-radius: 50%;
+  z-index: 3;
+  /* Add a radial gradient to give the impression of depth */
+  background-image: radial-gradient(circle at 15px 15px, #f8f9fa, #e9ecef 70%, #dee2e6);
+  /* Multiple shadows for a fluffy effect */
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.balloon-container {
+  margin-left: auto; /* This will push the balloon to the right */
+}
+
+</style> 
+
+
+
 <div class=" flex lg:flex-row flex-col justify-between relative gap-5">
 
 
-    <div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all">
+<div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border') ?> transition-all">
+  <div class="flex flex-col xl:flex-row items-center justify-between">
+    <div class="flex flex-col xl:flex-row items-center xl:justify-start justify-center flex-grow">
+      <div class="staff-profile-image-container flex items-center"> <!-- Added flex items-center -->
+        <?php 
+        // Check if it's the logged-in user's birthday
+        $is_birthday = (isset($todays_birthdays) && is_array($todays_birthdays)) ? in_array($GLOBALS['current_user']->staffid, array_column($todays_birthdays, 'staffid')) : false;
 
-        <div class="flex items-center xl:flex-row flex-col lg:justify-start justify-center">
-            <?php echo staff_profile_image($GLOBALS['current_user']->staffid, ['h-full', 'w-44' , 'object-cover', 'xl:mr-4' , 'xl:ml-0 mx-auto self-start' , 'staff-profile-image-thumb'], 'thumb') ?>
-            <div class="flex flex-col gap-1 xl:items-start items-center">
-
-                <div class="text-xl font-semibold flex flex-row justify-between">
-
-                    <div class="flex items-center">Hi, <?php echo $GLOBALS['current_user']->firstname; ?>! 👋</div>                    
-
-                </div>
-                <p class="text-lg">Welcome to your dashboard.</p>
-
-                <div class="my-2" id="shiftInfo">Upcoming Shift: </div>
-
-                <div class="flex flex-row gap-2">
-                    <button class="px-3 py-1 text-base bg-blue-600 rounded-3xl text-white transition-all shadow-lg hover:shadow-none" id="clock-in">Clock in</button>
-                    <button class="px-3 py-1 text-base bg-blue-600 rounded-3xl text-white transition-all shadow-lg hover:shadow-none" id="clock-out">Clock Out</button>
-                </div>
-            </div>
+        echo staff_profile_image($GLOBALS['current_user']->staffid, ['h-full', 'w-44', 'object-cover', 'xl:mr-4', 'xl:ml-0', 'mx-auto', 'xl:self-start', 'staff-profile-image-thumb'], 'thumb');
+        ?>
+        
+        <!-- Moved birthday elements into the same container -->
+        <?php if ($is_birthday): ?>
+          <div class="birthday-cap"></div>
+         <?php endif; ?>
+      </div>
+      <div class="flex flex-col gap-1 xl:items-start items-center">
+        <div class="text-xl font-semibold flex flex-row justify-between">
+          <div class="flex items-center">Hi, <?php echo $GLOBALS['current_user']->firstname; ?>! 👋</div>
         </div>
+        <p class="text-lg">Welcome to your dashboard.</p>
+        <div class="my-2" id="shiftInfo">Upcoming Shift: </div>
+        <div class="flex flex-row gap-2">
+          <button class="px-3 py-1 text-base bg-blue-600 rounded-3xl text-white transition-all shadow-lg hover:shadow-none" id="clock-in">Clock in</button>
+          <button class="px-3 py-1 text-base bg-blue-600 rounded-3xl text-white transition-all shadow-lg hover:shadow-none" id="clock-out">Clock Out</button>
+        </div>
+      </div>
+      <?php if ($is_birthday): ?>
+      <div class="balloon-container self-center xl:self-start">
+        <img src="<?php echo base_url('uploads/company/ballon.png') ?>" alt="Happy Birthday" class="balloon-image w-44 h-auto xl:ml-4">
+      </div>
+    <?php endif; ?>
     </div>
+  </div>
+</div>
+
 
     <div class="xl:w-[30%] w-full flex flex-row md:text-right shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all text-center md:mt-0 mt-5 justify-between bg-white rounded-[50px] p-6 relative">
 

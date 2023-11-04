@@ -52,7 +52,6 @@
     background-color: #fffcca;
 }
 </style>
-
 <div id="wrapper">
 
     <div class="content">

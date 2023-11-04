@@ -93,7 +93,8 @@ class Dashboard extends AdminController
         $data['posts'] = $this->newsfeed_model->load_newsfeed(0);
 
         $data['upcoming_birthdays'] = $this->staff_model->get_upcoming_birthdays();
-
+        $data['todays_birthdays'] = $this->staff_model->get_todays_birthdays();
+// var_dump($data['todays_birthdays']);
         $staff_id = get_staff_user_id(); // Yeh function current logged in user ki ID return karta hai.
 
         $data = hooks()->apply_filters('before_dashboard_render', $data);
