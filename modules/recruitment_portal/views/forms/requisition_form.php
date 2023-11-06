@@ -14,23 +14,23 @@
             <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">           
 
             <div class="form-row">
-            <div class="form-group col-md-6 mb-4">
-                <!-- Hidden field for Staff ID -->
-                <input type="hidden" name="staff_id" value="<?php echo $GLOBALS['current_user']->staffid; ?>">
+                <div class="form-group col-md-6 mb-4">
+                    <!-- Hidden field for Staff ID -->
+                    <input type="hidden" name="staff_id" value="<?php echo $GLOBALS['current_user']->staffid; ?>">
 
-                <label for="staffName">Staff Name</label>
-                <input type="text" class="form-control" id="staffName" required value="<?php echo $GLOBALS['current_user']->firstname; ?>" readonly>
-            </div>
+                    <label for="staffName">Staff Name</label>
+                    <input type="text" class="form-control" id="staffName" required value="<?php echo $GLOBALS['current_user']->firstname; ?>" readonly>
+                </div>
 
 
-            <!-- Visible field for Department Name -->
-            <div class="form-group col-md-6 mb-4">
-                <!-- Hidden field for Department ID -->
-                <input type="hidden" name="department_id" value="<?php echo $GLOBALS['current_user']->department_id; ?>">
+                <!-- Visible field for Department Name -->
+                <div class="form-group col-md-6 mb-4">
+                    <!-- Hidden field for Department ID -->
+                    <input type="hidden" name="department_id" value="<?php echo $GLOBALS['current_user']->department_id; ?>">
 
-                <label for="departmentName">Department</label>
-                <input type="text" class="form-control" id="departmentName" required value="<?php echo $GLOBALS['current_user']->department_name; ?>" readonly>
-            </div>
+                    <label for="departmentName">Department</label>
+                    <input type="text" class="form-control" id="departmentName" required value="<?php echo $GLOBALS['current_user']->department_name; ?>" readonly>
+                </div>
             </div>
 
 

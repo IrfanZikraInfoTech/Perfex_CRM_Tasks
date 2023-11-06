@@ -141,7 +141,7 @@ if (!$CI->db->table_exists(db_prefix() . 'requisition_form')) {
         `staff_id` INT(11) UNSIGNED NOT NULL,
         `department_id` INT(11) UNSIGNED NOT NULL,
         `job_title` VARCHAR(255) NOT NULL,
-        `Position_type` VARCHAR(100) NOT NULL,
+        `position_type` VARCHAR(100) NOT NULL,
         `employment_type` VARCHAR(100) NOT NULL,
         `expected_start_date` DATE NOT NULL,
         `experience` TEXT NOT NULL,
@@ -149,10 +149,10 @@ if (!$CI->db->table_exists(db_prefix() . 'requisition_form')) {
         `duties_and_responsibilities` TEXT NOT NULL,
         `qualifications` TEXT NOT NULL,
         `work_schedule` TEXT NOT NULL,
-        `salary` DECIMAL(15,2) NOT NULL
+        `salary` DECIMAL(15,2) NOT NULL,
         `status` VARCHAR(100) NOT NULL DEFAULT 'Pending' 
 
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+    ) ");
 }
 
 

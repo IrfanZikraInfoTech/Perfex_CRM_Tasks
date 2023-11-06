@@ -67,12 +67,21 @@ class Recruitment_portal_model extends App_Model
     }
 
     public function allRequisitiondata() {
-        $query = $this->db->get('tblrequisition_form');
+        $this->db->select('tblrequisition_form.*, staff_table.firstname as staff_name, department_table.name as department_name');
+        $this->db->from('tblrequisition_form');
+        $this->db->join('tblstaff as staff_table', 'staff_table.staffid = tblrequisition_form.staff_id', 'left');
+        $this->db->join('tbldepartments as department_table', 'department_table.departmentid = tblrequisition_form.department_id', 'left');
+        $query = $this->db->get();
         return $query->result_array();
     }
+    public function updateRequisitionStatus() {
+        $requisition_id = $this->input->post('requisition_id');
+        $status = $this->input->post('status');
     
-
-
+        $this->db->set('status', $status);
+        $this->db->where('id', $requisition_id);
+        return $this->db->update('tblrequisition_form');
+    }
 
 
     

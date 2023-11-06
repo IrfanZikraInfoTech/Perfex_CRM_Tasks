@@ -46,6 +46,8 @@ class Recruitment_portal extends AdminController
 
     public function all_requisition_form(){
         $this->load->model('recruitment_portal_model'); // Replace 'recruitment_portal_model' with the actual name of your model
+        $this->load->model('staff_model');
+        $data['staff_members'] = $this->staff_model->get(['is_active' => 1]);
     
         $data['allRequisitions'] = $this->recruitment_portal_model->allRequisitiondata();
     
@@ -53,6 +55,32 @@ class Recruitment_portal extends AdminController
         $this->load->view('forms/all_requistion_form', $data);
     }
 
+    public function update_requisition_status(){
+        if($this->input->is_ajax_request()) {
+            $requisition_id = $this->input->post('requisition_id');
+            $status = $this->input->post('status');
+    
+            if(!$requisition_id || !$status) {
+                // Respond with an error status
+                echo json_encode(['status' => false, 'message' => 'Invalid Request']);
+                return;
+            }
+    
+            $this->load->model('recruitment_portal_model');
+            $update_status = $this->recruitment_portal_model->updateRequisitionStatus($requisition_id, $status);
+    
+            if ($update_status) {
+                // Respond with a success status
+                echo json_encode(['status' => true, 'message' => 'Status updated successfully']);
+            } else {
+                // Respond with an error status
+                echo json_encode(['status' => false, 'message' => 'Failed to update status']);
+            }
+        } else {
+            // If it's not an AJAX request, you may redirect or show an error.
+            show_error('No direct script access allowed');
+        }
+    }
 
     // public function color() {
     //     $colorScheme = $this->recruitment_portal_model->getColorScheme();
