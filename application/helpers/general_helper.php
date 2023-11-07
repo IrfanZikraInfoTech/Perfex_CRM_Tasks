@@ -544,7 +544,9 @@ function _l($line, $label = '', $log_errors = true)
     } else {
         if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
             try {
-                $_line = sprintf($CI->lang->line(trim($line), $log_errors), $label);
+                // echo $CI->lang->line(trim($line)) . ' ||| '.$label;
+                $_line = sprintf($CI->lang->line(trim($line), $log_errors), $label, '');
+                // $_line = $CI->lang->line(trim($line));
             } catch (\ValueError $e) {
                 $_line = $CI->lang->line(trim($line), $log_errors);
             }

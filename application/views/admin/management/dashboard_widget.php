@@ -67,19 +67,16 @@
 <div class=" flex lg:flex-row flex-col justify-between relative gap-5">
 
 
-<div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border') ?> transition-all">
+<div class="w-full bg-white rounded-[50px] p-6 shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border') ?> transition-all b-doodle">
   <div class="flex flex-col xl:flex-row items-center justify-between">
     <div class="flex flex-col xl:flex-row items-center xl:justify-start justify-center flex-grow">
       <div class="staff-profile-image-container flex items-center"> <!-- Added flex items-center -->
         <?php 
-        // Check if it's the logged-in user's birthday
-        $is_birthday = (isset($todays_birthdays) && is_array($todays_birthdays)) ? in_array($GLOBALS['current_user']->staffid, array_column($todays_birthdays, 'staffid')) : false;
-
         echo staff_profile_image($GLOBALS['current_user']->staffid, ['h-full', 'w-44', 'object-cover', 'xl:mr-4', 'xl:ml-0', 'mx-auto', 'xl:self-start', 'staff-profile-image-thumb'], 'thumb');
         ?>
         
         <!-- Moved birthday elements into the same container -->
-        <?php if ($is_birthday): ?>
+        <?php if ($isMyBirthday): ?>
           <div class="birthday-cap"></div>
          <?php endif; ?>
       </div>
@@ -96,7 +93,7 @@
       </div>
       <?php if ($is_birthday): ?>
       <div class="balloon-container self-center xl:self-start">
-        <img src="<?php echo base_url('uploads/company/ballon.png') ?>" alt="Happy Birthday" class="balloon-image w-44 h-auto xl:ml-4">
+        <!-- <img src="<?php echo base_url('uploads/company/ballon.png') ?>" alt="Happy Birthday" class="balloon-image w-44 h-auto xl:ml-4"> -->
       </div>
     <?php endif; ?>
     </div>

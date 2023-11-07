@@ -381,6 +381,7 @@ class Staff_model extends App_Model
         // Loop until we have 4 birthdays or we have checked all 12 months
         for ($i = 0; $i < 12 && count($result) < 4; $i++) {
             $this->db->select('*,CONCAT(firstname,\' \',lastname) as full_name');
+            $this->db->where('active', '1');
             $this->db->where('MONTH(date_of_birth)', $currentMonth);
     
             if ($i == 0) { // Only check the day for the first (current) month

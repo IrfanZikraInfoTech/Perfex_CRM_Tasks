@@ -25,7 +25,7 @@ function displayTasks($tasks) {
         }
         echo '</div>';
     } else {
-        echo 'No Task!';
+        echo '<div class="w-full h-full flex justify-center items-center text-lg">No Task!</div>';
     }
 }
 
@@ -143,11 +143,12 @@ function displayTasks($tasks) {
     100% { transform: rotateZ(15deg) rotateY(1440deg) translate(10vw,110vh); }
     }
 
+    
+    <?php
 
-</style>
-
-<?php
 $todayIsBirthday = false;
+$birthdayStaffId = null;
+$isMyBirthday = false;
 foreach($upcoming_birthdays as $staff) {
     $dob = DateTime::createFromFormat('Y-m-d', $staff['date_of_birth']);
     $birthdayThisYear = new DateTime(date('Y') . '-' . date('m', strtotime($staff['date_of_birth'])) . '-' . date('d', strtotime($staff['date_of_birth'])));
@@ -155,9 +156,32 @@ foreach($upcoming_birthdays as $staff) {
     $currentDate = new DateTime(date('Y-m-d'));
     if ($currentDate == $birthdayThisYear) {
         $todayIsBirthday = true;
+        $birthdayStaffId = $staff['staffid'];
+
+        $birthdayStaffName = $staff['firstname'] . ' ' . $staff['lastname'];
         break;
     }
 }
+
+$isMyBirthday = (get_staff_user_id() == $birthdayStaffId);
+
+if($todayIsBirthday){
+  ?>
+
+.b-doodle,.swal2-modal{
+  background-image:url('<?= base_url('uploads/company/bd-pattern.png') ?>') !important;
+  background-size: 500px;
+  background-attachment: fixed;
+}
+.swal2-image{
+    border-radius: 100%;
+}
+<?php }?>
+
+</style>
+
+<?php
+
 if ($todayIsBirthday) : ?>
 <div class="fixed w-full h-full inset z-10 mt-[-60px] pointer-events-none">
        <div class="confetti"></div>
@@ -197,20 +221,20 @@ if ($todayIsBirthday) : ?>
                             <div class="mt-4 flex flex-col space-y-3">
 
                                 <!-- Attendance Status -->
-                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md b-doodle">
                                     <span class="text-gray-600">Status:</span>
                                     <span id="attendanceStatus" class="text-gray-500 font-bold">-</span>
 
                                 </div>
 
                                 <!-- Punctuality Rate -->
-                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md b-doodle">
                                     <span class="text-gray-600">Rate:</span>
                                     <span class="font-semibold"><?= round($puctuality_rate,2); ?>%</span>
                                 </div>
 
                                 <!-- Current Month -->
-                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md b-doodle">
                                     <span class="text-gray-600">Current Month:</span>
                                     <span class="font-semibold"><?= date("F") ?></span>
                                     <!-- Replace 'October' with the current month -->
@@ -219,8 +243,8 @@ if ($todayIsBirthday) : ?>
                             </div>
                         </div>
 
-                        <div class="custom_border bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all rounded-[50px] p-7 flex md:flex-row flex-col justify-between h-full lg:w-3/4 w-full">
-                            <div id="visualization"  class="relative w-full rounded-[50px]" >
+                        <div class="custom_border bg-white shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all rounded-[50px] p-7 flex md:flex-row flex-col justify-between h-full lg:w-3/4 w-full b-doodle">
+                            <div id="visualization"  class="relative w-full rounded-[50px] bg-white" >
                             </div>
                         </div>
 
@@ -233,7 +257,7 @@ if ($todayIsBirthday) : ?>
 
             <div class="col-md-12 my-4 flex lg:flex-row flex-col gap-10">
                     <!-- Assigned Tasks -->
-                    <div class="lg:w-1/2 w-full transition-all rounded-[50px] overflow-hidden p-5 bg-white shadow-xl">
+                    <div class="lg:w-1/2 w-full transition-all rounded-[50px] overflow-hidden p-5 bg-white shadow-xl b-doodle">
                         <div class="relative uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">
                         <button onclick="toggleDropdown()" id="taskToggle" class="focus:outline-none">
                                 ASSIGNED TASKS
@@ -270,7 +294,7 @@ if ($todayIsBirthday) : ?>
      
 
                         <!-- Newsfeed Panel Section -->
-                            <div class="panel-body p-0 m-0 lg:w-1/2 w-full  border-l border-gray-200 flex flex-col p-5 bg-white rounded-[50px] shadow-lg">
+                            <div class="panel-body p-0 m-0 lg:w-1/2 w-full  border-l border-gray-200 flex flex-col p-5 bg-white rounded-[50px] shadow-lg b-doodle">
                                 <div class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5 ">Announcements</div>
                                 <div class="custom_theme bg-<?= get_option('management_theme_background')?> p-4 py-3 shadow-inner rounded-[50px] overflow-y-scroll myscrollbar h-[300px]">
                                         
@@ -337,7 +361,7 @@ if ($todayIsBirthday) : ?>
                 <!-- Summary-->
             <div class="col-md-12 my-4">
                 
-                <div class="p-4 w-full bg-white shadow-xl rounded-[40px]">
+                <div class="p-4 w-full bg-white shadow-xl rounded-[40px] b-doodle">
 
 
                         <!-- Row for Summary heading and Date Picker -->
@@ -376,16 +400,16 @@ if ($todayIsBirthday) : ?>
 
             <!-- Countries Clocks -->
             <div class="col-md-12 my-4"  data-container="middle-left-6">
-                <div class="bg-white shadow-lg rounded-[50px] p-4 my-4 flex md:flex-row flex-col justify-between">
+                <div class="bg-white shadow-lg rounded-[50px] p-4 my-4 flex md:flex-row flex-col justify-between b-doodle">
                     <div id="clocks" class="p-4 rounded-lg text-lg grid grid-cols-2 gap-4 w-full"></div>
                 </div>
             </div>    
 
             <!-- Upcoming Birthdays -->
-            <div class="col-md-12">
+            <div class="col-md-12 ">
                 <?php
                 if (isset($upcoming_birthdays) && !empty($upcoming_birthdays)) : ?>
-                    <div class="upcoming-birthdays bg-white p-6 rounded-[50px] shadow-lg">
+                    <div class="upcoming-birthdays bg-white p-6 rounded-[50px] shadow-lg b-doodle">
                         <h3 class="uppercase tracking-wide text-xl text-center text-gray-700 font-bold mb-5">Upcoming Birthdays</h3>
                         <div class="grid grid-cols-2 gap-6">
                             <?php foreach ($upcoming_birthdays as $staff) : ?>
@@ -826,6 +850,30 @@ function showFollowedTasks() {
     document.getElementById('taskToggle').innerText = 'FOLLOWED TASKS';
     toggleDropdown();
 }
+
+
+<?php
+
+if ($todayIsBirthday && !isset($_SESSION['shown_birthday_popup'][$birthdayStaffId])) {
+    // Mark this staff member's birthday popup as shown in this session
+    $_SESSION['shown_birthday_popup'][$birthdayStaffId] = true;
+
+
+    // Prepare the birthday message
+    $birthdayMessage = $isMyBirthday ? "Happy Birthday to You!" : "Its {$birthdayStaffName}'s birthday!!";
+
+?>
+
+Swal.fire({
+    title: '🎉 Birthday Alert!',
+    text: '<?= addslashes($birthdayMessage) ?>',
+    imageUrl: '<?= staff_profile_image_url($birthdayStaffId,'thumb') ?>', // You can use a birthday image path here
+    imageAlt: 'Birthday',
+    confirmButtonText: 'Celebrate!'
+});
+
+<?php }?>
+
 </script>
 
 

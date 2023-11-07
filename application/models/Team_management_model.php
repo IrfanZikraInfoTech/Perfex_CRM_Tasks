@@ -830,18 +830,22 @@ class Team_management_model extends App_Model
 
     public function get_leaves_count($staff_id, $type, $status, $month = null)
     {
-        $this->db->select('COUNT(*) as total_leaves');
+        // This query will calculate the sum of days between start_date and end_date for each leave
+        $this->db->select('COALESCE(SUM(DATEDIFF(end_date, start_date) + 1), 0) as total_leaves'); // +1 to include both start and end dates in the count
         $this->db->from(db_prefix() . '_applications');
         $this->db->where('staff_id', $staff_id);
         $this->db->where('application_type', $type);
         $this->db->where('status', $status);
         $this->db->where('YEAR(created_at)', 'YEAR(CURDATE())', false);
-        if($month){
+        if ($month) {
             $this->db->where('MONTH(created_at)', $month, false);
         }
         $query = $this->db->get();
-        return $query->result_array();
+        
+        // This will return an array with a single element containing the total_leave_days
+        return $query->result_array(); // Changed from result_array() to row_array() as we're expecting a single row
     }
+
       
     
     public function get_leaves($staff_id) {
@@ -1584,7 +1588,7 @@ class Team_management_model extends App_Model
         }
 
         $day_status = 1;
-        if(($total_clocked_seconds + 600) < $total_clockable_seconds){
+        if(($total_clocked_seconds + 600 + 1800) < $total_clockable_seconds){ // 600 seconds for 10m leeway + 1800 seconds of AFK allowed
             $day_status = 0;
         }else if (($total_clocked_seconds - 1800) > $total_clockable_seconds){
             $day_status = 2;
