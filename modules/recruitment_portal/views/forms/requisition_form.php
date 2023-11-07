@@ -79,12 +79,12 @@
                 <label for="experience">Experience</label>
                     <select class="form-control" id="experience" name="experience" required>
                         <option value="">Select</option>
-                        <option value="0-1_years">0-1 years</option>
-                        <option value="2_years">2 years</option>
-                        <option value="3_years">3 years</option>
-                        <option value="4_years">4 years</option>
-                        <option value="5_years">5 years</option>
-                        <option value="more_then_5_years">More than 5 years</option>
+                        <option value="0-1 years">0-1 years</option>
+                        <option value="2 years">2 years</option>
+                        <option value="3 years">3 years</option>
+                        <option value="4 years">4 years</option>
+                        <option value="5 years">5 years</option>
+                        <option value="More than 5 years">More than 5 years</option>
                     </select>          
             </div>
             <div class="form-group  col-md-6 mb-4">
