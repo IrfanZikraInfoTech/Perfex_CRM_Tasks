@@ -43,7 +43,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <div class="triggerModal cursor-pointer" data-requisition='<?php echo htmlspecialchars(json_encode($requisition), ENT_QUOTES, 'UTF-8'); ?>'>
-                                        <?php echo $requisition['job_title']; ?>
+                                      <?php echo $requisition['job_title']; ?>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -70,66 +70,76 @@
 
 
 <!-- Modal -->
+<!-- Bootstrap 4 Modal with Tailwind CSS for styling -->
 <div class="modal fade" id="requisitionModal" tabindex="-1" role="dialog" aria-labelledby="requisitionModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title text-lg font-bold" id="requisitionModalLabel">Requisition Details</h5>
+      <div class="modal-header flex justify-between items-center">
+        <h5 class="modal-title text-lg font-bold mx-auto" id="requisitionModalLabel">Requisition Details</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+
       <div class="modal-body">
-  <div class="p-4">
-    <div class="mb-4">
-      <div class="mb-2">
-        <strong class="font-semibold">Job Title:</strong> <span id="modalJobTitle" class="text-gray-700"></span>
+        <div class="overflow-x-auto p-4">
+          <table class="min-w-full bg-white">
+            <tbody class="text-gray-700">
+              <tr>
+                <td class="border px-4 py-2 font-semibold">Job Title:</td>
+                <td class="border px-4 py-2" id="modalJobTitle"></td>
+              </tr>
+              <tr>
+                <td class="border px-4 py-2 font-semibold">Position Type:</td>
+                <td class="border px-4 py-2" id="modalPositionType"></td>
+              </tr>
+              <tr>
+                <td class="border px-4 py-2 font-semibold">Employment Type:</td>
+                <td class="border px-4 py-2" id="modalEmploymentType"></td>
+              </tr>
+              <tr>
+                <td class="border px-4 py-2 font-semibold">Expected Start Date:</td>
+                <td class="border px-4 py-2" id="modalExpectedStartDate"></td>
+              </tr>
+              <tr>
+                <td class="border px-4 py-2 font-semibold">Experience:</td>
+                <td class="border px-4 py-2" id="modalExperience"></td>
+              </tr>
+              <tr>
+                <td class="border px-4 py-2 font-semibold">Reason for Requisition:</td>
+                <td class="border px-4 py-2" id="modalReasonForRequisition"></td>
+              </tr>
+              <tr>
+                <td class="border px-4 py-2 font-semibold">Duties and Responsibilities:</td>
+                <td class="border px-4 py-2" id="modalDuties"></td>
+              </tr>
+              <tr>
+                <td class="border px-4 py-2 font-semibold">Qualifications:</td>
+                <td class="border px-4 py-2" id="modalQualifications"></td>
+              </tr>
+              <tr>
+                <td class="border px-4 py-2 font-semibold">Work Schedule:</td>
+                <td class="border px-4 py-2" id="modalWorkSchedule"></td>
+              </tr>
+              <tr>
+                <td class="border px-4 py-2 font-semibold">Salary:</td>
+                <td class="border px-4 py-2" id="modalSalary"></td>
+              </tr>
+              <tr>
+                <td class="border px-4 py-2 font-semibold">Additional Info:</td>
+                <td class="border px-4 py-2" id="modaladditionalInfo"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
-    <div class="flex flex-wrap -mx-2 mb-4">
-      <div class="w-full md:w-1/2 px-2 mb-4 md:mb-0">
-        <strong class="font-semibold">Position Type:</strong> <span id="modalPositionType" class="text-gray-700"></span>
-      </div>
-      <div class="w-full md:w-1/2 px-2">
-        <strong class="font-semibold">Employment Type:</strong> <span id="modalEmploymentType" class="text-gray-700"></span>
-      </div>
-    </div>
-    <div class="flex flex-wrap -mx-2 mb-4">
-      <div class="w-full md:w-1/2 px-2 mb-4 md:mb-0">
-        <strong class="font-semibold">Expected Start Date:</strong> <span id="modalExpectedStartDate" class="text-gray-700"></span>
-      </div>
-      <div class="w-full md:w-1/2 px-2">
-        <strong class="font-semibold">Experience:</strong> <span id="modalExperience" class="text-gray-700"></span>
-      </div>
-    </div>
-    <div class="mb-4">
-      <strong class="font-semibold">Reason for Requisition:</strong>
-      <p id="modalReasonForRequisition" class="text-gray-700 mt-1"></p>
-    </div>
-    <div class="mb-4">
-      <strong class="font-semibold">Duties and Responsibilities:</strong>
-      <p id="modalDuties" class="text-gray-700 mt-1"></p>
-    </div>
-    <div class="mb-4">
-      <strong class="font-semibold">Qualifications:</strong>
-      <p id="modalQualifications" class="text-gray-700 mt-1"></p>
-    </div>
-    <div class="flex flex-wrap -mx-2">
-      <div class="w-full md:w-1/2 px-2 mb-4 md:mb-0">
-        <strong class="font-semibold">Work Schedule:</strong> <span id="modalWorkSchedule" class="text-gray-700"></span>
-      </div>
-      <div class="w-full md:w-1/2 px-2">
-        <strong class="font-semibold">Salary:</strong> <span id="modalSalary" class="text-gray-700"></span>
-      </div>
-    </div>
-  </div>
-</div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
 </div>
+
 
 <?php init_tail(); ?>
 <script>
@@ -182,6 +192,7 @@ $(document).ready(function() {
         $('#modalDuties').text(requisitionData.duties_and_responsibilities);
         $('#modalQualifications').text(requisitionData.qualifications);
         $('#modalWorkSchedule').text(requisitionData.work_schedule);
+        $('#modaladditionalInfo').text(requisitionData.additional_info);
         $('#modalSalary').text(requisitionData.salary);
 
         $('#requisitionModal').modal('show');

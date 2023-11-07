@@ -149,7 +149,8 @@ if (!$CI->db->table_exists(db_prefix() . 'requisition_form')) {
         `duties_and_responsibilities` TEXT NOT NULL,
         `qualifications` TEXT NOT NULL,
         `work_schedule` TEXT NOT NULL,
-        `salary` DECIMAL(15,2) NOT NULL,
+        `salary` VARCHAR(100) NOT NULL,
+        `additional_info`TEXT NOT NULL,
         `status` VARCHAR(100) NOT NULL DEFAULT 'Pending' 
 
     ) ");

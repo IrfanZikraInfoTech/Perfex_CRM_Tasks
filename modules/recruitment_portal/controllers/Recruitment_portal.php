@@ -37,6 +37,7 @@ class Recruitment_portal extends AdminController
             'duties_and_responsibilities' => $this->input->post('duties_and_responsibilities'),
             'qualifications' => $this->input->post('qualifications'),
             'work_schedule' => $this->input->post('work_schedule'),
+            'additional_info' => $this->input->post('additional_info'),
             'salary' => $this->input->post('salary')
         );
         $this->load->model('recruitment_portal_model');

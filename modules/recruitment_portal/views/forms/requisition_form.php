@@ -38,15 +38,21 @@
             <div class="form-row">
                 <!-- Job Title -->
                 <div class="form-group col-md-6 mb-4">
-                    <label for="jobTitle">Job Title</label>
+                    <label for="jobTitle">Position Job Title</label>
                     <input type="text" class="form-control" id="jobTitle" name="job_title" required>
                 </div>
 
                 <!-- Job Type -->
                 <div class="form-group col-md-6 mb-4">
                     <label for="jobType">Job Type</label>
-                    <input type="text" class="form-control" id="jobType" name="job_type" required>
+                    <select class="form-control" id="jobType" name="job_type" required>
+                        <option value="">Select</option>
+                        <option value="New">New</option>
+                        <option value="Replacement">Replacement</option>
+                        <option value="Temporary">Temporary</option>
+                    </select>
                 </div>
+
             </div>
 
             <div class="form-row">
@@ -69,35 +75,67 @@
                     <input type="date" class="form-control" id="expectedStartDate" name="expected_start_date" required>
                 </div>
             </div>
-            <div class="form-group col-md-12 mb-4">
+            <div class="form-group col-md-6 mb-4">
                 <label for="experience">Experience</label>
-                <textarea class="form-control" id="experience" name="experience" rows="3" required></textarea>
+                    <select class="form-control" id="experience" name="experience" required>
+                        <option value="">Select</option>
+                        <option value="0-1_years">0-1 years</option>
+                        <option value="2_years">2 years</option>
+                        <option value="3_years">3 years</option>
+                        <option value="4_years">4 years</option>
+                        <option value="5_years">5 years</option>
+                        <option value="more_then_5_years">More than 5 years</option>
+                    </select>          
+            </div>
+            <div class="form-group  col-md-6 mb-4">
+                <label for="salary">Salary
+                <span class="text-gray-400 text-sm">
+                    - [Mention in PKR or INR]
+                </span>
+                </label>
+                <input type="text" class="form-control" id="salary" name="salary" required>
             </div>
 
             <div class="form-group  col-md-12 mb-4">
-                <label for="reasonForRequisition">Reason for Requisition</label>
-                <textarea class="form-control" id="reasonForRequisition" name="reason_for_requisition" rows="3" required></textarea>
+            <label for="reasonForRequisition">Reason for Requisition <span class="text-gray-400 text-sm">- [Brief explanation of why the new position is needed]</span></label>
+                <textarea class="form-control"  id="reasonForRequisition" name="reason_for_requisition" rows="3" required></textarea>
             </div>
 
             <div class="form-group  col-md-12 mb-4">
-                <label for="dutiesResponsibilities">Duties and Responsibilities</label>
+                <label for="dutiesResponsibilities"> Duties and Responsibilities
+                    <span class="text-gray-400 text-sm"> 
+                    - [List of essential duties and responsibilities of the position, as well as the required skills and experience]
+                    </span>
+                </label>
                 <textarea class="form-control" id="dutiesResponsibilities" name="duties_and_responsibilities" rows="3" required></textarea>
             </div>
-
+            
             <div class="form-group  col-md-12  mb-4">
-                <label for="qualifications">Qualifications</label>
+                <label for="qualifications">Qualifications
+                    <span class="text-gray-400 text-sm">
+                    - [List of desired qualifications for the position, such as education, experience, and skills]
+                    </span>
+                </label>
                 <textarea class="form-control" id="qualifications" name="qualifications" rows="3" required></textarea>
             </div>
 
             <div class="form-group col-md-12 mb-4 ">
-                <label for="workSchedule">Work Schedule</label>
+                <label for="workSchedule">Work Schedule
+                    <span class="text-gray-400 text-sm">
+                    - What will be the position's normal work schedule (days of week, shift, starting time, ending time, etc.)?  
+                    </span> 
+                </label>
                 <input type="text" class="form-control" id="workSchedule" name="work_schedule" required>
             </div>
-
             <div class="form-group  col-md-12 mb-4">
-                <label for="salary">Salary</label>
-                <input type="text" class="form-control" id="salary" name="salary" required>
+                <label for="additional_info"> Additional Information
+                    <span class="text-gray-400 text-sm"> 
+                    - [Write any additional information you feel is important to the review of this request]
+                    </span>
+                </label>
+                <textarea class="form-control" id="additional_info" name="additional_info" rows="3" required></textarea>
             </div>
+           
             <div class="form-group  col-md-12  ">
                 <input type="submit" value="Submit" class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-800 cursor-pointer">
             </div>
