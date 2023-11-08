@@ -186,13 +186,11 @@
                                                     </svg>
                                                 </button>
                                             </div>
-                                            <div class="flex profile-images" style="width:100px;"> <!-- adjust width as required -->
+                                            <div class="flex profile-images overflow-x-auto scrollbar-hide" style="width:100px;"> <!-- adjust width as required -->
                                                 <!-- Images of people who liked this kudos -->
                                                 <?php foreach($liked_staff_ids as $staff_id): 
                                                     if(!empty($staff_id)): ?>
-                                                        <div class="w-6 h-6 rounded-full overflow-x-auto scrollbar-hide">
-                                                            <?= staff_profile_image($staff_id, ['w-6 h-6 rounded-full'], 'thumb') ?>
-                                                        </div>
+                                                            <?= staff_profile_image($staff_id, ['w-10 h-10 thumbnail rounded-full border border-none'], 'thumb') ?>      
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
                                             </div>
