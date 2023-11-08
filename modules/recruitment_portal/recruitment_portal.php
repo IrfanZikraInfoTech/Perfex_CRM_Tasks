@@ -226,7 +226,7 @@ if (has_permission('recruitment_portal', '', 'admin') || has_staff_under()) {
 if (has_permission('recruitment_portal', '', 'admin')) {
     $CI->app_menu->add_sidebar_children_item('recruitment_portal', [
         'slug'     => 'All_Requisition_Form', // Required ID/slug UNIQUE for the child menu
-        'name'     => 'All Requisition Form', // The name if the item
+        'name'     => 'Req Submissions', // The name if the item
         'href'     => admin_url('recruitment_portal/all_requisition_form'), // URL of the item
         'position' => 2, // The menu position
         'icon'     => 'fa fa-address-book', // Font awesome icon

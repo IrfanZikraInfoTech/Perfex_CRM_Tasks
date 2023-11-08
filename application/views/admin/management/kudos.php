@@ -178,19 +178,19 @@
 
                                                 <p class="mb-5"><?php echo $kudos['remarks']; ?></p>
 
-                                                <div class="flex items-center justify-between space-x-2">
-                                            <div>
+                                                <div class="flex items-center justify-between space-x-2 mt-4">
+                                            <div class="">
                                                 <button class="focus:outline-none like-btn" data-kudos-id="<?php echo $kudos['id']; // Assuming 'id' is the column name for kudos unique ID ?>">
                                                     <svg class="h-6 w-6 heart-icon" fill="<?php echo $liked_by_current_user ? '#CF3333' : 'none'; ?>" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                                                     </svg>
                                                 </button>
                                             </div>
-                                            <div class="flex profile-images overflow-x-auto scrollbar-hide" style="width:100px;"> <!-- adjust width as required -->
+                                            <div class="flex profile-images overflow-x-auto scrollbar-hide gap-x-2"> <!-- adjust width as required -->
                                                 <!-- Images of people who liked this kudos -->
                                                 <?php foreach($liked_staff_ids as $staff_id): 
                                                     if(!empty($staff_id)): ?>
-                                                            <?= staff_profile_image($staff_id, ['w-10 h-10 thumbnail rounded-full border border-none'], 'thumb') ?>      
+                                                            <?= staff_profile_image($staff_id, ['w-10 h-10 rounded-full border border-none'], 'thumb') ?>      
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
                                             </div>
