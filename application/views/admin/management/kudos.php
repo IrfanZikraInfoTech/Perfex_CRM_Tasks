@@ -385,7 +385,10 @@
         var kudosId = $(this).data('kudos-id');
         var btn = $(this);
         var icon = btn.find('.heart-icon');
-        var profileImagesDiv = btn.closest('div').next('.profile-images'); // closest profile images div to our like button
+    var profileImagesDiv = btn.closest('div').next('.profile-images');
+    var additionalLikesSpan = profileImagesDiv.find('span'); // Get the additional likes span
+    var maxDisplay = 3; // Update this value if it changes in the PHP code
+
 
         $.ajax({
             url: 'like_kudos', 
@@ -394,35 +397,49 @@
             data: {kudos_id: kudosId},
             success: function(response) {
                 if(response.success) {
-                    if(response.action === 'liked') {
-                        icon.css({
-                            'fill': '#CF3333',
-                            'stroke': '#CF3333'
-                        });
-                        var newImageHtml = `<div class="w-6 h-6 rounded-full overflow-x-auto scrollbar-hide">
-                                                <img src="${response.image_url}" class="w-6 h-6 rounded-full">
+                if(response.action === 'liked') {
+                    icon.attr('fill', '#CF3333').attr('stroke', '#CF3333');
+                    var imagesCount = profileImagesDiv.find('div').length;
+                    
+                    if (imagesCount < maxDisplay) {
+                        // Add the new image directly if less than maxDisplay images are shown
+                        var newImageHtml = `<div class="w-8 h-8 rounded-full">
+                                                <img src="${response.image_url}" class="w-8 h-8 rounded-full">
                                             </div>`;
-                        profileImagesDiv.append(newImageHtml);
-                    } else if(response.action === 'unliked') {
-                        icon.css({
-                            'fill': 'none',
-                            'stroke': 'currentColor'
-                        });
-                        // Assuming each div inside profile-images corresponds to a staff's image
-                        profileImagesDiv.find('div').each(function() {
-                            var imageUrl = $(this).find('img').attr('src');
-                            if(imageUrl === response.image_url) {
-                                $(this).remove();
-                                return false; // Break out of the each loop once the image is removed
-                            }
-                        });
+                        profileImagesDiv.prepend(newImageHtml); // Prepend to show as the most recent like
+                    } else {
+                        // Update the additional likes span if maxDisplay images are already shown
+                        var additionalLikes = additionalLikesSpan.text().replace(/^\D+/g, ''); // Remove non-digit characters
+                        additionalLikes = parseInt(additionalLikes, 10) + 1;
+                        additionalLikesSpan.text('+' + additionalLikes);
                     }
-                } else {
-                    alert('Something went wrong!');
+                } else if(response.action === 'unliked') {
+                    icon.attr('fill', 'none').attr('stroke', 'currentColor');
+                    var imageToRemove = profileImagesDiv.find('div').filter(function() {
+                        return $(this).find('img').attr('src') === response.image_url;
+                    }).first();
+
+                    if (imageToRemove.length) {
+                        imageToRemove.remove();
+                        var additionalLikesText = additionalLikesSpan.text();
+                        if (additionalLikesText) {
+                            // Decrease the number in the additional likes span
+                            var additionalLikes = parseInt(additionalLikesText.replace(/^\D+/g, ''), 10) - 1;
+                            if (additionalLikes > 0) {
+                                additionalLikesSpan.text('+' + additionalLikes);
+                            } else {
+                                // If there are no additional likes left, remove the span
+                                additionalLikesSpan.remove();
+                            }
+                        }
+                    }
                 }
+            } else {
+                alert('Something went wrong!');
             }
-        });
+        }
     });
+});
 
 
     $(document).ready(function() {
