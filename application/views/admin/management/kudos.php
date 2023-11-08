@@ -186,14 +186,26 @@
                                                     </svg>
                                                 </button>
                                             </div>
-                                            <div class="flex profile-images overflow-x-auto scrollbar-hide gap-x-2"> <!-- adjust width as required -->
-                                                <!-- Images of people who liked this kudos -->
-                                                <?php foreach($liked_staff_ids as $staff_id): 
-                                                    if(!empty($staff_id)): ?>
-                                                            <?= staff_profile_image($staff_id, ['w-10 h-10 rounded-full border border-none'], 'thumb') ?>      
-                                                    <?php endif; ?>
-                                                <?php endforeach; ?>
+                                            <div class="flex profile-images overflow-x-auto scrollbar-hide gap-x-2">
+                                                <?php
+                                                $max_display = 3; // Set the maximum number of profile images to display
+                                                $total_likes = count($liked_staff_ids); // Total number of likes
+                                                $additional_likes = $total_likes - $max_display; // Additional likes to display as a number
+
+                                                foreach ($liked_staff_ids as $index => $staff_id):
+                                                    if (!empty($staff_id)):
+                                                        if ($index < $max_display):
+                                                            echo staff_profile_image($staff_id, ['w-8 h-8 rounded-full border border-none'], 'thumb');
+                                                        endif;
+                                                    endif;
+                                                endforeach;
+
+                                                if ($additional_likes > 0): // Check if there are more likes than the maximum displayed
+                                                    echo "<span class='w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center'>+{$additional_likes}</span>";
+                                                endif;
+                                                ?>
                                             </div>
+
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
