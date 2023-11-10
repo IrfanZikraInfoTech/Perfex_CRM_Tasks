@@ -446,6 +446,8 @@ class Team_management extends AdminController {
 
             $data['dates'][$formatted_date] = $date_data;
 
+            $dataTotals = $date_data['totals'];
+
             $data['totals']['allocation_shift_1'] += $dateTotals['clockable_shift_1'];
             $data['totals']['actual_shift_1'] += $dateTotals['clocked_shift_1'];
             $data['totals']['allocation_shift_2'] += $dateTotals['clockable_shift_2'];
@@ -503,13 +505,11 @@ class Team_management extends AdminController {
             $staff_id = $staff->staffid;
 
             $shifts_data = $this->team_management_model->staff_attendance_data($staff_id, $date);
-            $department_id = $this->team_management_model->get_staff_by_department($staff_id); // Replace with actual function to get department
-            $data[$staff_id]['department_id'] = $department_id; // Add department ID to the data array
+
 
             $data[$staff_id] = [
                 'name' => $staff->firstname . ' ' . $staff->lastname,
-                'department_id' => $department_id, // Include department_id here
-
+                'department_id' => id_to_name($staff->staffid, 'tblstaff_departments', 'staffid', 'departmentid'), // Include department_id here
                 'data' => $shifts_data
             ];
 

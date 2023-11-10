@@ -984,12 +984,15 @@ class Team_management_model extends App_Model
 
 
     public function get_total_task_time_for_day($staff_id, $day, $month, $year) {
-        $this->db->select('start_time, end_time');
-        $this->db->from(db_prefix() . 'taskstimers');
-        $this->db->where('staff_id', $staff_id);
-        $this->db->where('DAY(FROM_UNIXTIME(start_time))', $day);
-        $this->db->where('MONTH(FROM_UNIXTIME(start_time))', $month);
-        $this->db->where('YEAR(FROM_UNIXTIME(start_time))', $year);
+        $this->db->select('t.start_time, t.end_time');
+        $this->db->from(db_prefix() . 'taskstimers as t');
+        $this->db->join(db_prefix() . 'tasks as ts', 't.task_id = ts.id', 'left');
+        $this->db->where('t.staff_id', $staff_id);
+        $this->db->where('DAY(FROM_UNIXTIME(t.start_time))', $day);
+        $this->db->where('MONTH(FROM_UNIXTIME(t.start_time))', $month);
+        $this->db->where('YEAR(FROM_UNIXTIME(t.start_time))', $year);
+        $this->db->where('ts.sprint_id IS NOT NULL'); // Ensure sprint_id is not null
+    
         $query = $this->db->get();
     
         $task_timers = $query->result_array();

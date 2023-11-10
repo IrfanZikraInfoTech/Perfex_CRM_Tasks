@@ -187,281 +187,295 @@
 
                     <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-5 xl:text-base text-sm" id="<?= $date ?>">
 
-                    <?php foreach($departments as $department): ?>
-                        <div class="department-block mb-8">
-                            <h2 class="text-lg uppercase font-bold text-gray-800 text-center py-4 rounded-[40px] transition-all">
-                                <?= $department->name; ?>
-                            </h2>
-                        <?php 
-                            foreach($data as $index => $staff):   
+                        <?php
+                        $totals = null;
 
-                                if($index != 'totals' && $staff['department_id'] == $department->id): ?>
+                        $staffByDepartment = [];
+                        foreach ($data as $index => $staff) {
+                            if($index == 'totals'){
+                                $totals = $staff;
+                                continue;
+                            }
+                            $staffByDepartment[$staff['department_id']][] = $staff;
+                        }
+
+                        foreach($departments as $department): ?>
+                            <div class="department-block border-y border-solid border-gray-600">
+                                <h2 class="text-lg uppercase font-bold text-gray-800 text-center py-2 rounded-[40px] transition-all">
+                                    <?= $department->name; ?>
+                                </h2>
+                            </div>
+                            <?php 
+                            $departmentStaff = $staffByDepartment[$department->departmentid] ?? [];
+                            foreach ($departmentStaff as $staff):
+                            ?>
+
+                                <div class="flex flex-row transition-all hover:bg-sky-200/75staff-row" >
+
+                                            <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center">
+                                                <?= $staff['name'] ?>
+                                            </div>
+
+                                            <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center">
+                                                <?= !empty($staff['data']['shifts'][0]['shift_start_time']) 
+                                                ? 
+                                                $staff['data']['shifts'][0]['shift_start_time'] . ' - '. $staff['data']['shifts'][0]['shift_end_time']
+                                                : '-'; ?>
+                                            </div>
+
+                                            <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all flex justify-center items-center">
+                                                <?php 
+
+                                                if(
+                                                    isset($staff['data']['shifts'][0]['is_on_leave'])
+                                                    &&
+                                                    ($staff['data']['shifts'][0]['is_on_leave'])
+                                                ){
+                                                    $title = "Leave";
+                                                    $bg = "yellow-200";
+                                                }
+
+                                                else if(
+                                                    isset($staff['data']['shifts'][0]['status'])
+                                                    &&
+                                                    ($staff['data']['shifts'][0]['status'] == 'absent')
+                                                ){
+                                                    $title = "Absent";
+                                                    $bg = "red-200";
+                                                }
+
+                                                else{
+                                                    
+                                                    
+                                                    
+                                                    if(
+                                                        isset($staff['data']['shifts'][0]['status'])
+                                                        &&
+                                                        ($staff['data']['shifts'][0]['status'] == 'late')
+                                                    ){
+                                                        $title = "Late by " . round($staff['data']['shifts'][0]['difference'] / 60).'m';
+                                                        $bg = "orange-200";
+                                                    }
+
+                                                    else if(
+                                                        isset($staff['data']['shifts'][0]['is_early_departure'])
+                                                        &&
+                                                        ($staff['data']['shifts'][0]['is_early_departure'])
+                                                    ){
+                                                        $title = "Early Departure";
+                                                        $bg = "pink-200";
+                                                    }
+                                                    else if(
+                                                        isset($staff['data']['shifts'][0]['status'])
+                                                        &&
+                                                        ($staff['data']['shifts'][0]['status'] == 'present')
+                                                    ){
+                                                        $title = "On Time";
+                                                        $bg = "green-200";
+                                                    }else{
+                                                        $title = "No Shift";
+                                                        $bg = "gray-200";
+                                                    }
+
+                                                }
+
+                                                ?>
+
+                                                <button class="bg-<?=$bg?> rounded flex justify-center items-center w-[70%] h-[70%] py-2" title="<?= $title ?>" data-toggle="tooltip" data-placement="top">
+
+                                                <?= 
+                                                !empty($staff['data']['shifts'][0]['clock_in']) ? 
+                                                $staff['data']['shifts'][0]['clock_in'] . ' - '. $staff['data']['shifts'][0]['clock_out']
+                                                : '-'; 
+                                                ?>
+
+                                                </button>
+
+                                            </div>
+
+                                            <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center">
+                                                <?= !empty($staff['data']['shifts'][1]['shift_start_time']) 
+                                                ? 
+                                                $staff['data']['shifts'][1]['shift_start_time'] . ' - '. $staff['data']['shifts'][1]['shift_end_time']
+                                                : '-'; ?>
+                                            </div>
+
+                                            <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all flex justify-center items-center">
+                                                <?php 
+
+                                                if(
+                                                    isset($staff['data']['shifts'][1]['is_on_leave'])
+                                                    &&
+                                                    ($staff['data']['shifts'][1]['is_on_leave'])
+                                                ){
+                                                    $title = "Leave";
+                                                    $bg = "yellow-200";
+                                                }
+
+                                                else if(
+                                                    isset($staff['data']['shifts'][1]['status'])
+                                                    &&
+                                                    ($staff['data']['shifts'][1]['status'] == 'absent')
+                                                ){
+                                                    
+                                                    $title = "Absent";
+                                                    $bg = "red-200";
+                                                }
+
+                                                else{
+                                                    
+                                                    
+                                                    if(
+                                                        isset($staff['data']['shifts'][1]['status'])
+                                                        &&
+                                                        ($staff['data']['shifts'][1]['status'] == 'late')
+                                                    ){
+                                                        $title = "Late by " . round($staff['data']['shifts'][1]['difference'] / 60).'m';                                
+                                                        $bg = "orange-200";
+                                                    }
+
+                                                    else if(
+                                                        isset($staff['data']['shifts'][1]['is_early_departure'])
+                                                        &&
+                                                        ($staff['data']['shifts'][1]['is_early_departure'])
+                                                    ){
+                                                        $title = "Early Departure";
+                                                        $bg = "pink-200";
+                                                    }
+                                                    else if(
+                                                        isset($staff['data']['shifts'][1]['status'])
+                                                        &&
+                                                        ($staff['data']['shifts'][1]['status'] == 'present')
+                                                    ){
+                                                        $title = "On Time";
+                                                        $bg = "green-200";
+                                                    }else{
+                                                        $title = "No Shift";
+                                                        $bg = "gray-200";
+                                                    }
+
+                                                }
+                            
+                                                ?>
+
+                                                <button class="bg-<?=$bg?> rounded flex justify-center items-center w-[70%] h-[70%] py-2" title="<?= $title ?>" data-toggle="tooltip" data-placement="top">
+
+                                                <?= !empty($staff['data']['shifts'][1]['clock_in']) ? 
+                                                $staff['data']['shifts'][1]['clock_in'] . ' - '. $staff['data']['shifts'][1]['clock_out']
+                                                : '-'; ?>
+
+                                                </button>
+
+                                            </div>
+
+                                            <div class="w-[10%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center font-bold">
+                                                <?php
+
+                                                    $attendance = $staff['data']['status'];
+
+                                                    if($attendance == 'absent')
+                                                    {
+                                                        $attendance = 'Absent';
+                                                        $class = 'text-red-500 p-2 rounded';
+                                                    }
+                                                    else if($attendance == 'present')
+                                                    {
+                                                        $attendance = 'On Time';
+                                                        $class = 'text-green-500 p-2 rounded';
+                                                    }
+                                                    else if($attendance == 'late')
+                                                    {
+                                                        $attendance = 'Late';
+                                                        $class = 'text-orange-500 p-2 rounded';
+                                                    }
+                                                    else if($attendance == 'leave')
+                                                    {
+                                                        $attendance = 'Leave';
+                                                        $class = 'text-yellow-500 p-2 rounded';
+                                                    }
+                                                    else if($attendance == 'no-shifts')
+                                                    {
+                                                        $attendance = 'No Shifts';
+                                                        $class = 'text-gray-500 p-2 rounded';
+                                                    }
+                                                    
+                                                    echo '<span class="'.$class.'">'.$attendance.'</span>';
+                                                
+                                                ?>
+                                            </div>
+                                            
+                                            <div class="w-[10%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center font-bold">
+                                                <?php
+
+                                                    $status = $staff['data']['status'];
+                                                    if($status != "absent" && $status != "leave" && $status != "no-shifts"){
+                                                        if($staff['data']['day_status'] == 0){
+                                                            $completion = 'Incompleted';
+                                                            $class = 'text-red-500';
+                                                        }else if($staff['data']['day_status'] == 1){
+                                                            $completion = 'Completed';
+                                                            $class = 'text-green-500';
+                                                        }else if($staff['data']['day_status'] == 2){
+                                                            $completion = 'Overtime';
+                                                            $class = 'text-lime-700';
+                                                        }
+                                                    }else{
+                                                        $completion = '-';
+                                                        $class = '';
+                                                    }
+
+                                                    echo '<span class="font-bold '.$class.'">'.$completion.'</span>';
+                                                ?>
+                                            </div>
+                                            
+                                </div>
+
+
+                            <?php
+                            endforeach; 
+                        endforeach; 
                         
-                            <div class="flex flex-row transition-all hover:bg-sky-200/75 staff-row" >
+                        ?>
 
-                                <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center">
-                                    <?= $staff['name'] ?>
-                                </div>
+                        <div class="flex flex-row text-base transition-all hover:bg-sky-200/75 staff-row border-t border-solid border-gray-700 mt-4" >
 
-                                <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center">
-                                    <?= !empty($staff['data']['shifts'][0]['shift_start_time']) 
-                                    ? 
-                                    $staff['data']['shifts'][0]['shift_start_time'] . ' - '. $staff['data']['shifts'][0]['shift_end_time']
-                                    : '-'; ?>
-                                </div>
-
-                                <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all flex justify-center items-center">
-                                    <?php 
-
-                                    if(
-                                        isset($staff['data']['shifts'][0]['is_on_leave'])
-                                        &&
-                                        ($staff['data']['shifts'][0]['is_on_leave'])
-                                    ){
-                                        $title = "Leave";
-                                        $bg = "yellow-200";
-                                    }
-
-                                    else if(
-                                        isset($staff['data']['shifts'][0]['status'])
-                                        &&
-                                        ($staff['data']['shifts'][0]['status'] == 'absent')
-                                    ){
-                                        $title = "Absent";
-                                        $bg = "red-200";
-                                    }
-
-                                    else{
-                                        
-                                        
-                                        
-                                        if(
-                                            isset($staff['data']['shifts'][0]['status'])
-                                            &&
-                                            ($staff['data']['shifts'][0]['status'] == 'late')
-                                        ){
-                                            $title = "Late by " . round($staff['data']['shifts'][0]['difference'] / 60).'m';
-                                            $bg = "orange-200";
-                                        }
-
-                                        else if(
-                                            isset($staff['data']['shifts'][0]['is_early_departure'])
-                                            &&
-                                            ($staff['data']['shifts'][0]['is_early_departure'])
-                                        ){
-                                            $title = "Early Departure";
-                                            $bg = "pink-200";
-                                        }
-                                        else if(
-                                            isset($staff['data']['shifts'][0]['status'])
-                                            &&
-                                            ($staff['data']['shifts'][0]['status'] == 'present')
-                                        ){
-                                            $title = "On Time";
-                                            $bg = "green-200";
-                                        }else{
-                                            $title = "No Shift";
-                                            $bg = "gray-200";
-                                        }
-
-                                    }
-
-                                    ?>
-
-                                    <button class="bg-<?=$bg?> rounded flex justify-center items-center w-[70%] h-[70%] py-2" title="<?= $title ?>" data-toggle="tooltip" data-placement="top">
-
-                                    <?= 
-                                    !empty($staff['data']['shifts'][0]['clock_in']) ? 
-                                    $staff['data']['shifts'][0]['clock_in'] . ' - '. $staff['data']['shifts'][0]['clock_out']
-                                    : '-'; 
-                                    ?>
-
-                                    </button>
-
-                                </div>
-
-                                <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center">
-                                    <?= !empty($staff['data']['shifts'][1]['shift_start_time']) 
-                                    ? 
-                                    $staff['data']['shifts'][1]['shift_start_time'] . ' - '. $staff['data']['shifts'][1]['shift_end_time']
-                                    : '-'; ?>
-                                </div>
-
-                                <div class="w-[15%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all flex justify-center items-center">
-                                    <?php 
-
-                                    if(
-                                        isset($staff['data']['shifts'][1]['is_on_leave'])
-                                        &&
-                                        ($staff['data']['shifts'][1]['is_on_leave'])
-                                    ){
-                                        $title = "Leave";
-                                        $bg = "yellow-200";
-                                    }
-
-                                    else if(
-                                        isset($staff['data']['shifts'][1]['status'])
-                                        &&
-                                        ($staff['data']['shifts'][1]['status'] == 'absent')
-                                    ){
-                                        
-                                        $title = "Absent";
-                                        $bg = "red-200";
-                                    }
-
-                                    else{
-                                        
-                                        
-                                        if(
-                                            isset($staff['data']['shifts'][1]['status'])
-                                            &&
-                                            ($staff['data']['shifts'][1]['status'] == 'late')
-                                        ){
-                                            $title = "Late by " . round($staff['data']['shifts'][1]['difference'] / 60).'m';                                
-                                            $bg = "orange-200";
-                                        }
-
-                                        else if(
-                                            isset($staff['data']['shifts'][1]['is_early_departure'])
-                                            &&
-                                            ($staff['data']['shifts'][1]['is_early_departure'])
-                                        ){
-                                            $title = "Early Departure";
-                                            $bg = "pink-200";
-                                        }
-                                        else if(
-                                            isset($staff['data']['shifts'][1]['status'])
-                                            &&
-                                            ($staff['data']['shifts'][1]['status'] == 'present')
-                                        ){
-                                            $title = "On Time";
-                                            $bg = "green-200";
-                                        }else{
-                                            $title = "No Shift";
-                                            $bg = "gray-200";
-                                        }
-
-                                    }
-                
-                                    ?>
-
-                                    <button class="bg-<?=$bg?> rounded flex justify-center items-center w-[70%] h-[70%] py-2" title="<?= $title ?>" data-toggle="tooltip" data-placement="top">
-
-                                    <?= !empty($staff['data']['shifts'][1]['clock_in']) ? 
-                                    $staff['data']['shifts'][1]['clock_in'] . ' - '. $staff['data']['shifts'][1]['clock_out']
-                                    : '-'; ?>
-
-                                    </button>
-
-                                </div>
-
-                                <div class="w-[10%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center font-bold">
-                                    <?php
-
-                                        $attendance = $staff['data']['status'];
-
-                                        if($attendance == 'absent')
-                                        {
-                                            $attendance = 'Absent';
-                                            $class = 'text-red-500 p-2 rounded';
-                                        }
-                                        else if($attendance == 'present')
-                                        {
-                                            $attendance = 'On Time';
-                                            $class = 'text-green-500 p-2 rounded';
-                                        }
-                                        else if($attendance == 'late')
-                                        {
-                                            $attendance = 'Late';
-                                            $class = 'text-orange-500 p-2 rounded';
-                                        }
-                                        else if($attendance == 'leave')
-                                        {
-                                            $attendance = 'Leave';
-                                            $class = 'text-yellow-500 p-2 rounded';
-                                        }
-                                        else if($attendance == 'no-shifts')
-                                        {
-                                            $attendance = 'No Shifts';
-                                            $class = 'text-gray-500 p-2 rounded';
-                                        }
-                                        
-                                        echo '<span class="'.$class.'">'.$attendance.'</span>';
-                                    
-                                    ?>
-                                </div>
-                                
-                                <div class="w-[10%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 flex justify-center items-center font-bold">
-                                    <?php
-
-                                        $status = $staff['data']['status'];
-                                        if($status != "absent" && $status != "leave" && $status != "no-shifts"){
-                                            if($staff['data']['day_status'] == 0){
-                                                $completion = 'Incompleted';
-                                                $class = 'text-red-500';
-                                            }else if($staff['data']['day_status'] == 1){
-                                                $completion = 'Completed';
-                                                $class = 'text-green-500';
-                                            }else if($staff['data']['day_status'] == 2){
-                                                $completion = 'Overtime';
-                                                $class = 'text-lime-700';
-                                            }
-                                        }else{
-                                            $completion = '-';
-                                            $class = '';
-                                        }
-
-                                        echo '<span class="font-bold '.$class.'">'.$completion.'</span>';
-                                    ?>
-                                </div>
-                                
+                            <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold">
+                                Totals
                             </div>
 
-                            <?php else: ?>
+                            <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                                <?= convertSecondsToRoundedTime($totals['clockable_shift_1']); ?>
+                            </div>
 
-                                <div class="flex flex-row text-base transition-all hover:bg-sky-200/75 staff-row border-t border-solid border-gray-700" >
+                            <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                                <?= convertSecondsToRoundedTime($totals['clocked_shift_1']); ?>
+                            </div>
 
-                                    <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold">
-                                        Totals
-                                    </div>
+                            <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                                <?= convertSecondsToRoundedTime($totals['clockable_shift_2']); ?>
+                            </div>
 
-                                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
-                                        <?= convertSecondsToRoundedTime($staff['clockable_shift_1']); ?>
-                                    </div>
+                            <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
+                                <?= convertSecondsToRoundedTime($totals['clocked_shift_2']); ?>
+                            </div>
 
-                                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
-                                        <?= convertSecondsToRoundedTime($staff['clocked_shift_1']); ?>
-                                    </div>
-
-                                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
-                                        <?= convertSecondsToRoundedTime($staff['clockable_shift_2']); ?>
-                                    </div>
-
-                                    <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
-                                        <?= convertSecondsToRoundedTime($staff['clocked_shift_2']); ?>
-                                    </div>
-
-                                    <div class="w-[20%] border-l border-solid border-gray-600 text-center flex flex-col font-bold">
-                                        <div class="border-b border-solid border-gray-600 py-1">
-                                            Rates
-                                        </div>
-                                        <div class="transition-all text-center flex flex-row">
-                                            <button data-toggle="tooltip" data-title="Punctuality Rate" class="py-1 w-1/2 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($staff['pr'],2) ?>%</button>
-                                            <button data-toggle="tooltip" data-title="Attenandance Rate" class="py-1 w-1/2 border-l border-solid border-gray-600 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($staff['ar'],2) ?>%</button>
-                                        </div>
-                                    </div>
-
+                            <div class="w-[20%] border-l border-solid border-gray-600 text-center flex flex-col font-bold">
+                                <div class="border-b border-solid border-gray-600 py-1">
+                                    Rates
                                 </div>
+                                <div class="transition-all text-center flex flex-row">
+                                    <button data-toggle="tooltip" data-title="Punctuality Rate" class="py-1 w-1/2 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($totals['pr'],2) ?>%</button>
+                                    <button data-toggle="tooltip" data-title="Attenandance Rate" class="py-1 w-1/2 border-l border-solid border-gray-600 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($totals['ar'],2) ?>%</button>
+                                </div>
+                            </div>
 
-                            <?php endif; ?>
+                        </div>
 
-                        <?php endforeach; ?>
-                    <?php endforeach; ?>
-
-                    
                     </div>
 
+
                 <?php endforeach; ?>
+                
 
                 <div class="flex flex-row text-base transition-all bg-<?= get_option('management_theme_foreground')?> ease-in-out rounded-[40px] xl:text-xl lg:text-md md:text-md overflow-hidden sticky bottom-4 mt-4 z-10 " >
 
@@ -470,19 +484,19 @@
                     </div>
 
                     <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
-                        <?= convertSecondsToRoundedTime($staff['clockable_shift_1']); ?>
+                        <?= convertSecondsToRoundedTime($totals['clockable_shift_1']); ?>
                     </div>
 
                     <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
-                        <?= convertSecondsToRoundedTime($staff['clocked_shift_1']); ?>
+                        <?= convertSecondsToRoundedTime($totals['clocked_shift_1']); ?>
                     </div>
 
                     <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
-                        <?= convertSecondsToRoundedTime($staff['clockable_shift_2']); ?>
+                        <?= convertSecondsToRoundedTime($totals['clockable_shift_2']); ?>
                     </div>
 
                     <div class="w-[15%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center flex justify-center items-center font-bold border-l border-gray-700 border-solid">
-                        <?= convertSecondsToRoundedTime($staff['clocked_shift_2']); ?>
+                        <?= convertSecondsToRoundedTime($totals['clocked_shift_2']); ?>
                     </div>
 
                     <div class="w-[20%] border-l border-solid border-gray-600 text-center flex flex-col font-bold">
@@ -490,8 +504,8 @@
                             Rates
                         </div>
                         <div class="transition-all text-center flex flex-row">
-                            <button data-toggle="tooltip" data-title="Punctuality Rate" class="py-1 w-1/2 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($staff['pr'],2) ?>%</button>
-                            <button data-toggle="tooltip" data-title="Attenandance Rate" class="py-1 w-1/2 border-l border-solid border-gray-600 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($staff['ar'],2) ?>%</button>
+                            <button data-toggle="tooltip" data-title="Punctuality Rate" class="py-1 w-1/2 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($totals['pr'],2) ?>%</button>
+                            <button data-toggle="tooltip" data-title="Attenandance Rate" class="py-1 w-1/2 border-l border-solid border-gray-600 hover:bg-<?= get_option('management_theme_hover')?> transition-all"><?= round($totals['ar'],2) ?>%</button>
                         </div>
                     </div>
 

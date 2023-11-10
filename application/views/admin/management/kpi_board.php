@@ -163,9 +163,13 @@
 
             <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-4 rows-container">
             <?php foreach($departments as $department): ?>
-                <h2 class="my-4 text-lg uppercase font-bold text-gray-800 text-center py-4 rounded-[40px] transition-all">
-                    <?= $department->name; ?>
-                </h2>
+
+                <div class="department-block border-y border-solid border-gray-600">
+                    <h2 class="text-lg uppercase font-bold text-gray-800 text-center py-2 rounded-[40px] transition-all">
+                        <?= $department->name; ?>
+                    </h2>
+                </div>
+
                 <?php $staff_members = $this->team_management_model->get_staff_by_department($department->departmentid); ?>
                     <?php foreach($staff_members as $staff_member): ?>
                         <?php $staff_kpi = $staff_kpi_data[$staff_member->staffid]; ?>
