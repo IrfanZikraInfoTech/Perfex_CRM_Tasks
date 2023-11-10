@@ -439,6 +439,7 @@ function interpolateColor($from, $to, $percent) {
                         <th class="font-bold">ASSIGNED DATE</th>
                         <th class="font-bold">DUE DATE</th>
                         <th class="font-bold">COMPLETED DATE</th>
+                        <th class="font-bold">ESTIMSTED HOURS</th>
                         <th class="font-bold">TOTAL TIME TAKEN</th>
                         <th class="font-bold">NO. DAYS LATE</th>
                     </tr>
@@ -456,6 +457,15 @@ function interpolateColor($from, $to, $percent) {
                                 <td class="font-semibold"><?= date("Y-m-d", strtotime( $story->dateadded)) ?></td>
                                 <td class="font-semibold"><?= $story->duedate ?></td>
                                 <td class="font-semibold"><?= $story->datefinished ? $story->datefinished : "Not Completed" ?></td>
+                                <td class="font-semibold">
+                                <?php
+                                    // Assuming $story->estimated_hours contains the decimal hours
+                                    $hours = floor($story->estimated_hours);
+                                    $minutes = ($story->estimated_hours - $hours) * 60;
+                                    echo $hours . "h " . $minutes . "m";
+                                    
+                                    ?>
+                                </td>
                                 <td class="font-semibold">
                                     <?php
                                     $hours = floor($story->total_time_spent / 3600);
