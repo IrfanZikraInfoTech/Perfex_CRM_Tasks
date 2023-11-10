@@ -97,15 +97,27 @@
                         </select>
                     </div>
 
-                    <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
-                        <?php foreach($staff_kpi_data as $staff_id => $staff): ?>
-                            <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[100px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box" data-name="<?= $staff['name'] ?>" data-ops="<?= $staff['ops'] ?>">
-                                <h3 class="text-xl font-bold"><?= $staff['name'] ?></h3>
-                                <h4 class="text-2xl font-bold"><?= round($staff['ops']/10,2) ?>/10</h4>
+
+                    <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden p-4" id="staffGrid">
+    
+                        <?php foreach($departments as $department): ?>
+                            <h2 class="my-4 text-lg uppercase font-bold text-gray-800 text-center py-4 rounded-[40px] transition-all">
+                                <?= $department->name; ?>
+                            </h2>
+
+                            <div class="grid grid-cols-3 gap-4">
+                                <?php $staff_members = $this->team_management_model->get_staff_by_department($department->departmentid); ?>
+                                <?php foreach($staff_members as $staff_member): ?>
+                                        <?php $staff_kpi = $staff_kpi_data[$staff_member->staffid]; ?>
+                                        <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[100px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box" data-name="<?= $staff_kpi['name'] ?>" data-ops="<?= $staff_kpi['ops'] ?>">
+                                            <h3 class="text-xl font-bold"><?= $staff_kpi['name'] ?></h3>
+                                            <h4 class="text-2xl font-bold"><?= round($staff_kpi['ops']/10, 2) ?>/10</h4>
+                                        </div>
+                                <?php endforeach; ?>
                             </div>
                         <?php endforeach; ?>
+                        
                     </div>
-
                 </div>
             </div>
         
@@ -150,42 +162,48 @@
             </div>
 
             <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-4 rows-container">
-             
-                <?php foreach($staff_kpi_data as $staff_id => $staff): ?>
+            <?php foreach($departments as $department): ?>
+                <h2 class="my-4 text-lg uppercase font-bold text-gray-800 text-center py-4 rounded-[40px] transition-all">
+                    <?= $department->name; ?>
+                </h2>
+                <?php $staff_members = $this->team_management_model->get_staff_by_department($department->departmentid); ?>
+                    <?php foreach($staff_members as $staff_member): ?>
+                        <?php $staff_kpi = $staff_kpi_data[$staff_member->staffid]; ?>
                     <div class="flex flex-row text-base transition-all hover:bg-sky-200/75 staff-row" data-ar="<?= round($staff['ar'],2) ?>" data-pr="<?= round($staff['pr'],2) ?>" data-tcr="<?= round($staff['tcr'],2) ?>" data-ter="<?= round($staff['ter'],2) ?>" data-ttr="<?= round($staff['ttr'],2) ?>" data-sar="<?= round($staff['sar'],2) ?>" data-adr="<?= round($staff['adr'],2) ?>" data-spr="<?= round($staff['spr'],2) ?>" data-ops="<?= round($staff['ops']/10,2) ?>">
 
                         <div class="w-[20%] hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2 text-center">
-                        <?= $staff['name'] ?>
+                        <?= $staff_kpi['name'] ?>
                         </div>
                         <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
-                            <?= round($staff['ar'],2) ?>%
+                            <?= round($staff_kpi['ar'],2) ?>%
                         </div>
                         <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
-                        <?= round($staff['pr'],2) ?>%
+                        <?= round($staff_kpi['pr'],2) ?>%
                         </div>
                         <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
-                        <?= round($staff['tcr'],2) ?>%
+                        <?= round($staff_kpi['tcr'],2) ?>%
                         </div>
                         <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
-                        <?= round($staff['ter'],2) ?>%
+                        <?= round($staff_kpi['ter'],2) ?>%
                         </div>
                         <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
-                        <?= round($staff['ttr'],2) ?>%
+                        <?= round($staff_kpi['ttr'],2) ?>%
                         </div>
                         <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
-                        <?= round($staff['sar'],2) ?>%
+                        <?= round($staff_kpi['sar'],2) ?>%
                         </div>
                         <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
-                        <?= round($staff['adr'],2) ?>%
+                        <?= round($staff_kpi['adr'],2) ?>%
                         </div>
                         <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
-                        <?= round($staff['spr'],2) ?>%
+                        <?= round($staff_kpi['spr'],2) ?>%
                         </div>
                         <div class="w-[8.88%] border-l border-solid text-center hover:bg-<?= get_option('management_theme_hover')?> transition-all py-2">
-                        <?= round($staff['ops']/10,2) ?>/10
+                        <?= round($staff_kpi['ops']/10,2) ?>/10
                         </div>
                     </div>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+            <?php endforeach; ?>
 
             </div>
 

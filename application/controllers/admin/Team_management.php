@@ -147,6 +147,9 @@ class Team_management extends AdminController {
     
 
     public function kpi_board($from = null, $to = null, $exclude_ids = ''){
+        $data['departments'] = $this->team_management_model->get_all_departments();
+
+
         $from = $from ?? date("Y-m-d");
         $to = $to ?? date("Y-m-d");
 
@@ -365,6 +368,8 @@ class Team_management extends AdminController {
 
 
     public function attendance_board($from = null, $to = null, $exclude_ids = ''){
+        $data['departments'] = $this->team_management_model->get_all_departments();
+
         $from = $from ?? date("Y-m-d");
         $to = $to ?? date("Y-m-d");
 
@@ -482,6 +487,7 @@ class Team_management extends AdminController {
 
     public function fetch_attendance_for_date($date, $staffs) {
 
+
         $data = [];
 
         $clockableShift1 = 0;
@@ -497,9 +503,13 @@ class Team_management extends AdminController {
             $staff_id = $staff->staffid;
 
             $shifts_data = $this->team_management_model->staff_attendance_data($staff_id, $date);
-    
+            $department_id = $this->team_management_model->get_staff_by_department($staff_id); // Replace with actual function to get department
+            $data[$staff_id]['department_id'] = $department_id; // Add department ID to the data array
+
             $data[$staff_id] = [
                 'name' => $staff->firstname . ' ' . $staff->lastname,
+                'department_id' => $department_id, // Include department_id here
+
                 'data' => $shifts_data
             ];
 
@@ -547,6 +557,7 @@ class Team_management extends AdminController {
     
         return $data;
     }
+
     
     
     public function staff_data($staff_id, $date){

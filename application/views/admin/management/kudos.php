@@ -385,9 +385,9 @@
         var kudosId = $(this).data('kudos-id');
         var btn = $(this);
         var icon = btn.find('.heart-icon');
-    var profileImagesDiv = btn.closest('div').next('.profile-images');
-    var additionalLikesSpan = profileImagesDiv.find('span'); // Get the additional likes span
-    var maxDisplay = 3; // Update this value if it changes in the PHP code
+        var profileImagesDiv = btn.closest('div').next('.profile-images');
+        var additionalLikesSpan = profileImagesDiv.find('span'); // Get the additional likes span
+        var maxDisplay = 3; // Update this value if it changes in the PHP code
 
 
         $.ajax({
@@ -413,27 +413,27 @@
                         additionalLikes = parseInt(additionalLikes, 10) + 1;
                         additionalLikesSpan.text('+' + additionalLikes);
                     }
-                } else if(response.action === 'unliked') {
-                    icon.attr('fill', 'none').attr('stroke', 'currentColor');
-                    var imageToRemove = profileImagesDiv.find('div').filter(function() {
-                        return $(this).find('img').attr('src') === response.image_url;
-                    }).first();
+                    } else if(response.action === 'unliked') {
+                        icon.attr('fill', 'none').attr('stroke', 'currentColor');
+                        var imageToRemove = profileImagesDiv.find('div').filter(function() {
+                            return $(this).find('img').attr('src') === response.image_url;
+                        }).first();
 
-                    if (imageToRemove.length) {
-                        imageToRemove.remove();
-                        var additionalLikesText = additionalLikesSpan.text();
-                        if (additionalLikesText) {
-                            // Decrease the number in the additional likes span
-                            var additionalLikes = parseInt(additionalLikesText.replace(/^\D+/g, ''), 10) - 1;
-                            if (additionalLikes > 0) {
-                                additionalLikesSpan.text('+' + additionalLikes);
-                            } else {
-                                // If there are no additional likes left, remove the span
-                                additionalLikesSpan.remove();
+                        if (imageToRemove.length) {
+                            imageToRemove.remove();
+                            var additionalLikesText = additionalLikesSpan.text();
+                            if (additionalLikesText) {
+                                // Decrease the number in the additional likes span
+                                var additionalLikes = parseInt(additionalLikesText.replace(/^\D+/g, ''), 10) - 1;
+                                if (additionalLikes > 0) {
+                                    additionalLikesSpan.text('+' + additionalLikes);
+                                } else {
+                                    // If there are no additional likes left, remove the span
+                                    additionalLikesSpan.remove();
+                                }
                             }
                         }
                     }
-                }
             } else {
                 alert('Something went wrong!');
             }

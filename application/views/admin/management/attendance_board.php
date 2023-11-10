@@ -102,25 +102,29 @@
                     </select>
                 </div>
 
-                <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
-
-                    <?php foreach($staff_dates_data as $staff_id => $staff): ?>
-
-
-                        <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[140px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box p-4" data-name="<?= $staff['name'] ?>" data-ar="<?= $staff['ar'] ?>" data-pr="<?= $staff['pr'] ?>" data-ct="<?= $staff['ct'] ?>" data-cdt="<?= $staff['cdt'] ?>">
-                            <h3 class="text-xl text-center font-bold"><?= $staff['name'] ?></h3>
-                            <hr class="bg-gray-700 text-gray-800 h-[1px] border-none w-full mb-1" />
-                            <div class="xl:text-xl lg:text-lg text-base grid lg:grid-cols-2 grid-cols-1 gap-4 place-items-centers">
-                                <h4 class="text-center font-bold border-gray-700">AR: <?= round($staff['ar'],2) ?>%</h4>
-                                <h4 class="text-center font-bold border-gray-700">PR: <?= round($staff['pr'],2) ?>%</h4>
-                                <h4 class="text-center font-bold border-gray-700 ">Clockable: <?= convertSecondsToRoundedTime($staff['ct']) ?></h4>
-                                <h4 class="text-center font-bold border-gray-700 ">Clocked: <?= convertSecondsToRoundedTime($staff['cdt']) ?></h4>
+                <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden p-4" id="staffGrid">
+                    <?php foreach($departments as $department): ?>
+                        <div class="department-block mb-8">
+                            <h2 class="text-lg uppercase font-bold text-gray-800 text-center py-4 rounded-[40px] transition-all">
+                                <?= $department->name; ?>
+                            </h2>
+                            <div class="grid grid-cols-3 gap-4">
+                                <?php $staff_members = $this->team_management_model->get_staff_by_department($department->departmentid); ?>
+                                <?php foreach($staff_members as $staff_member): ?>
+                                    <?php $staff = $staff_dates_data[$staff_member->staffid]; ?>
+                                    <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[140px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box p-4" data-name="<?= $staff['name'] ?>" data-ar="<?= $staff['ar'] ?>" data-pr="<?= $staff['pr'] ?>" data-ct="<?= $staff['ct'] ?>" data-cdt="<?= $staff['cdt'] ?>">
+                                        <h3 class="text-xl text-center font-bold"><?= $staff['name'] ?></h3>
+                                        <hr class="bg-gray-700 text-gray-800 h-[1px] border-none w-full mb-1" />
+                                        <div class="xl:text-xl lg:text-lg text-base grid lg:grid-cols-2 grid-cols-1 gap-4 place-items-centers">
+                                            <h4 class="text-center font-bold border-gray-700">AR: <?= round($staff['ar'],2) ?>%</h4>
+                                            <h4 class="text-center font-bold border-gray-700">PR: <?= round($staff['pr'],2) ?>%</h4>
+                                            <h4 class="text-center font-bold border-gray-700 ">Clockable: <?= convertSecondsToRoundedTime($staff['ct']) ?></h4>
+                                            <h4 class="text-center font-bold border-gray-700 ">Clocked: <?= convertSecondsToRoundedTime($staff['cdt']) ?></h4>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
-
-                            
                         </div>
-
-
                     <?php endforeach; ?>
                 </div>
             
@@ -172,7 +176,7 @@
                 <?php 
 
                 foreach ($dates as $date => $data): 
-                    
+                                    
                     ?>
 
                     <div class="flex flex-row justify-between items-center gap-4 px-4 py-2 cursor-pointer text-lg text-gray-600 transition-all bg-gray-100 rounded-[40px]" data-date="<?= $date ?>" onclick="toggleCollapse(this, event, '<?= $date ?>')">
@@ -183,11 +187,15 @@
 
                     <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-5 xl:text-base text-sm" id="<?= $date ?>">
 
+                    <?php foreach($departments as $department): ?>
+                        <div class="department-block mb-8">
+                            <h2 class="text-lg uppercase font-bold text-gray-800 text-center py-4 rounded-[40px] transition-all">
+                                <?= $department->name; ?>
+                            </h2>
                         <?php 
                             foreach($data as $index => $staff):   
 
-                                if($index != 'totals'):
-                        ?>
+                                if($index != 'totals' && $staff['department_id'] == $department->id): ?>
                         
                             <div class="flex flex-row transition-all hover:bg-sky-200/75 staff-row" >
 
@@ -448,7 +456,8 @@
                             <?php endif; ?>
 
                         <?php endforeach; ?>
-                        
+                    <?php endforeach; ?>
+
                     
                     </div>
 
