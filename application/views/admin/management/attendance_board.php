@@ -28,44 +28,44 @@
                         <input type="date" id="to" class="w-full py-2 px-4 border !rounded-3xl text-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="To" value="<?= $to ?>">
 
                         <select data-width="100%" id="staff" data-live-search="true" class="selectpicker text-2xl font-bold text-uppercase" multiple>
-    <?php 
-        $current_staff_id = get_staff_user_id();
+                        <?php 
+                            $current_staff_id = get_staff_user_id();
 
-        if (has_permission('team_management', '', 'admin')) {
-            $staff_members = $this->staff_model->get();
-        } else {
-            $subordinate_ids = get_staff_under($current_staff_id);
-            
-            if (!empty($subordinate_ids)) {
-                array_push($subordinate_ids, $current_staff_id);
+                            if (has_permission('team_management', '', 'admin')) {
+                                $staff_members = $this->staff_model->get();
+                            } else {
+                                $subordinate_ids = get_staff_under($current_staff_id);
+                                
+                                if (!empty($subordinate_ids)) {
+                                    array_push($subordinate_ids, $current_staff_id);
 
-                $staff_members = [];
-                foreach ($subordinate_ids as $id) {
-                    $staff_member = $this->staff_model->get($id);
-                    // Check if the result is an object, if so convert to array
-                    if (is_object($staff_member)) {
-                        $staff_member = (array) $staff_member;
-                    }
-                    $staff_members[] = $staff_member;
-                }
-            } else {
-                $staff_member = $this->staff_model->get($current_staff_id);
-                if (is_object($staff_member)) {
-                    $staff_member = (array) $staff_member;
-                }
-                $staff_members = [$staff_member];
-            }
-        }
+                                    $staff_members = [];
+                                    foreach ($subordinate_ids as $id) {
+                                        $staff_member = $this->staff_model->get($id);
+                                        // Check if the result is an object, if so convert to array
+                                        if (is_object($staff_member)) {
+                                            $staff_member = (array) $staff_member;
+                                        }
+                                        $staff_members[] = $staff_member;
+                                    }
+                                } else {
+                                    $staff_member = $this->staff_model->get($current_staff_id);
+                                    if (is_object($staff_member)) {
+                                        $staff_member = (array) $staff_member;
+                                    }
+                                    $staff_members = [$staff_member];
+                                }
+                            }
 
-        foreach($staff_members as $staff_member) {
-            $selected = '';
-            if (isset($exclude_ids) && in_array($staff_member['staffid'], $exclude_ids)) {
-                $selected = 'selected';
-            }
-            echo '<option '.$selected.' value="'.$staff_member['staffid'].'">'.$staff_member['full_name'].'</option>';
-        }
-    ?>
-</select>
+                            foreach($staff_members as $staff_member) {
+                                $selected = '';
+                                if (isset($exclude_ids) && in_array($staff_member['staffid'], $exclude_ids)) {
+                                    $selected = 'selected';
+                                }
+                                echo '<option '.$selected.' value="'.$staff_member['staffid'].'">'.$staff_member['full_name'].'</option>';
+                            }
+                        ?>
+                    </select>
 
 
 
@@ -88,31 +88,26 @@
 
             <div class="w-full bg-white rounded-[50px] shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex flex-col collapsible-content" id="staff-cards">
             
-            <div class="p-6 ">
+                     <div class="p-6 ">
 
-                <!-- Select box for sorting -->
-                <div class="w-full mb-6">
-                    <label for="sortSelect" class="mr-2">Sort by:</label>
-                    <select id="sortSelect" class="border rounded-md p-2 w-64">
-                        <option value="name">Name</option>
-                        <option value="ar">Attendance Rate</option>
-                        <option value="pr">Punctuality Rate</option>
-                        <option value="ct">Clockable Time</option>
-                        <option value="cdt">Clocked Time</option>
-                    </select>
-                </div>
+                    <!-- Select box for sorting -->
+                        <div class="w-full mb-6">
+                            <label for="sortSelect" class="mr-2">Sort by:</label>
+                            <select id="sortSelect" class="border rounded-md p-2 w-64">
+                                <option value="name">Name</option>
+                                <option value="ar">Attendance Rate</option>
+                                <option value="pr">Punctuality Rate</option>
+                                <option value="ct">Clockable Time</option>
+                                <option value="cdt">Clocked Time</option>
+                                <option value="departments">Department</option>
 
-                <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden p-4" id="staffGrid">
-                    <?php foreach($departments as $department): ?>
-                        <div class="department-block mb-8">
-                            <h2 class="text-lg uppercase font-bold text-gray-800 text-center py-4 rounded-[40px] transition-all">
-                                <?= $department->name; ?>
-                            </h2>
-                            <div class="grid grid-cols-3 gap-4">
-                                <?php $staff_members = $this->team_management_model->get_staff_by_department($department->departmentid); ?>
-                                <?php foreach($staff_members as $staff_member): ?>
-                                    <?php $staff = $staff_dates_data[$staff_member->staffid]; ?>
-                                    <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[140px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box p-4" data-name="<?= $staff['name'] ?>" data-ar="<?= $staff['ar'] ?>" data-pr="<?= $staff['pr'] ?>" data-ct="<?= $staff['ct'] ?>" data-cdt="<?= $staff['cdt'] ?>">
+                            </select>
+                        </div>
+                             <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
+                                <?php foreach($staff_dates_data as $staff_id => $staff): ?>
+                                    <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[140px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box p-4" data-name="<?= $staff['name'] ?>" data-ar="<?= $staff['ar'] ?>" data-pr="<?= $staff['pr'] ?>" data-ct="<?= $staff['ct'] ?>" data-cdt="<?= $staff['cdt'] ?>"           data-departments="<?= htmlspecialchars($staff['department']) ?>"> 
+ 
+                                   
                                         <h3 class="text-xl text-center font-bold"><?= $staff['name'] ?></h3>
                                         <hr class="bg-gray-700 text-gray-800 h-[1px] border-none w-full mb-1" />
                                         <div class="xl:text-xl lg:text-lg text-base grid lg:grid-cols-2 grid-cols-1 gap-4 place-items-centers">
@@ -122,11 +117,10 @@
                                             <h4 class="text-center font-bold border-gray-700 ">Clocked: <?= convertSecondsToRoundedTime($staff['cdt']) ?></h4>
                                         </div>
                                     </div>
+                                    
                                 <?php endforeach; ?>
                             </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
+                    </div>
             
             </div>
 
@@ -572,14 +566,17 @@ function updateMaxHeight(collapsibleContent, isExpanding) {
         collapsibleContent.style.maxHeight = '0';
     }
 }
-
 $(document).ready(function() {
-
     $('#sortSelect').on('change', function() {
         var sortBy = $(this).val();
-        
-        var staffBoxes = $('.staff-box').sort(function(a, b) {
-            if (sortBy === 'name') {
+
+        if (sortBy === 'departments') {
+            sortAndDisplayByDepartment();
+        } else {
+            var staffBoxes = $('.staff-box').sort(function(a, b) {
+                var valA = $(a).data(sortBy);
+                var valB = $(b).data(sortBy);
+                if (sortBy === 'name') {
                 return $(a).data('name').localeCompare($(b).data('name'));
             } else if(sortBy === 'ar') { // Sort by OPS
                 return $(b).data('ar') - $(a).data('ar');
@@ -590,13 +587,56 @@ $(document).ready(function() {
             }else if(sortBy === 'cdt') { // Sort by OPS
                 return $(b).data('cdt') - $(a).data('cdt');
             }
-        });
+            });
 
-        $('#staffGrid').html(staffBoxes);
+            $('#staffGrid').html(staffBoxes);
+        }
+    });
+});
+
+function sortAndDisplayByDepartment() {
+    var departments = {};
+
+    // Group the staff boxes by department
+    $('.staff-box').each(function() {
+        var department = $(this).data('departments') || 'No Department';
+        if (!departments[department]) {
+            departments[department] = [];
+        }
+        departments[department].push(this);
     });
 
+    $('#staffGrid').empty();
 
-});
+    // Loop through each department and create the layout
+    $.each(departments, function(departmentName, staffBoxes) {
+        // Create the full-width department header
+        var departmentHeader = $('<div/>', {
+            'class': 'text-lg uppercase font-bold text-gray-800 text-center py-2 mb-4 bg-blue-100 rounded-lg shadow w-full', // full width
+            'text': departmentName
+        });
+
+        // Create a container for the staff boxes, this will be a flex container
+        var boxesContainer = $('<div/>', {
+            'class': 'flex flex-wrap justify-center gap-4' // flexbox container
+        });
+
+        // Append staff boxes to the container
+        $.each(staffBoxes, function(index, box) {
+            // Add flex classes for the boxes
+            $(box).addClass('bg-pink-100 p-4 rounded-lg shadow-md flex-1'); // flex-1 for equal width
+            boxesContainer.append(box);
+        });
+
+        // Append the department header and container to the grid
+        var departmentContainer = $('<div/>', {
+            'class': 'mb-8' // margin bottom for spacing between departments
+        });
+
+        departmentContainer.append(departmentHeader).append(boxesContainer);
+        $('#staffGrid').append(departmentContainer);
+    });
+}
 
 const container = document.querySelector('.overflow-x-auto');
                 
