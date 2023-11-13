@@ -87,42 +87,49 @@
             </div>
 
             <div class="w-full bg-white rounded-[50px] shadow-lg hover:shadow-xl border border-solid border-white hover:border-<?= get_option('management_theme_border')?> transition-all flex flex-col collapsible-content" id="staff-cards">
-            
-                     <div class="p-6 ">
+                <div class="p-6">
+                
+
 
                     <!-- Select box for sorting -->
-                        <div class="w-full mb-6">
-                            <label for="sortSelect" class="mr-2">Sort by:</label>
-                            <select id="sortSelect" class="border rounded-md p-2 w-64">
-                                <option value="name">Name</option>
-                                <option value="ar">Attendance Rate</option>
-                                <option value="pr">Punctuality Rate</option>
-                                <option value="ct">Clockable Time</option>
-                                <option value="cdt">Clocked Time</option>
-                                <option value="departments">Department</option>
-
-                            </select>
-                        </div>
-                             <div class="w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden grid grid-cols-3 p-4 gap-4" id="staffGrid">
-                                <?php foreach($staff_dates_data as $staff_id => $staff): ?>
-                                    <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[140px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box p-4" data-name="<?= $staff['name'] ?>" data-ar="<?= $staff['ar'] ?>" data-pr="<?= $staff['pr'] ?>" data-ct="<?= $staff['ct'] ?>" data-cdt="<?= $staff['cdt'] ?>"           data-departments="<?= htmlspecialchars($staff['department']) ?>"> 
- 
-                                   
-                                        <h3 class="text-xl text-center font-bold"><?= $staff['name'] ?></h3>
-                                        <hr class="bg-gray-700 text-gray-800 h-[1px] border-none w-full mb-1" />
-                                        <div class="xl:text-xl lg:text-lg text-base grid lg:grid-cols-2 grid-cols-1 gap-4 place-items-centers">
-                                            <h4 class="text-center font-bold border-gray-700">AR: <?= round($staff['ar'],2) ?>%</h4>
-                                            <h4 class="text-center font-bold border-gray-700">PR: <?= round($staff['pr'],2) ?>%</h4>
-                                            <h4 class="text-center font-bold border-gray-700 ">Clockable: <?= convertSecondsToRoundedTime($staff['ct']) ?></h4>
-                                            <h4 class="text-center font-bold border-gray-700 ">Clocked: <?= convertSecondsToRoundedTime($staff['cdt']) ?></h4>
-                                        </div>
-                                    </div>
-                                    
-                                <?php endforeach; ?>
-                            </div>
+                    <div class="w-full mb-6">
+                        <label for="sortSelect" class="mr-2">Sort by:</label>
+                        <select id="sortSelect" class="border rounded-md p-2 w-64">
+                            <option value="name">Name</option>
+                            <option value="ar">Attendance Rate</option>
+                            <option value="pr">Punctuality Rate</option>
+                            <option value="ct">Clockable Time</option>
+                            <option value="cdt">Clocked Time</option>
+                        </select>
                     </div>
-            
+                    
+                    <?php foreach($departments as $department): ?>
+                        <div class="department-block mb-8">
+                            <h2 class="text-lg uppercase font-bold text-gray-800 text-center py-4 rounded-[40px] transition-all">
+                                <?= $department->name; ?>
+                            </h2>
+                            <div class="grid grid-cols-3 gap-4">
+                                <?php $staff_members = $this->team_management_model->get_staff_by_department($department->departmentid); ?>
+                                <?php foreach($staff_members as $staff_member): ?>
+                                    <?php $staff = $staff_dates_data[$staff_member->staffid]; ?>
+
+                                <div class="flex flex-col justify-center items-center gap-2 shadow-inner bg-<?= get_option('management_theme_foreground')?> rounded-[40px] min-h-[140px] shadow-inner hover:shadow-xl shadow-none transition-all staff-box p-4" data-name="<?= $staff['name'] ?>" data-ar="<?= $staff['ar'] ?>" data-pr="<?= $staff['pr'] ?>" data-ct="<?= $staff['ct'] ?>" data-cdt="<?= $staff['cdt'] ?>" data-departments="<?= htmlspecialchars($staff['department']) ?>">
+                                    <h3 class="text-xl text-center font-bold"><?= $staff['name'] ?></h3>
+                                    <hr class="bg-gray-700 text-gray-800 h-[1px] border-none w-full mb-1" />
+                                    <div class="xl:text-xl lg:text-lg text-base grid lg:grid-cols-2 grid-cols-1 gap-4 place-items-centers">
+                                        <h4 class="text-center font-bold border-gray-700">AR: <?= round($staff['ar'],2) ?>%</h4>
+                                        <h4 class="text-center font-bold border-gray-700">PR: <?= round($staff['pr'],2) ?>%</h4>
+                                        <h4 class="text-center font-bold border-gray-700 ">Clockable: <?= convertSecondsToRoundedTime($staff['ct']) ?></h4>
+                                        <h4 class="text-center font-bold border-gray-700 ">Clocked: <?= convertSecondsToRoundedTime($staff['cdt']) ?></h4>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>    
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
+
 
             </div>
         </div>
@@ -180,29 +187,40 @@
                     </div>
 
                     <div class="collapsible-content w-full transition-all ease-in-out rounded-[40px] border border-solid border-white bg-<?= get_option('management_theme_background')?> shadow-inner overflow-hidden mb-5 xl:text-base text-sm" id="<?= $date ?>">
+                    <?php
+                            $totals = null;
+                            $staffByDepartment = [];
 
-                        <?php
-                        $totals = null;
-
-                        $staffByDepartment = [];
-                        foreach ($data as $index => $staff) {
-                            if($index == 'totals'){
-                                $totals = $staff;
-                                continue;
+                            // Organize the staff data by department
+                            foreach ($data as $index => $staff) {
+                                if ($index == 'totals') {
+                                    $totals = $staff;
+                                    continue;
+                                }
+                                $staffByDepartment[$staff['department_id']][] = $staff;
                             }
-                            $staffByDepartment[$staff['department_id']][] = $staff;
-                        }
 
-                        foreach($departments as $department): ?>
-                            <div class="department-block border-y border-solid border-gray-600">
-                                <h2 class="text-lg uppercase font-bold text-gray-800 text-center py-2 rounded-[40px] transition-all">
-                                    <?= $department->name; ?>
-                                </h2>
-                            </div>
-                            <?php 
-                            $departmentStaff = $staffByDepartment[$department->departmentid] ?? [];
-                            foreach ($departmentStaff as $staff):
-                            ?>
+                            // Loop through the departments
+                            foreach ($departments as $department) :
+                                // Check if there are staff members in this department
+                                $departmentStaff = $staffByDepartment[$department->departmentid] ?? [];
+                                
+                                // If there are no staff members, continue to the next department
+                                if (empty($departmentStaff)) {
+                                    continue;
+                                }
+
+                                // If there are staff members, then show the department name
+                                ?>
+                                <div class="department-block border-y border-solid border-gray-600">
+                                    <h2 class="text-lg uppercase font-bold text-gray-800 text-center py-2 rounded-[40px] transition-all">
+                                        <?= $department->name; ?>
+                                    </h2>
+                                </div>
+                                <?php 
+                                // Loop through and display the staff members in this department
+                                foreach ($departmentStaff as $staff):
+                                ?>
 
                                 <div class="flex flex-row transition-all hover:bg-sky-200/75staff-row" >
 
@@ -569,14 +587,9 @@ function updateMaxHeight(collapsibleContent, isExpanding) {
 $(document).ready(function() {
     $('#sortSelect').on('change', function() {
         var sortBy = $(this).val();
-
-        if (sortBy === 'departments') {
-            sortAndDisplayByDepartment();
-        } else {
-            var staffBoxes = $('.staff-box').sort(function(a, b) {
-                var valA = $(a).data(sortBy);
-                var valB = $(b).data(sortBy);
-                if (sortBy === 'name') {
+        
+        var staffBoxes = $('.staff-box').sort(function(a, b) {
+            if (sortBy === 'name') {
                 return $(a).data('name').localeCompare($(b).data('name'));
             } else if(sortBy === 'ar') { // Sort by OPS
                 return $(b).data('ar') - $(a).data('ar');
@@ -587,57 +600,89 @@ $(document).ready(function() {
             }else if(sortBy === 'cdt') { // Sort by OPS
                 return $(b).data('cdt') - $(a).data('cdt');
             }
-            });
-
-            $('#staffGrid').html(staffBoxes);
-        }
+        });
+        $('#staffGrid').html(staffBoxes);
     });
 });
 
-function sortAndDisplayByDepartment() {
-    var departments = {};
+// function sortAndDisplayByDepartment() {
+//     var departments = {};
 
-    // Group the staff boxes by department
-    $('.staff-box').each(function() {
-        var department = $(this).data('departments') || 'No Department';
-        if (!departments[department]) {
-            departments[department] = [];
-        }
-        departments[department].push(this);
-    });
+//     // Group the staff boxes by department
+//     $('.staff-box').each(function() {
+//         var department = $(this).data('departments') || 'No Department';
+//         if (!departments[department]) {
+//             departments[department] = [];
+//         }
+//         departments[department].push(this);
+//     });
 
-    $('#staffGrid').empty();
+//     $('#staffGrid').empty();
 
-    // Loop through each department and create the layout
-    $.each(departments, function(departmentName, staffBoxes) {
-        // Create the full-width department header
-        var departmentHeader = $('<div/>', {
-            'class': 'text-lg uppercase font-bold text-gray-800 text-center py-2 mb-4 bg-blue-100 rounded-lg shadow w-full', // full width
-            'text': departmentName
-        });
+//     // Loop through each department and create the layout
+//     $.each(departments, function(departmentName, staffBoxes) {
+//         // Create the full-width department header
+//         var departmentHeader = $('<div/>', {
+//             'class': 'text-lg uppercase font-bold text-gray-800 text-center py-2 mb-4 bg-blue-100 rounded-lg shadow w-full', // full width
+//             'text': departmentName
+//         });
 
-        // Create a container for the staff boxes, this will be a flex container
-        var boxesContainer = $('<div/>', {
-            'class': 'flex flex-wrap justify-center gap-4' // flexbox container
-        });
+//         // Create a container for the staff boxes, this will be a flex container
+//         var boxesContainer = $('<div/>', {
+//             'class': 'flex flex-row flex-wrap justify-center gap-4' // Updated classes for flex row
+//         });
 
-        // Append staff boxes to the container
-        $.each(staffBoxes, function(index, box) {
-            // Add flex classes for the boxes
-            $(box).addClass('bg-pink-100 p-4 rounded-lg shadow-md flex-1'); // flex-1 for equal width
-            boxesContainer.append(box);
-        });
+//         // Append staff boxes to the container
+//         $.each(staffBoxes, function(index, box) {
+//             // Add flex classes for the boxes
+//             $(box).addClass('bg-pink-100 p-4 rounded-lg shadow-md'); // Removed flex-4 as it's not a standard Tailwind class
+//             boxesContainer.append(box);
+//         });
 
-        // Append the department header and container to the grid
-        var departmentContainer = $('<div/>', {
-            'class': 'mb-8' // margin bottom for spacing between departments
-        });
+//         // Append the department header and container to the grid
+//         var departmentContainer = $('<div/>', {
+//             'class': 'mb-8' // margin bottom for spacing between departments
+//         });
 
-        departmentContainer.append(departmentHeader).append(boxesContainer);
-        $('#staffGrid').append(departmentContainer);
-    });
-}
+//         departmentContainer.append(departmentHeader).append(boxesContainer);
+//         $('#staffGrid').append(departmentContainer);
+//     });
+// }
+// function sortAndDisplayByDepartment() {
+//     var departments = {};
 
+//     // Group the staff boxes by department
+//     $('.staff-box').each(function() {
+//         var department = $(this).data('departments') || 'No Department';
+//         if (!departments[department]) {
+//             departments[department] = [];
+//         }
+//         departments[department].push(this);
+//     });
+
+//     // Assume only one department can be displayed at a time
+//     // If your logic requires showing multiple departments at once, you will need to adjust this.
+//     var departmentNames = Object.keys(departments);
+//     if (departmentNames.length > 0) {
+//         // Display the first department name and hide the department row if no department is found
+//         var departmentName = departmentNames[1];
+//         $('#departmentNameRow').text(departmentName).removeClass('hidden');
+//     } else {
+//         $('#departmentNameRow').addClass('hidden');
+//     }
+
+//     // Empty the current staffGrid for staff cards
+//     $('#staffGrid').empty();
+
+//     // Get the staff boxes for the first department
+//     var staffBoxes = departments[departmentName] || [];
+
+//     // Append staff boxes to the staffGrid
+//     $.each(staffBoxes, function(index, box) {
+//         $(box).addClass('bg-pink-100 p-4 rounded-lg shadow-md'); // Classes for styling the staff boxes
+//         $('#staffGrid').append(box); // Append each staff card to the staffGrid
+//     });
+// }
 const container = document.querySelector('.overflow-x-auto');
                 
 let startY;

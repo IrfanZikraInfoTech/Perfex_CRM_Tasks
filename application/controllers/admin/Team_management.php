@@ -369,8 +369,7 @@ class Team_management extends AdminController {
 
     public function attendance_board($from = null, $to = null, $exclude_ids = ''){
         $data['departments'] = $this->team_management_model->get_all_departments();
-        
-        // var_dump($data['departments']);
+
         $from = $from ?? date("Y-m-d");
         $to = $to ?? date("Y-m-d");
 
@@ -457,32 +456,33 @@ class Team_management extends AdminController {
             $data['totals']['ar'] += $dateTotals['ar'];
         }
 
-        $all_departments = $this->team_management_model->get_all_departments();
-$all_staff_with_departments = [];
+        $data['totals']['pr'] = ($data['totals']['pr'] / count($data['dates'])) * 100;
+        $data['totals']['ar'] = ($data['totals']['ar'] / count($data['dates'])) * 100;
 
-foreach ($all_departments as $department) {
-    $department_staff = $this->team_management_model->get_staff_by_department($department->departmentid);
+        
 
-    foreach ($department_staff as $staff) {
-        $staff_id = $staff->staffid;
+        $staff_dates_data = [];
 
-        // Fetch KPIs for the staff member
-        $punctuality_rate = $this->kpi_system->kpi_punctuality_rate($staff_id, $from, $to);
-        $attendance_data = $this->kpi_system->attendance_data($staff_id, $from, $to);
+        foreach ($staffs as $staff) {
+            $staff_id = $staff->staffid;
 
-        // Store the data in the array, including the department
-        $all_staff_with_departments[$staff_id] = [
-            'name' => $staff->firstname . ' ' . $staff->lastname,
-            'ar' => $punctuality_rate['present_percentage'],
-            'pr' => $punctuality_rate['on_time_percentage'],
-            'ct' => $attendance_data['total_clockable'],
-            'cdt' => $attendance_data['total_clocked'],
-            'department' => $staff->department // Add department here
-        ];
-    }
-}
+            // Fetch KPIs for the staff member for the given date range
+            $punctuality_rate = $this->kpi_system->kpi_punctuality_rate($staff_id, $from, $to);
+            $attendance_data = $this->kpi_system->attendance_data($staff_id, $from, $to);
 
-$data['staff_dates_data'] = $all_staff_with_departments;
+            // Store the OPS in the array
+            $staff_dates_data[$staff_id] = [
+                'name' => $staff->firstname . ' ' . $staff->lastname,
+                'ar' => $punctuality_rate['present_percentage'],
+                'pr' => $punctuality_rate['on_time_percentage'],
+                'ct' => $attendance_data['total_clockable'],
+                'cdt' => $attendance_data['total_clocked'],
+            ];
+        }
+
+        // Pass the OPS data to the view
+        $data['staff_dates_data'] = $staff_dates_data;
+
 
         $this->load->view('admin/management/attendance_board', $data);
     }
