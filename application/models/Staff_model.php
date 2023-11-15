@@ -961,5 +961,24 @@ class Staff_model extends App_Model
     }
 
 
+// count work .
+public function count_all_staff() {
+        $this->db->where('active', 1); // Assuming 'active' column exists and '1' means active
+        $query = $this->db->get('tblstaff');
+        return $query->num_rows(); // This returns the count of all active staff members
+    }
+    
 
+public function count_staff_on_notice_period() {
+    $this->db->where('status_work', 'notice period');
+    $this->db->where('active', 1); // Only include active staff members
+    $query = $this->db->get('tblstaff');
+    return $query->num_rows(); // This returns the count of active rows where status_work is 'notice_period'
+}
+public function count_staff_on_probation() {
+    $this->db->where('status_work', 'probation');
+    $this->db->where('active', 1); // Only include active staff members
+    $query = $this->db->get('tblstaff');
+    return $query->num_rows(); // This returns the count of active rows where status_work is 'probation'
+}
 }

@@ -96,6 +96,9 @@
 
 		<?php render_yes_no_option('enable_webhooks','Enable Webhook'); ?>
 		<?php echo render_yes_no_option('show_ceo_data','Show CEO Data?'); ?>
+		<?php echo render_input('settings[custom_prefix]','Custom Prefix',get_option('custom_prefix'), 'text'); ?>
+
+
 		<hr />
 	</div>
 </div>

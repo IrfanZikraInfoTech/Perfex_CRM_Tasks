@@ -338,7 +338,9 @@ function hr_profile_load_js(){
 	function hr_profile_add_head_components(){    
 		$CI = &get_instance();
 		$viewuri = $_SERVER['REQUEST_URI'];
-
+		
+		echo'<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		';
 		if(hr_profile_check_hide_menu()){
 			if(!(strpos($viewuri,'admin') === false)){
 				echo '<link href="' . module_dir_url(HR_PROFILE_MODULE_NAME, 'assets/css/hide_sidebar_menu.css') . '?v=' . VERSION_HR_PROFILE. '"  rel="stylesheet" type="text/css" />';
