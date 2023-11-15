@@ -2,37 +2,57 @@
 
 <script>
 
-	$(function(){
+$(function(){
 
-		'use strict';
+'use strict';
 
-		var StaffServerParams = {
+var StaffServerParams = {
 
-			"status_work": "[name='status_work[]']",
+	"status_work": "[name='status_work[]']",
 
-			"hr_profile_deparment": "[name='hr_profile_deparment']",
+	"hr_profile_deparment": "[name='hr_profile_deparment']",
 
-			"staff_role": "[name='staff_role[]']",
+	"staff_role": "[name='staff_role[]']",
 
-			"staff_teammanage": "input[name='staff_dep_tree']",
+	"active": "[name='active[]']",
 
-		};
+	"staff_teammanage": "input[name='staff_dep_tree']",
 
-		var table_staff = $('table.table-table_staff');
+};
 
-		initDataTable(table_staff,admin_url + 'hr_profile/table', [0],[0], StaffServerParams, [1, 'asc']);
+var table_staff = $('table.table-table_staff');
 
-		//hide first column
-
-		 var hidden_columns = [];
-
-		 $('.table-table_staff').DataTable().columns(hidden_columns).visible(false, false);
+initDataTable(table_staff,admin_url + 'hr_profile/table', [0],[0], StaffServerParams, [1, ' ']);
 
 
+
+//hide first column
+
+ var hidden_columns = [];
+
+ $('.table-table_staff').DataTable().columns(hidden_columns).visible(false, false);
+
+
+
+$.each(StaffServerParams, function() {
+
+	$('#hr_profile_deparment').on('change', function() {
+
+		table_staff.DataTable().ajax.reload()
+
+		.columns.adjust()
+
+		.responsive.recalc();
+
+	});
+
+});
+
+		//staff role
 
 		$.each(StaffServerParams, function() {
 
-			$('#hr_profile_deparment').on('change', function() {
+			$('#staff_role').on('change', function() {
 
 				table_staff.DataTable().ajax.reload()
 
@@ -44,21 +64,17 @@
 
 		});
 
-				//staff role
+		$.each(StaffServerParams, function() {
+			$('#active').on('change', function() {
+				table_staff.DataTable().ajax.reload()
+					.columns.adjust()
+					.responsive.recalc();
+			});
+		});
 
-				$.each(StaffServerParams, function() {
 
-					$('#staff_role').on('change', function() {
 
-						table_staff.DataTable().ajax.reload()
 
-						.columns.adjust()
-
-						.responsive.recalc();
-
-					});
-
-				});
 
 				//combotree filter by team manage
 

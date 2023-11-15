@@ -159,7 +159,16 @@ if($this->ci->input->post('status_work')){
 }          
 
 
+if ($this->ci->input->post('active') != '') {
+    $active = $this->ci->input->post('active');
+    $where_active = db_prefix() . 'staff.active = "' . $active . '"';
 
+    if ($where != '') {
+        array_push($where, 'AND ' . $where_active);
+    } else {
+        $where = [$where_active];
+    }
+}
 
 
 

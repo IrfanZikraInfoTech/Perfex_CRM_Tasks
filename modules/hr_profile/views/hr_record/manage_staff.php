@@ -144,6 +144,14 @@
 								</select>
 
 							</div>
+
+							<div class="col-md-3 pull-right">
+                            <select name="active[]" class="selectpicker" id="active" data-width="100%" data-none-selected-text="<?php echo ('Staff Status'); ?>">
+                            <option value="<?php echo '1'; ?>"><?php echo _l('Active'); ?></option>
+
+                            <option value="<?php echo '0'; ?>"><?php echo _l('Inactive'); ?></option>
+                            </select>
+                            </div>
 						</div>
 
 						<br>

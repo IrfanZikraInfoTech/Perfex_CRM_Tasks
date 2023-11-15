@@ -110,7 +110,7 @@ function hr_profile_module_init_menu_items()
 	 if(has_permission('hrm_hr_records','','view') || has_permission('hrm_hr_records','','view_own')){
 		 $CI->app_menu->add_sidebar_children_item('hr_profile', [
 			'slug'     => 'hr_profile_hr_records',
-			'name'     => _l('hr_hr_records'),
+			'name'     => _l('Employees Record'),
 			'icon'     => 'fa fa-user',
 			'href'     => admin_url('hr_profile/staff_infor'),
 			'position' => 4,
@@ -120,7 +120,7 @@ function hr_profile_module_init_menu_items()
 	 if(has_permission('staffmanage_job_position','','view') || has_permission('staffmanage_job_position','','view_own')){
 		 $CI->app_menu->add_sidebar_children_item('hr_profile', [
 			'slug'     => 'hr_profile_job_position_manage',
-			'name'     => _l('hr_job_descriptions'),
+			'name'     => _l('Job Titles'),
 			'icon'     => 'fa fa-map-pin',
 			'href'     => admin_url('hr_profile/job_positions'),
 			'position' => 2,
