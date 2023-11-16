@@ -446,15 +446,6 @@ function report_by_staffs(id, value, title_c){
 
 
 
-       	}, {
-
-
-       		name: '<?php echo _l('hr_staff_quit'); ?>',
-
-       		data: response.hr_staff_quit
-
-
-
        	},{
         name: '<?php echo _l('Staff Resigned'); ?>',
         data: response.hr_staff_resigned // Make sure to send this data from the server

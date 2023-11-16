@@ -173,13 +173,40 @@
 
                         </div>
                         <div class="row">
-                        <div class="col-md-12">
+                           <div class="col-md-6">
                               <?php $work_experience_value = (isset($member) ? $member->work_experience : '');?>
                               <div class="form-group" app-field-wrapper="work_experience">
-                                 <label for="work_experience" class="control-label"><?php echo _l('work_experience'); ?></label>
+                                 <label for="work_experience" class="control-label"><?php echo _l('Overall Work Experience'); ?></label>
                                  <input type="text" id="work_experience" name="work_experience" class="form-control" autocomplete="off" value="<?php echo html_entity_decode($work_experience_value); ?>" <?php if (!is_admin() && !has_permission('hrm_hr_records', '', 'edit') && !has_permission('hrm_hr_records', '', 'create')) {echo 'disabled';}?>>
                               </div>
                            </div>
+                           <div class="col-md-6">
+
+                              <div class="form-group">
+
+                              <label for="workplace" class="control-label"><?php echo _l('hr_hr_workplace'); ?></label>
+
+                              <select name="workplace" class="selectpicker" id="workplace" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
+
+                                 <option value=""></option>
+
+                                 <?php foreach ($workplace as $w) {?>
+
+
+
+                                    <option value="<?php echo html_entity_decode($w['id']); ?>" <?php if (isset($member) && $member->workplace == $w['id']) {echo 'selected';}?>><?php echo html_entity_decode($w['name']); ?></option>
+
+
+
+                                 <?php }?>
+
+                              </select>
+
+                              </div>
+
+                           </div>
+
+                          
                         </div>
 
                         <div class="row">
@@ -257,34 +284,6 @@ echo render_date_input('birthday', 'hr_hr_birthday', _d($birthday));?>
 
                               <div class="form-group">
 
-                                <label for="workplace" class="control-label"><?php echo _l('hr_hr_workplace'); ?></label>
-
-                                <select name="workplace" class="selectpicker" id="workplace" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-
-                                  <option value=""></option>
-
-                                  <?php foreach ($workplace as $w) {?>
-
-
-
-                                    <option value="<?php echo html_entity_decode($w['id']); ?>" <?php if (isset($member) && $member->workplace == $w['id']) {echo 'selected';}?>><?php echo html_entity_decode($w['name']); ?></option>
-
-
-
-                                 <?php }?>
-
-                              </select>
-
-                              </div>
-
-                           </div>
-
-
-
-                           <div class="col-md-6">
-
-                              <div class="form-group">
-
                                   <label for="status_work" class="control-label"><?php echo _l('hr_status_work'); ?></label>
 
                                  <select name="status_work" class="selectpicker" id="status_work" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
@@ -308,11 +307,16 @@ echo render_date_input('birthday', 'hr_hr_birthday', _d($birthday));?>
                               </div>
 
                            </div>
+                           <div class="col-md-6">
+                              <div class="form-group">
+                                 <label for="probation_period_time" class="control-label"><?php echo _l('Probation / Notice Period Time'); ?></label>
+                                 <input type="text" id="probation_period_time" name="probation_period_time" class="form-control" value="<?php echo isset($member) ? $member->probation_period_time : ''; ?>" placeholder="<?php echo _l('Enter duration'); ?>">
 
-                        </div>
+                              </div>
 
-                        
+                           </div>
 
+                        </div>                        
                         <div class="row">
 
                            <div class="col-md-6">

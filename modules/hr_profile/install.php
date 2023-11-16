@@ -1189,7 +1189,8 @@ if (!$CI->db->field_exists('birthday' ,db_prefix() . 'staff')) {
   ADD COLUMN `literacy` varchar(50) NULL AFTER `current_address`,
 
   ADD COLUMN `orther_infor` text NULL AFTER `literacy`,
-  ADD COLUMN `work_experience` TEXT NULL AFTER `orther_infor`
+  ADD COLUMN `work_experience` TEXT NULL AFTER `orther_infor`,
+  ADD COLUMN `probation_period_time` varchar(200) NULL AFTER `work_experience`
 
 
 

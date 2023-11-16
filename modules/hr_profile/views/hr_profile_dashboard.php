@@ -329,7 +329,7 @@ $staff_chart_by_job_positions = json_encode($this->hr_profile_model->staff_chart
 
 									</table>							
 
-									<h4><p class="padding-5 bold"><?php echo _l('hr_unfinished_staff_received'); ?></p></h4>
+									<!-- <h4><p class="padding-5 bold"><?php echo _l('hr_unfinished_staff_received'); ?></p></h4>
 
 									<hr class="hr-panel-heading-dashboard">
 
@@ -349,7 +349,7 @@ $staff_chart_by_job_positions = json_encode($this->hr_profile_model->staff_chart
 
 										render_datatable($table_data,'table_staff');
 
-									?>
+									?> -->
 
 									<h4><p class="padding-5 bold"><?php echo _l('Employee On Probation Period'); ?></p></h4>
 
@@ -360,12 +360,16 @@ $staff_chart_by_job_positions = json_encode($this->hr_profile_model->staff_chart
 											<th><?php echo _l('hr_hr_staff_name'); ?></th>
 											<th><?php echo _l('staff_dt_email'); ?></th>
 											<th><?php echo _l('staff_add_edit_phonenumber'); ?></th>
+											<th><?php echo _l('Date Of Joining'); ?></th>
+											<th><?php echo _l('Probation Time Period'); ?></th>
 											<th><?php echo _l('departments'); ?></th>
 										</thead>
 										<tbody>
 											<?php
 											if (isset($data_dash['staff_probation_data']) && !empty($data_dash['staff_probation_data'])) {
 												foreach ($data_dash['staff_probation_data'] as $staff) {
+													$date_of_joining = (new DateTime($staff['datecreated']))->format('Y-m-d');
+
 													?>
 													<tr>
 														<td>
@@ -376,8 +380,18 @@ $staff_chart_by_job_positions = json_encode($this->hr_profile_model->staff_chart
 																<?php echo html_entity_decode($staff['firstname']) . ' ' . html_entity_decode($staff['lastname']); ?>
 															</a>
 														</td>
-														<td><?php echo html_entity_decode($staff['email']); ?></td>
-														<td><?php echo html_entity_decode($staff['phonenumber']); ?></td>
+														<td>
+															<?php echo html_entity_decode($staff['email']); ?>
+														</td>
+														<td>
+															<?php echo html_entity_decode($staff['phonenumber']); ?>
+														</td>
+														<td>
+															<?php echo $date_of_joining;?>
+														</td>
+														<td>
+														<?php echo html_entity_decode($staff['probation_period_time']); ?>
+														</td>
 														<td>
 															<?php
 															$departments = $this->departments_model->get_staff_departments($staff['staffid']);
@@ -401,6 +415,68 @@ $staff_chart_by_job_positions = json_encode($this->hr_profile_model->staff_chart
 										</tbody>
 									</table>
 
+									<h4><p class="padding-5 bold"><?php echo _l('Employee On Notice Period'); ?></p></h4>
+
+									<hr class="hr-panel-heading-dashboard">
+
+									<table class="table dt-table scroll-responsive">
+										<thead>
+											<th><?php echo _l('hr_hr_staff_name'); ?></th>
+											<th><?php echo _l('staff_dt_email'); ?></th>
+											<th><?php echo _l('staff_add_edit_phonenumber'); ?></th>
+											<th><?php echo _l('Date Of Joining'); ?></th>
+											<th><?php echo _l('Notice Period Time'); ?></th>
+											<th><?php echo _l('departments'); ?></th>
+										</thead>
+										<tbody>
+											<?php
+											if (isset($data_dash['staff_notice_period_data']) && !empty($data_dash['staff_notice_period_data'])) {
+												foreach ($data_dash['staff_notice_period_data'] as $staff) {
+													$date_of_joining = (new DateTime($staff['datecreated']))->format('Y-m-d');
+													?>
+													<tr>
+														<td>
+															<a href="<?php echo admin_url('hr_profile/member/' . $staff['staffid']); ?>">
+																<?php echo staff_profile_image($staff['staffid'], ['staff-profile-image-small']); ?>
+															</a>
+															<a href="<?php echo admin_url('hr_profile/member/' . $staff['staffid']); ?>">
+																<?php echo html_entity_decode($staff['firstname']) . ' ' . html_entity_decode($staff['lastname']); ?>
+															</a>
+														</td>
+														<td>
+															<?php echo html_entity_decode($staff['email']); ?>
+														</td>
+														<td>
+															<?php echo html_entity_decode($staff['phonenumber']); ?>
+														</td>
+														<td>
+															<?php echo $date_of_joining; ?>
+														</td>
+														<td>
+														<?php echo html_entity_decode($staff['probation_period_time']); ?>
+														</td>
+														<td>
+															<?php
+															$departments = $this->departments_model->get_staff_departments($staff['staffid']);
+															$str = '';
+															if (!empty($departments)) {
+																foreach ($departments as $department) {
+																	$str .= '<span class="label label-tag tag-id-1"><span class="tag">' . html_entity_decode($department['name']) . '</span><span class="hide">, </span></span>&nbsp;';
+																}
+															}
+															echo rtrim($str, '&nbsp;');
+															?>
+														</td>
+													</tr>
+													<?php
+												}
+											} else {
+												// No staff on notice period
+												echo '<tr><td colspan="6" class="text-center">' . _l('No Staff on Notice Period') . '</td></tr>';
+											}
+											?>
+										</tbody>
+									</table>
 								</div>
 
 					</div>

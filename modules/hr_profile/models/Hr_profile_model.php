@@ -44,7 +44,11 @@ class Hr_profile_model extends App_Model
 		$expire_contract = $this->db->query('SELECT * FROM '.db_prefix().'hr_staff_contract WHERE end_valid <= "'.date('Y-m-d',strtotime('+7 day',strtotime(date('Y-m-d')))).'" AND end_valid >= "'.date('Y-m-d').'" AND contract_status = "valid"')->result_array();
 
 		$staff_probation = $this->db->query('SELECT * FROM '.db_prefix().'staff WHERE status_work = "probation" AND active = 1')->result_array();
-
+		
+		$staff_notice_period = $this->db->query('SELECT * FROM '.db_prefix().'staff WHERE status_work = "notice period" AND active = 1')->result_array();
+		
+		$data_hrm['staff_notice_period_data'] = $staff_notice_period;
+	
 		$data_hrm['staff_probation_data'] = $staff_probation;
 
 		$data_hrm['staff_birthday'] = $staff_birthday;
@@ -286,12 +290,11 @@ class Hr_profile_model extends App_Model
 
 
 
-		$this->db->select(db_prefix().'staff_departments.departmentid, count(staffdepartmentid) as total_staff,'.db_prefix().'departments.name as department_name');
-
-		$this->db->join(db_prefix() . 'departments', db_prefix() . 'departments.departmentid = ' . db_prefix() . 'staff_departments.departmentid', 'left');
-
-		$this->db->group_by('departmentid');
-
+		$this->db->select(db_prefix().'staff_departments.departmentid, count('.db_prefix().'staff_departments.staffdepartmentid) as total_staff,'.db_prefix().'departments.name as department_name');
+		$this->db->join(db_prefix().'staff', db_prefix().'staff.staffid = '.db_prefix().'staff_departments.staffid', 'left');
+		$this->db->join(db_prefix().'departments', db_prefix().'departments.departmentid = '.db_prefix().'staff_departments.departmentid', 'left');
+		$this->db->where(db_prefix().'staff.active', 1); // Only include active staff
+		$this->db->group_by(db_prefix().'staff_departments.departmentid');
 		$staff_departments = $this->db->get(db_prefix().'staff_departments')->result_array();
 
 		$color_index=0;
@@ -367,7 +370,7 @@ class Hr_profile_model extends App_Model
 		$this->db->select(db_prefix().'hr_job_position.position_name, count(staffid) as total_staff, job_position');
 
 		$this->db->join(db_prefix() . 'hr_job_position', db_prefix() . 'hr_job_position.position_id = ' . db_prefix() . 'staff.job_position', 'left');
-
+		$this->db->where(db_prefix().'staff.active', 1); // Only include active staff
 		$this->db->group_by('job_position');
 
 		$staff_departments = $this->db->get(db_prefix().'staff')->result_array();
