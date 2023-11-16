@@ -84,25 +84,19 @@ if ($member->active == 0) {?>
 
 									<div class="socials text-center mt-3">
 
-										<a href="facebook: <?php echo html_escape($member->facebook); ?>" class="btn btn-circle">
-
+									<a href="https://www.facebook.com/<?php echo html_escape($member->facebook); ?>" class="btn btn-circle" target="_blank">
 										<i class="fa-brands fa-facebook" aria-hidden="true"></i>
+									</a>
+									
+									<a href="<?php echo html_escape($member->linkedin); ?>" class="btn btn-circle" target="_blank">
+										<i class="fa-brands fa-linkedin"></i>
+									</a>
 
-										</a>
-
-										<a href="linkedin: <?php echo html_escape($member->linkedin); ?>" class="btn btn-circle">
-
-											<i class="fa-brands fa-linkedin"></i>
-
-										</a>
-
-										<a href="skype: <?php echo html_escape($member->skype); ?>" class="btn btn-circle">
-
+										<a href="skype:<?php echo html_escape($member->skype); ?>?chat" class="btn btn-circle">
 											<i class="fa-brands fa-skype"></i>
-
 										</a>
 
-										<a href="mailto: <?php echo html_escape($member->email); ?>" class="btn btn-circle">
+										<a href="mailto:{email} " class="btn btn-circle">
 
 											<i class="fa fa-envelope"></i>
 

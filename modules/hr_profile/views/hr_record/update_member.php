@@ -931,7 +931,7 @@ echo render_input('Personal_tax_code', 'hr_Personal_tax_code', $Personal_tax_cod
 
                           <div class="form-group">
 
-                              <label for="facebook" class="control-label"><i class="fa fa-facebook"></i> <?php echo _l('staff_add_edit_facebook'); ?></label>
+                              <label for="facebook" class="control-label"><i class="fa-brands fa-facebook"></i> <?php echo _l('staff_add_edit_facebook'); ?></label>
 
                               <input type="text" class="form-control" name="facebook" value="<?php if (isset($member)) {echo html_entity_decode($member->facebook);}?>">
 
@@ -943,7 +943,7 @@ echo render_input('Personal_tax_code', 'hr_Personal_tax_code', $Personal_tax_cod
 
                            <div class="form-group">
 
-                              <label for="linkedin" class="control-label"><i class="fa fa-linkedin"></i> <?php echo _l('staff_add_edit_linkedin'); ?></label>
+                              <label for="linkedin" class="control-label"><i class="fa-brands fa-linkedin"></i> <?php echo _l('staff_add_edit_linkedin'); ?></label>
 
                               <input type="text" class="form-control" name="linkedin" value="<?php if (isset($member)) {echo html_entity_decode($member->linkedin);}?>">
 
@@ -961,7 +961,7 @@ echo render_input('Personal_tax_code', 'hr_Personal_tax_code', $Personal_tax_cod
 
                            <div class="form-group">
 
-                             <label for="skype" class="control-label"><i class="fa fa-skype"></i> <?php echo _l('staff_add_edit_skype'); ?></label>
+                             <label for="skype" class="control-label"><i class="fa-brands fa-skype"></i> <?php echo _l('staff_add_edit_skype'); ?></label>
 
                              <input type="text" class="form-control" name="skype" value="<?php if (isset($member)) {echo html_entity_decode($member->skype);}?>">
 
