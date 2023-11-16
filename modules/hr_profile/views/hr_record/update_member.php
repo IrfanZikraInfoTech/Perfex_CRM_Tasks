@@ -150,8 +150,8 @@
 
                            <?php $lastname = (isset($member) ? $member->lastname : '');?>
                            <?php
-                           $date_of_joining = (isset($member) && isset($member->datecreated)) ? _d($member->datecreated) : '';
-                           ?>
+                              $date_of_joining = (isset($member) && isset($member->datecreated)) ? (new DateTime($member->datecreated))->format('Y-m-d') : '';
+                              ?>
                            <?php $attrs = (isset($member) ? array() : array('autofocus' => true));?>    
                         </div>
 
@@ -359,9 +359,9 @@ echo render_date_input('birthday', 'hr_hr_birthday', _d($birthday));?>
 
                         <div class="row">
                          
-                           <div class="col-md-6">
-                                 <?php echo render_input('datecreated', 'Date Of joining', $date_of_joining, 'datetime-local', $attrs); ?>
-                           </div>
+                        <div class="col-md-6">
+                           <?php echo render_input('datecreated', 'Date Of joining', $date_of_joining, 'date', $attrs); ?>
+                        </div>
                       
                       <div class="col-md-6">
                         <?php if (is_admin() || has_permission('hrm_hr_records', '', 'edit')) {

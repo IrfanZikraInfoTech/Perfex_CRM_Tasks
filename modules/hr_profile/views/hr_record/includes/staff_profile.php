@@ -86,19 +86,19 @@ if ($member->active == 0) {?>
 
 										<a href="facebook: <?php echo html_escape($member->facebook); ?>" class="btn btn-circle">
 
-										<i class="fa fa-facebook" aria-hidden="true"></i>
+										<i class="fa-brands fa-facebook" aria-hidden="true"></i>
 
 										</a>
 
 										<a href="linkedin: <?php echo html_escape($member->linkedin); ?>" class="btn btn-circle">
 
-											<i class="fa fa-linkedin"></i>
+											<i class="fa-brands fa-linkedin"></i>
 
 										</a>
 
 										<a href="skype: <?php echo html_escape($member->skype); ?>" class="btn btn-circle">
 
-											<i class="fa fa-skype"></i>
+											<i class="fa-brands fa-skype"></i>
 
 										</a>
 

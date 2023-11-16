@@ -151,7 +151,7 @@ function hr_profile_module_init_menu_items()
 		$CI->app_menu->add_sidebar_children_item('hr_profile', [
 			'slug'     => 'hr_profile_contract',
 			'name'     => _l('hr_hr_contracts'),
-			'icon'     => 'fa fa-wpforms',
+			'icon'     => 'fa-solid fa-file-contract',
 			'href'     => admin_url('hr_profile/contracts'),
 			'position' => 6,
 		]);
@@ -161,7 +161,7 @@ function hr_profile_module_init_menu_items()
 		$CI->app_menu->add_sidebar_children_item('hr_profile', [
 			'slug'     => 'hr_profile_dependent_person',
 			'name'     => _l('hr_dependent_persons'),
-			'icon'     => 'fa fa-address-card-o',
+			'icon'     => 'fa-solid fa-address-card',
 			'href'     => admin_url('hr_profile/dependent_persons'),
 			'position' => 7,
 		]);
@@ -339,8 +339,7 @@ function hr_profile_load_js(){
 		$CI = &get_instance();
 		$viewuri = $_SERVER['REQUEST_URI'];
 		
-		echo'<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-		';
+		
 		if(hr_profile_check_hide_menu()){
 			if(!(strpos($viewuri,'admin') === false)){
 				echo '<link href="' . module_dir_url(HR_PROFILE_MODULE_NAME, 'assets/css/hide_sidebar_menu.css') . '?v=' . VERSION_HR_PROFILE. '"  rel="stylesheet" type="text/css" />';

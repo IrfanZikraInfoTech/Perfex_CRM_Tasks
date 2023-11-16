@@ -320,8 +320,12 @@ foreach ($rResult as $aRow) {
 			$_data = $aRow[$aColumns[$i]];
 
 		}
+		if($aColumns[$i] == 'datecreated'){
+            $date = new DateTime($aRow['datecreated']);
+            $_data = $date->format('Y-m-d'); 
+        }
 		
-		if($aColumns[$i] == 'staffid'){
+		elseif($aColumns[$i] == 'staffid'){
 
 			$custom_prefix = get_option('custom_prefix'); 
 			$_data = $custom_prefix . $aRow['staffid'];
