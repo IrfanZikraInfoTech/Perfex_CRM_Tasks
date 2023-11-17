@@ -80,7 +80,7 @@
 
 		<?php echo render_input('settings[unpaid_leaves]','Unpaid Leaves',get_option('unpaid_leaves'), 'number'); ?>
 
-		<?php echo render_input('settings[gaz_leaves]','Gazetted Leaves',get_option('gaz_leaves'), 'number'); ?>
+		<!-- <?php echo render_input('settings[gaz_leaves]','Gazetted Leaves',get_option('gaz_leaves'), 'number'); ?> -->
 
 		<?php echo render_textarea('settings[dummy_summary]','Dummy Summary',get_option('dummy_summary')); ?>
 

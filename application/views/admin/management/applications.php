@@ -37,7 +37,7 @@
                     $unpaidDisplayText = $unpaidDifference >= 0 ? $unpaidDifference . " left" : abs($unpaidDifference) . " Exceeded";
                     ?>
                     <div class="flex flex-row justify-between">
-                        <h3 class="text-xl font-bold mb-2">Unpaid Leaves:</h3>
+                        <h3 class="text-xl font-bold mb-2">Loss Of Pay Leaves:</h3>
                         <div><h2 class="px-4 flex items-center justify-center h-5 rounded-full bg-white text-black"><?= $unpaidDisplayText ?></h2></div>
                     </div>
                     <div class="text-lg font-semibold flex xl:flex-row flex-col justify-between">
@@ -49,13 +49,13 @@
 
                 <!-- Gazetted Leaves Details -->
                 <div class="bg-yellow-100 rounded-lg p-4 shadow">
-                    <?php 
+                    <!-- <?php 
                     $gazDifference = (int)get_option('gaz_leaves') - (int)$app_gaz_no;
                     $gazDisplayText = $gazDifference >= 0 ? $gazDifference . " left" : abs($gazDifference) . " Exceeded";
-                    ?>
+                    ?> -->
                     <div class="flex flex-row justify-between">
                         <h3 class="text-xl font-bold mb-2">Gazetted Leaves:</h3>
-                        <div><h2 class="px-4 flex items-center justify-center h-5 rounded-full bg-white text-black"><?= $gazDisplayText ?></h2></div>
+                        <!-- <div><h2 class="px-4 flex items-center justify-center h-5 rounded-full bg-white text-black"><?= $gazDisplayText ?></h2></div> -->
                     </div>
                     <div class="text-lg font-semibold flex xl:flex-row flex-col justify-between">
                         <div>Pending: <?= $pen_gaz_no ?></div>
