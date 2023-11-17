@@ -22,12 +22,12 @@
                }
                ?>
             </div>
-            <div class="col-md-4 tw-text-neutral-600 mtop10 tw-text-sm">
+            <div class="col-md-8 tw-text-neutral-600 mtop10 tw-text-sm flex flex-wrap">
                 <?php
                echo format_members_by_ids_and_names($task['assignees_ids'], $task['assignees'], false, 'staff-profile-image-xs');
                ?>
             </div>
-            <div class="col-md-8 text-right tw-text-neutral-500 mtop10 tw-text-sm">
+            <div class="col-md-4 text-right tw-text-neutral-500 mtop10 tw-text-sm">
                 <?php if ($task['total_checklist_items'] > 0) { ?>
                 <span class="mright5 inline-block tw-text-neutral-500" data-toggle="tooltip"
                     data-title="<?php echo _l('task_checklist_items'); ?>">
