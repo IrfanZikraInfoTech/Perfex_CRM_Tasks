@@ -1354,6 +1354,25 @@ class Projects extends AdminController
         echo json_encode(array('success' => $success));
     }
 
+    
+    // This is a pseudo-code example for your PHP backend
+    public function reorg_epic() {
+        
+        $epicId = $this->input->post('epicId');
+        $updatedOrder = $this->input->post('updatedOrder');
+
+        foreach ($updatedOrder as $orderData) {
+            $storyId = $orderData['id'];
+            $newOrder = $orderData['order'];
+            // Call a function in your model to update the order index for the story
+            $this->projects_model->update_story_order($storyId, $newOrder);
+        }
+
+        // Send a response back to the frontend
+        echo json_encode(['success' => true]);
+    }
+
+
     public function create_new_sprint() {
         $project_id = $this->input->post('project_id');
         $sprint_name = $this->input->post('name');

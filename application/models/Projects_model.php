@@ -2678,6 +2678,7 @@ class Projects_model extends App_Model
 
         $this->db->select('id');
         $this->db->where($type.'_id', $type_id);
+        $this->db->order_by('order_index', 'ASC');
         $this->db->order_by('name', 'ASC');
         if(!$all_epics){
             ($type == "epic") ? $this->db->where('sprint_id IS NULL') : '';
@@ -2698,6 +2699,16 @@ class Projects_model extends App_Model
         $this->db->where('id', $story_id);
         return $this->db->update('tbltasks', $data);
     }
+
+    public function update_story_order($storyId, $newOrder) {
+        // Update the order_index in the database for the given story
+        $data = [
+            'order_index' => $newOrder
+        ];
+        $this->db->where('id', $storyId);
+        $this->db->update('tasks', $data);
+    }
+
 
     public function create_new_sprint($data) {
         $this->db->insert('tblsprints', $data);

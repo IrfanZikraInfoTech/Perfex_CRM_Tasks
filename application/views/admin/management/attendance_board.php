@@ -105,10 +105,10 @@
                     
                     <?php foreach($departments as $department): ?>
                         <div class="department-block mb-8">
-                            <h2 class="text-lg uppercase font-bold text-gray-800 text-center py-4 rounded-[40px] transition-all">
+                            <h2 class="text-lg uppercase font-bold text-gray-800 text-center py-4 rounded-[40px] transition-all bg-gray-100 mb-2">
                                 <?= $department->name; ?>
                             </h2>
-                            <div class="grid grid-cols-3 gap-4">
+                            <div class="grid grid-cols-3 gap-4 department-block-grid">
                                 <?php $staff_members = $this->team_management_model->get_staff_by_department($department->departmentid); ?>
                                 <?php foreach($staff_members as $staff_member): ?>
                                     <?php $staff = $staff_dates_data[$staff_member->staffid]; ?>
@@ -587,23 +587,30 @@ function updateMaxHeight(collapsibleContent, isExpanding) {
 $(document).ready(function() {
     $('#sortSelect').on('change', function() {
         var sortBy = $(this).val();
-        
-        var staffBoxes = $('.staff-box').sort(function(a, b) {
-            if (sortBy === 'name') {
-                return $(a).data('name').localeCompare($(b).data('name'));
-            } else if(sortBy === 'ar') { // Sort by OPS
-                return $(b).data('ar') - $(a).data('ar');
-            }else if(sortBy === 'pr') { // Sort by OPS
-                return $(b).data('pr') - $(a).data('pr');
-            }else if(sortBy === 'ct') { // Sort by OPS
-                return $(b).data('ct') - $(a).data('ct');
-            }else if(sortBy === 'cdt') { // Sort by OPS
-                return $(b).data('cdt') - $(a).data('cdt');
-            }
+
+        // Loop over each department block
+        $('.department-block-grid').each(function() {
+            // var $departmentBlock = $(this); // Current department block
+            var staffBoxes = $(this).find('.staff-box').sort(function(a, b) {
+                if (sortBy === 'name') {
+                    return $(a).data('name').localeCompare($(b).data('name'));
+                } else if(sortBy === 'ar') {
+                    return $(b).data('ar') - $(a).data('ar');
+                } else if(sortBy === 'pr') {
+                    return $(b).data('pr') - $(a).data('pr');
+                } else if(sortBy === 'ct') {
+                    return $(b).data('ct') - $(a).data('ct');
+                } else if(sortBy === 'cdt') {
+                    return $(b).data('cdt') - $(a).data('cdt');
+                }
+            });
+            // Replace the existing staff boxes with the sorted ones
+            $(this).html(staffBoxes);
+            console.log(staffBoxes);
         });
-        $('#staffGrid').html(staffBoxes);
     });
 });
+
 
 // function sortAndDisplayByDepartment() {
 //     var departments = {};

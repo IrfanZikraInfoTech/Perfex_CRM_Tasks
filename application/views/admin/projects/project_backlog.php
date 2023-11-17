@@ -5,13 +5,19 @@
 ?>
 
 <style>
+    .collapsible-content::-webkit-scrollbar {
+        width: 0px; 
+    }
+
     .collapsible-content {
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.3s;
+
     }
     .expanded {
         max-height: 50em; /* large enough to accommodate content */
+        overflow-y: scroll;
     }
 </style>
 
@@ -45,7 +51,7 @@
             <!-- Existing Sprint -->
             <div class="border-2 border-solid <?= $color ?> rounded-lg mb-4 transition-all hover:shadow-lg ease-in-out duration-300" style="background:white;">
                 
-                <div class="flex justify-between items-center py-2 px-4 <?= $color ?> rounded-t-lg cursor-pointer sprint-anchor" onclick="toggleCollapse(event, 'sprint-<?= $sprint->id ?>-content')">
+                <div class="flex justify-between items-center py-2 px-4 <?= $color ?> rounded-t-lg cursor-pointer closed-anchor" onclick="toggleCollapse(event, 'sprint-<?= $sprint->id ?>-content')">
                     <div class="flex items-center text-black font-bold text-base gap-2 w-1/3" >
                         <div class="fas fa-angle-down transform transition-transform duration-300"></div>
                         <input class="text-black font-bold text-base bg-transparent w-full px-2 py-1" value="<?= htmlspecialchars($sprint->name); ?>" onchange="updateSprintName(this.value, <?= $sprint->id ?>)" placeholder="Sprint Name" />
@@ -144,7 +150,7 @@
 
                     <div class="border-2 border-solid border-purple-100 rounded-lg transition-all hover:shadow-lg ease-in-out duration-300">
             
-                        <div class="flex justify-between items-center py-2 px-4 bg-purple-100/40 rounded-t-lg border-solid border-purple-200 cursor-pointer" onclick="toggleCollapse(event, 'epic-<?= $epic->id ?>-content')">
+                        <div class="flex justify-between items-center py-2 px-4 bg-purple-100/40 rounded-t-lg border-solid border-purple-200 cursor-pointer closed-anchor" onclick="toggleCollapse(event, 'epic-<?= $epic->id ?>-content', true)">
 
                             <div class="flex items-center text-black font-bold text-base gap-2 w-1/3">
                                 <div class="fas fa-angle-down transform transition-transform duration-300"></div>
@@ -196,13 +202,18 @@
         updateMaxHeight(content, isExpanding);
         var arrow = event.currentTarget.querySelector('.fa-angle-down');
         arrow.classList.toggle('rotate-[-90deg]');
-
     }
 
-    function updateMaxHeight(collapsibleContent, isExpanding) {
+    function updateMaxHeight(collapsibleContent, isExpanding, limitHeight = false) {
         if (isExpanding) {
-            // Set max-height to scrollHeight when expanding
-            var maxHeight = collapsibleContent.scrollHeight + 'px';
+            
+            var height = collapsibleContent.scrollHeight;
+            
+            // if(collapsibleContent.scrollHeight > 400 && limitHeight){
+            //     height = 300;
+            // }
+
+            var maxHeight = height + 'px';
             collapsibleContent.style.maxHeight = maxHeight;
         } else {
             // Reset max-height to 0 when collapsing
@@ -214,8 +225,8 @@
         updateMaxHeight(element, true);
     });
 
-    document.querySelectorAll('.sprint-anchor').forEach(function(element) {
-        // element.click();
+    document.querySelectorAll('.closed-anchor').forEach(function(element) {
+        element.click();
     });
 
 
@@ -224,63 +235,98 @@
         pull: true,
         put: true,
     };
+
+    function handleEpicUpdate(evt){
+
+        var target_issue_type = evt.to.getAttribute('data-issue-type'); // Check the attribute is set in HTML
+        var target_issue_id = evt.to.getAttribute('data-issue-id'); // Check the attribute is set in HTML
+
+
+        if(target_issue_type == 'epic'){
+
+            var updatedOrder = Array.from(evt.to.children).map((child, index) => ({
+                id: child.getAttribute('data-story-id'),
+                order: index
+            }));
+
+            // AJAX request to update the order in the database
+            updateStoryOrderInEpic(target_issue_id, updatedOrder);
+
+        }
+    }
     
     function handleStoryMove(evt) {
-    var story_id = evt.item.getAttribute('data-story-id');
-    var estimated_hours = evt.item.getAttribute('data-estimated-hours'); // Ensure this attribute is set correctly in the HTML
-    var origin_issue_type = evt.from.getAttribute('data-issue-type'); // Check the attribute is set in HTML
-    var target_issue_type = evt.to.getAttribute('data-issue-type'); // Check the attribute is set in HTML
+            
+        var story_id = evt.item.getAttribute('data-story-id');
+        var estimated_hours = evt.item.getAttribute('data-estimated-hours'); // Ensure this attribute is set correctly in the HTML
+        var origin_issue_type = evt.from.getAttribute('data-issue-type'); // Check the attribute is set in HTML
+        var origin_issue_id = evt.from.getAttribute('data-issue-id'); // Check the attribute is set in HTML
+        var target_issue_type = evt.to.getAttribute('data-issue-type'); // Check the attribute is set in HTML
 
-    var target_issue_id = evt.to.getAttribute('data-issue-id'); // Check the attribute is set in HTML
+        var target_issue_id = evt.to.getAttribute('data-issue-id'); // Check the attribute is set in HTML
 
-    // Function to move the story back to the epic
-    function moveStoryBack() {
-        evt.from.appendChild(evt.item); // Move back to the original list
-    }
 
-    // Check if we're moving from 'epic' to 'sprint' and if estimated hours are not set or zero
-    if (origin_issue_type === 'epic' && target_issue_type === 'sprint' && (!estimated_hours || parseFloat(estimated_hours) === 0)) {
-        // Show Swal with input for estimated hours
-        Swal.fire({
-            title: 'Estimated Hours Required',
-            input: 'number',
-            inputAttributes: {
-                min: '0.5',
-                step: '0.5'
-            },
-            inputValue: '0.5', // Default if estimated hours are not set
-            showCancelButton: true,
-            confirmButtonText: 'Update Hours',
-            cancelButtonText: 'Cancel',
-            inputValidator: (value) => {
-                if (!value || parseFloat(value) <= 0) {
-                    return 'You must enter estimated hours greater than 0!';
+        // Function to move the story back to the epic
+        function moveStoryBack() {
+            evt.from.appendChild(evt.item); // Move back to the original list
+        }
+
+        // Check if we're moving from 'epic' to 'sprint' and if estimated hours are not set or zero
+        if (origin_issue_type === 'epic' && target_issue_type === 'sprint' && (!estimated_hours || parseFloat(estimated_hours) === 0)) {
+            // Show Swal with input for estimated hours
+            Swal.fire({
+                title: 'Estimated Hours Required',
+                input: 'number',
+                inputAttributes: {
+                    min: '0.5',
+                    step: '0.5'
+                },
+                inputValue: '0.5', // Default if estimated hours are not set
+                showCancelButton: true,
+                confirmButtonText: 'Update Hours',
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (!value || parseFloat(value) <= 0) {
+                        return 'You must enter estimated hours greater than 0!';
+                    }
                 }
-            }
-        }).then((result) => {
-            if (result.isConfirmed && result.value) {
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
 
-                updateStoryEstimatedHours(story_id, result.value)
-                .then(result => {
-                    moveStory(story_id, target_issue_id, target_issue_type, evt.to.parentElement);
-                })
-                .catch(error => {
-                    console.error(error); // 'No' or 'Error' if not successful
-                });
+                    updateStoryEstimatedHours(story_id, result.value)
+                    .then(result => {
+                        moveStory(story_id, target_issue_id, target_issue_type, evt.to.parentElement);
+                    })
+                    .catch(error => {
+                        console.error(error); // 'No' or 'Error' if not successful
+                    });
 
-            } else {
-                // No valid hours entered; move the story back to the epic
-                moveStoryBack();
-            }
-        });
+                } else {
+                    // No valid hours entered; move the story back to the epic
+                    moveStoryBack();
+                }
+            });
 
-        // Cancel the current move operation
-        return false;
-    }else{
-        moveStory(story_id, target_issue_id, target_issue_type, evt.to.parentElement);
+            // Cancel the current move operation
+            return false;
+        }else{
+            moveStory(story_id, target_issue_id, target_issue_type, evt.to.parentElement);
+        }
+
     }
 
+function updateStoryOrderInEpic(epicId, updatedOrder) {
+    $.ajax({
+        url: admin_url + 'projects/reorg_epic',
+        type: 'POST',
+        data: {
+            epicId: epicId,
+            updatedOrder: updatedOrder
+        }
+    });
 }
+
+
 
 function moveStory(story_id, new_issue_id, new_issue_type, new_issue){
     updateMaxHeight(new_issue, true);
@@ -349,7 +395,8 @@ function updateStoryEstimatedHours(story_id, hours) {
             easing: "cubic-bezier(1, 0, 0, 1)",
             ghostClass: 'sortable-ghost',
             dragClass: "sortable-drag",
-            onAdd: handleStoryMove
+            onAdd: handleStoryMove,
+            onSort: handleEpicUpdate
         });
     }
 

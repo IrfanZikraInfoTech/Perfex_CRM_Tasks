@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monthly Payslip</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        @page {
+            background: url('https://i.ibb.co/qFYCS3K/Letter-haed-empty-01.jpg') no-repeat 0 0;
+            background-image-resize: 6;
+        }
+    </style>
+</head>
+<body>
+    <table style="color:#f9c53a;">
+        <tr>
+            <td style="padding-top:327px;padding-left: 70px;">{firstname} {lastname}</td>
+        </tr>
+        <tr>
+            <td style="padding-top:10px;padding-left: 130px;">{email}</td>
+        </tr>
+        <tr>
+            <td style="padding-left: 93px;padding-top:18px;">{phonenumber}</td>
+        </tr>
+    </table>
+    
+    <table style="color:#000;font-weight:bold;font-size: 17px;">
+        <tr>
+            <td style="width: 480px; padding-top:123px;padding-left: 130px;">{salary}</td>
+            <td style="width: 200px; padding-top:123px;padding-left: 40px;">{deduction}</td>
+        </tr>
+        <tr>
+            <td style="width: 480px; padding-top:20px;padding-left: 80px;">{bonus}</td>
+            <td style="width: 200px; padding-top:20px;padding-left: 0px;">{total}</td>
+        </tr>
+        <tr>
+            <td style="width: 200px; padding-top:20px;padding-left: 0px;">{remark}</td>
+        </tr>
+    </table>
+    
+
+    <table style="color:#414039;font-size: 19px;">
+        <tr>
+            <td style="width: 250px; padding-top:76px;padding-left: 12px;">{approver_name}</td>
+            <td style="width: 244px; padding-top:76px;padding-left: 5px;">{payment_mode}</td>
+            <td style="width: 150px; padding-top:76px;padding-left: 0px;">{Refrence_number}</td>
+        </tr>
+    </table>    
+
+</body>
+
+</html>

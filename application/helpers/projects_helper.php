@@ -504,12 +504,25 @@ function story($story, $show_epic = false, $href = '') {
                              '</div>';
     }
 
-    // Compute the time indicator text
     $current_date = new DateTime();  // get the current date
     $start_date = $story->startdate ? new DateTime($story->startdate) : null;
     $due_date = $story->duedate ? new DateTime($story->duedate) : null;
-
-    if ($start_date && $current_date < $start_date) {
+    
+    $data_finished = $story->datefinished ? new DateTime(date("Y-m-d", strtotime($story->datefinished))) : null;
+    
+    // Check if the story is finished
+    if ($data_finished) {
+        $interval = $current_date->diff($data_finished);
+        $days_finished_ago = $interval->days;
+        $time_indicator_text = 'Finished ' . $days_finished_ago . ' days ago';
+    
+        // Check if finished after the due date
+        if ($due_date && $data_finished > $due_date) {
+            $overdue_interval = $due_date->diff($data_finished);
+            $days_overdue = $overdue_interval->days;
+            $time_indicator_text .= ', ' . $days_overdue . ' day' . ($days_overdue > 1 ? 's' : '') . ' overdue';
+        }
+    } elseif ($start_date && $current_date < $start_date) {
         $interval = $current_date->diff($start_date);
         $time_indicator_text = $interval->days . ' days remaining to start';
     } elseif ($due_date && $current_date > $due_date) {
@@ -527,7 +540,7 @@ function story($story, $show_epic = false, $href = '') {
     } else {
         $time_indicator_text = 'Date information not available';
     }
-
+    
     $color_classes = [
         1 => 'border-gray-100 hover:border-gray-200', // Not Started
         4 => 'border-cyan-100 hover:border-cyan-200', // In Progress
