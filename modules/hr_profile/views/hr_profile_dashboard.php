@@ -31,43 +31,60 @@ $staff_chart_by_job_positions = json_encode($this->hr_profile_model->staff_chart
 		<div class="row">
 			<div class="flex flex-wrap -mx-2">
 				<!-- Total Employees Card -->
-				<div class="w-full xl:w-1/4 lg:flex-grow lg:w-1/4 md:w-2/4 p-4 cursor-pointer">
-					<div class="bg-white p-6 rounded-[20px] shadow-xl hover:shadow-2xl border border-gray-200 transform transition-all duration-500 ease-in-out hover:scale-105 relative flex items-center justify-center">
-						<div class="mr-6">
-							<p id="total_employees" class="text-3xl font-extrabold text-[rgba(0,135,171)] lms-contrast"><?php echo $total_employees; ?></p>
-							<h5 class="text-lg font-medium text-uppercase mb-2 lms-contrast text-[rgba(0,135,171,0.6)]">Total Employees</h5>
+				<div class="w-full md:w-1/3 p-2">
+            		<div class="bg-white p-6 rounded-[20px] shadow-xl hover:shadow-2xl border border-gray-200 transform transition-all duration-500 ease-in-out hover:scale-105 relative flex items-center justify-center">
+                		<div class="mr-6">
+							<p id="total_employees" class="text-3xl font-extrabold text-[rgba(0,135,171)] "><?php echo $total_employees; ?></p>
+							<h5 class="text-lg font-medium text-uppercase mb-2  text-[rgba(0,135,171,0.6)]">Total Employees</h5>
 						</div>
-						<div class="w-16 h-16 lms-contrast bg-[rgba(0,135,171)] rounded-full flex items-center justify-center ml-auto">
+						<div class="w-16 h-16  bg-[rgba(0,135,171)] rounded-full flex items-center justify-center ml-auto">
 							<i class="fas fa-briefcase text-white text-2xl"></i>
 						</div>
 					</div>
 				</div>
 
 				<!-- Total Employees on Notice Period Card -->
-				<div class="w-full xl:w-1/4 lg:flex-grow lg:w-1/4 md:w-2/4 p-4 cursor-pointer">
-					<div class="bg-white p-6 rounded-[20px] shadow-xl hover:shadow-2xl border border-gray-200 transform transition-all duration-500 ease-in-out hover:scale-105 relative flex items-center justify-center">
+				 <div class="w-full md:w-1/3 p-2">
+            		<div class="bg-white p-6 rounded-[20px] shadow-xl hover:shadow-2xl border border-gray-200 transform transition-all duration-500 ease-in-out hover:scale-105 relative flex items-center justify-center">
+              
 						<div class="mr-6">
-							<p id="total_notice_period" class="text-3xl font-extrabold text-[rgba(255,193,7)] lms-contrast"><?php echo $total_notice_period; ?></p>
-							<h5 class="text-lg font-medium text-uppercase mb-2 lms-contrast text-[rgba(255,193,7,0.6)]">Notice Period</h5>
+							<p id="total_notice_period" class="text-3xl font-extrabold text-[rgba(255,193,7)] "><?php echo $total_notice_period; ?></p>
+							<h5 class="text-lg font-medium text-uppercase mb-2  text-[rgba(255,193,7,0.6)]">Notice Period</h5>
 						</div>
-						<div class="w-16 h-16 lms-contrast bg-[rgba(255,193,7)] rounded-full flex items-center justify-center ml-auto">
+						<div class="w-16 h-16  bg-[rgba(255,193,7)] rounded-full flex items-center justify-center ml-auto">
 							<i class="fas fa-exclamation-triangle text-white text-2xl"></i>
 						</div>
 					</div>
 				</div>
 
 				<!-- Total Employees on Probation Card -->
-				<div class="w-full xl:w-1/4 lg:flex-grow lg:w-1/4 md:w-2/4 p-4 cursor-pointer">
-					<div class="bg-white p-6 rounded-[20px] shadow-xl hover:shadow-2xl border border-gray-200 transform transition-all duration-500 ease-in-out hover:scale-105 relative flex items-center justify-center">
+				<div class="w-full md:w-1/3 p-2">
+            		<div class="bg-white p-6 rounded-[20px] shadow-xl hover:shadow-2xl border border-gray-200 transform transition-all duration-500 ease-in-out hover:scale-105 relative flex items-center justify-center">
+                
 						<div class="mr-6">
-							<p id="total_probation" class="text-3xl font-extrabold text-[rgba(40,167,69)] lms-contrast"><?php echo $total_probation; ?></p>
-							<h5 class="text-lg font-medium text-uppercase mb-2 lms-contrast text-[rgba(40,167,69,0.6)]">Probation</h5>
+							<p id="total_probation" class="text-3xl font-extrabold text-[rgba(40,167,69)] "><?php echo $total_probation; ?></p>
+							<h5 class="text-lg font-medium text-uppercase mb-2  text-[rgba(40,167,69,0.6)]">Probation</h5>
 						</div>
-						<div class="w-16 h-16 lms-contrast bg-[rgba(40,167,69)] rounded-full flex items-center justify-center ml-auto">
+						<div class="w-16 h-16  bg-[rgba(40,167,69)] rounded-full flex items-center justify-center ml-auto">
 							<i class="fas fa-hourglass-start text-white text-2xl"></i>
 						</div>
 					</div>
 				</div>
+
+				<!-- Total Employees on Permanent Card -->
+
+				<div class="w-full md:w-1/3 p-2">
+            		<div class="bg-white p-6 rounded-[20px] shadow-xl hover:shadow-2xl border border-gray-200 transform transition-all duration-500 ease-in-out hover:scale-105 relative flex items-center justify-center">
+					<div class="mr-6">
+						<p id="total_permanent" class="text-3xl font-extrabold text-[#d62828]"><?php echo $total_permanent; ?></p>
+						<h5 class="text-lg font-medium text-uppercase mb-2  text-[#d62828]">Permanent Employees</h5>
+					</div>
+					<div class="w-16 h-16 bg-[#d62828] rounded-full flex items-center justify-center ml-auto">
+						<i class="fas fa-anchor text-white text-2xl"></i>
+					</div>
+				</div>
+				</div>
+
 			</div>
 		</div>
 

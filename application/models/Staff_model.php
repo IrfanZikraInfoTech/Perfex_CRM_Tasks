@@ -981,4 +981,11 @@ public function count_staff_on_probation() {
     $query = $this->db->get('tblstaff');
     return $query->num_rows(); // This returns the count of active rows where status_work is 'probation'
 }
+public function count_permanent_staff() {
+    $this->db->where('status_work', 'permanent');
+    $this->db->where('active', 1); // Assuming 'active' column exists and '1' means active
+    $query = $this->db->get('tblstaff');
+    return $query->num_rows(); // Returns the count of active permanent staff members
+}
+
 }

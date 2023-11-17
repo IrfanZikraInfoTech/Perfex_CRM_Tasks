@@ -720,7 +720,7 @@ $lang['40_60_age'] 														= '40-60 (Age)';
 
 $lang['hr_chart_by_department'] 										= 'Staff ratio by departments';
 
-$lang['hr_chart_by_job_positions'] 										= 'Staff ratio by jobs Titles';
+$lang['hr_chart_by_job_positions'] 										= 'Staff ratio by Jobs Titles';
 
 $lang['hr_chart_seniority_fluctuations']								= 'Ratio of changes in staff by seniority';
 

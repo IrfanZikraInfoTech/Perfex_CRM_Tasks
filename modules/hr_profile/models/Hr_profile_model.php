@@ -473,7 +473,9 @@ class Hr_profile_model extends App_Model
 
 			$chart['hr_staff_are_working'][] = $this->staff_working_by_month($month);
 
-			$chart['hr_staff_quit'][] = $this->staff_quit_work_by_month($month);
+			$chart['staff_probation_by_month'][] = $this->staff_probation_by_month($month);
+			$chart['staff_notice_by_month'][] = $this->staff_notice_by_month($month);
+			$chart['staff_permanent_by_month'][] = $this->staff_permanent_by_month($month);
 
 			$chart['hr_staff_resigned'][] = $this->staff_resigned_by_month($month);
 
@@ -556,6 +558,82 @@ class Hr_profile_model extends App_Model
 		$this->db->select('count(staffid) as total_staff');
 
 		$sql_where = "status_work = 'working' AND date_format(datecreated, '%Y-%m') < '".$month."'";
+
+		$this->db->where($sql_where);
+
+		$result = $this->db->get(db_prefix().'staff')->row();
+
+
+
+		if($result){
+
+			return (int)$result->total_staff;
+
+		}
+
+		return 0;
+
+
+
+	}
+
+	public function staff_probation_by_month($month)
+
+	{
+
+		$this->db->select('count(staffid) as total_staff');
+
+		$sql_where = "status_work = 'probation' AND date_format(datecreated, '%Y-%m') < '".$month."'";
+
+		$this->db->where($sql_where);
+
+		$result = $this->db->get(db_prefix().'staff')->row();
+
+
+
+		if($result){
+
+			return (int)$result->total_staff;
+
+		}
+
+		return 0;
+
+
+
+	}
+	public function staff_notice_by_month($month)
+
+	{
+
+		$this->db->select('count(staffid) as total_staff');
+
+		$sql_where = "status_work = 'notice period' AND date_format(datecreated, '%Y-%m') < '".$month."'";
+
+		$this->db->where($sql_where);
+
+		$result = $this->db->get(db_prefix().'staff')->row();
+
+
+
+		if($result){
+
+			return (int)$result->total_staff;
+
+		}
+
+		return 0;
+
+
+
+	}
+	public function staff_permanent_by_month($month)
+
+	{
+
+		$this->db->select('count(staffid) as total_staff');
+
+		$sql_where = "status_work = 'permanent' AND date_format(datecreated, '%Y-%m') < '".$month."'";
 
 		$this->db->where($sql_where);
 

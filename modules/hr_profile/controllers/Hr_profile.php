@@ -49,6 +49,7 @@ class Hr_profile extends AdminController {
 		$total_employees = $this->Staff_model->count_all_staff(); // Get the count of all staff
 	    $data['total_notice_period'] = $this->Staff_model->count_staff_on_notice_period(); // Get the count of staff on notice period
 		$data['total_probation'] = $this->Staff_model->count_staff_on_probation(); // Get the count of staff on probation
+		$data['total_permanent'] = $this->Staff_model->count_permanent_staff();
 
 		$data['total_employees'] = $total_employees; // Pass the count to the view
 		$data['title'] = 'HR Profile';	

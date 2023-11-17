@@ -438,18 +438,43 @@ function report_by_staffs(id, value, title_c){
 
 
 
-       	}, {
+       	}, 
+		{
+        name: '<?php echo _l('Staff Permanent'); ?>',
+        data: response.staff_permanent_by_month 
+		// Make sure to send this data from the server
+   		},
+		{
+        name: '<?php echo _l('Staff Probation'); ?>',
+        data: response.staff_probation_by_month 
+		// Make sure to send this data from the server
+   		},
+		{
+        name: '<?php echo _l('Staff Notice'); ?>',
+        data: response.staff_notice_by_month 
+		// Make sure to send this data from the server
+   		},
 
-       		name: '<?php echo _l('hr_staff_are_working'); ?>',
+		// {
 
-       		data: response.hr_staff_are_working
+       	// 	name: '<?php echo _l('hr_staff_are_working'); ?>',
+
+       	// 	data: response.hr_staff_are_working
 
 
-
-       	},{
+			   
+       	// },
+		{
         name: '<?php echo _l('Staff Resigned'); ?>',
-        data: response.hr_staff_resigned // Make sure to send this data from the server
-   		 }]
+        data: response.hr_staff_resigned 
+		// Make sure to send this data from the server
+   		 }
+		
+		
+		
+		
+		
+		]
 
        });
 
