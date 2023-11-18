@@ -1870,5 +1870,39 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
     // var_dump($result);
         return $result;
     }
+
+    public function exit_view()
+    {
+
+    }
+
+    public function insert_formdata($data) {
+        $this->db->insert('tbl_exit', $data);
+        return $this->db->insert_id();
+    }
+
+    public function get_exit_data() {
+        $query = $this->db->get('tbl_exit');
+        return $query->result_array();
+    }
     
+    
+    public function all_exit_form_data() {
+        $this->db->select('tbl_exit.*, staff_table.firstname as staff_name, department_table.name as department_name');
+        $this->db->from('tbl_exit');
+        $this->db->join('tblstaff as staff_table', 'staff_table.staffid = tbl_exit.staff_id', 'left');
+        $this->db->join('tbldepartments as department_table', 'department_table.departmentid = tbl_exit.department_id', 'left');
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+    
+    public function update_exit_form_data() {
+        $form_id = $this->input->post('form_id');
+        $status = $this->input->post('status');
+    
+        $this->db->set('status', $status);
+        $this->db->where('id', $form_id);
+        return $this->db->update('tbl_exit');
+    }
+
 }

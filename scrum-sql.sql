@@ -96,3 +96,16 @@ CREATE TABLE `tbl_global_leaves` (
   `created_at` timestamp NULL,
   `updated_at` timestamp NULL
 );
+
+CREATE TABLE tbl_exit (
+    'id' INT AUTO_INCREMENT PRIMARY KEY,
+    'staff_name' VARCHAR(255) NOT NULL,
+    'department_id' VARCHAR(255),
+    'separation_date' DATE,
+    'reason' VARCHAR(255),
+    'working_again' BOOLEAN,
+    'likes_about_org' TEXT,
+    'improvement_suggestions' TEXT,
+    'additional_comments' TEXT,
+    'status' VARCHAR(100);
+);

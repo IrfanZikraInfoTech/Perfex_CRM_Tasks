@@ -265,6 +265,22 @@ function app_init_admin_sidebar_menu_items()
             'icon'     => 'fa fa-chart-bar', // Font awesome icon
         ]);
     }
+
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'management_projects', // Required ID/slug UNIQUE for the child menu
+        'name'     => 'Exit Form', // The name if the item
+        'href'     => admin_url('team_management/exit_view'), // URL of the item
+        'position' => 2, // The menu position
+        'icon'     => 'fa-solid fa-circle-xmark', // Font awesome icon
+    ]);
+
+    $CI->app_menu->add_sidebar_children_item('team_management', [
+        'slug'     => 'management_projects', // Required ID/slug UNIQUE for the child menu
+        'name'     => 'All Exit Forms', // The name if the item
+        'href'     => admin_url('team_management/all_exit_view'), // URL of the item
+        'position' => 2, // The menu position
+        'icon'     => 'fa-brands fa-wpforms', // Font awesome icon
+    ]);
     
 
     

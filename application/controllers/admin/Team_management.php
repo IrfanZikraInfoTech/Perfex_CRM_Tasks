@@ -1713,6 +1713,62 @@ class Team_management extends AdminController {
         $this->load->view('admin/management/set_shifts',$data);
     }
 
+    public function exit_view()
+    {
+        $data['exit_data'] = $this->team_management_model->get_exit_data();
+        $this->load->view('admin/management/exit_form',$data);
+        
+    }
+
+    public function save_exit() {
+        $data = array(
+            'staff_id' => $this->input->post('staff_id'),
+            'department_id' => $this->input->post('department_id'),
+            'seperation_date' => $this->input->post('seperation_date'),
+            'reason' => $this->input->post('reason'),
+            'working_again' => $this->input->post('working_again'),
+            'likes_about_org' => $this->input->post('likes_about_org'),
+            'improvement_suggestions' => $this->input->post('improvement_suggestions'),
+            'additional_comments' => $this->input->post('additional_comments'),
+        );
+        $this->team_management_model->insert_formdata($data);
+        $this->exit_view();
+    }
+    
+    public function all_exit_view(){
+        $data['staff_members'] = $this->staff_model->get(['is_active' => 1]);
+    
+        $data['all_forms'] = $this->team_management_model->all_exit_form_data();
+    
+        $this->load->view('admin/management/all_exit_form', $data);
+    }
+
+    public function update_exit_form_status(){
+        if($this->input->is_ajax_request()) {
+            $form_id = $this->input->post('form_id');
+            $status = $this->input->post('status');
+    
+            if(!$form_id || !$status) {
+                echo json_encode(['status' => false, 'message' => 'Invalid Request']);
+                return;
+            }
+    
+            $update_status = $this->team_management_model->update_exit_form_data($form_id, $status);
+    
+            if ($update_status) {
+                // Respond with a success status
+                echo json_encode(['status' => true, 'message' => 'Status updated successfully']);
+            } else {
+                // Respond with an error status
+                echo json_encode(['status' => false, 'message' => 'Failed to update status']);
+            }
+        } else {
+            show_error('No direct script access allowed');
+        }
+    }
+
+
 }
+
 
 ?>
