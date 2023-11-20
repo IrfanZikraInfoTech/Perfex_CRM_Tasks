@@ -4,29 +4,74 @@
 
 <div id="wrapper">
 <div class="container">
-    <h2 class="text-center my-6 text-2xl">Employee Payroll Details</h2>
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email Address</th>
-                <th>Salary</th>
-                <th>Action</th>
-            </tr>
+    <h2 class="text-3xl font-bold my-6 text-center">
+    Employee Payroll Details
+    </h2>
+    <div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead class="bg-gray-100">
+        <tr>
+            <th class="px-4 py-2 font-seminbold">Staff Code</th>
+            <th class="px-4 py-2 font-seminbold">Name</th>
+            <th class="px-4 py-2 font-seminbold">Title</th>
+            <th class="px-4 py-2 font-seminbold">Department</th>
+            <th class="px-4 py-2 font-seminbold">Email Address</th>
+            <th class="px-4 py-2 font-seminbold">Bank Name</th>
+            <th class="px-4 py-2 font-seminbold">Bank Acc No.</th>
+            <th class="px-4 py-2 font-seminbold">Salary</th>
+            <th class="px-4 py-2 font-seminbold">Action</th>
+        </tr>
         </thead>
         <tbody>
-            <?php foreach ($staffs as $staff) : ?>
+
+            <?php 
+            $custom_prefix = get_option('custom_prefix'); 
+            foreach ($staffs as $staff) :
+            $prefixed_staff_id = $custom_prefix . $staff['staffid'];
+            ?>
                 <tr>
+                    <td><?php echo $prefixed_staff_id; ?></td> 
                     <td><?php echo $staff['firstname']; ?></td>
+                    <td><?php echo $staff['staff_title']; ?></td>
+                    <td><?php echo $staff['department_name']; ?></td>
                     <td><?php echo $staff['email']; ?></td>
+                    <td><?php echo $staff['bank_name']; ?></td>
+                    <td><?php echo $staff['bank_acc_no']; ?></td>
                     <td><?php echo $staff['currency'] . ' ' . $staff['employee_salary']; ?></td>
                     <td>
-                        <button type="button" class="rounded transition-all bg-emerald-500 text-white hover:bg-white hover:text-emerald-500 hover:border-emerald-500 border border-solid px-4 py-2" onclick="openPayModal(<?php echo $staff['staffid']; ?>, '<?php echo $staff['employee_salary']; ?>')">Update</button>
+                        <button type="button" class="rounded transition-all bg-emerald-500 text-white hover:bg-white hover:text-emerald-500 hover:border-emerald-500 border border-solid px-3 py-1" onclick="openPayModal(<?php echo $staff['staffid']; ?>, '<?php echo $staff['employee_salary']; ?>', '<?php echo $staff['firstname'] . ' ' . $staff['lastname']; ?>')"> <i class="fas fa-edit"></i></button>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
+
+        <!-- <tbody>
+    <?php 
+    $custom_prefix = get_option('custom_prefix'); 
+    foreach ($staffs as $staff) :
+        $prefixed_staff_id = $custom_prefix . $staff['staffid'];
+
+        // Assuming that punctuality data is stored in a variable like $staffPunctualityData
+        $punctualityInfo = $staffPunctualityData[$staff['staffid']] ?? null;
+        ?>
+        <tr>
+            <td><?php echo $prefixed_staff_id; ?></td> 
+            <td><?php echo $staff['firstname']; ?></td>
+            <td><?php echo $staff['staff_title']; ?></td>
+            <td><?php echo $staff['department_name']; ?></td>
+            <td><?php echo $staff['email']; ?></td>
+            <td><?php echo $staff['bank_name']; ?></td>
+            <td><?php echo $staff['bank_acc_no']; ?></td>
+            <td><?php echo $staff['currency'] . ' ' . $staff['employee_salary']; ?></td>
+            <td>
+                <button type="button" class="rounded transition-all bg-emerald-500 text-white hover:bg-white hover:text-emerald-500 hover:border-emerald-500 border border-solid px-3 py-1" onclick="openPayModal(<?php echo $staff['staffid']; ?>, '<?php echo $staff['employee_salary']; ?>', '<?php echo $staff['firstname'] . ' ' . $staff['lastname']; ?>', '<?php echo $staff['current_month_punctuality']['total_days']; ?>', '<?php echo $staff['current_month_punctuality']['days_present']; ?>')"> <i class="fas fa-edit"></i></button>
+
+            </td>
+        </tr>
+    <?php endforeach; ?>
+</tbody> -->
     </table>
+    </div>
 </div>
 
 </div>
@@ -34,8 +79,12 @@
 <div class="modal" tabindex="-1" id="payModal">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Payment</h5>
+            <div class="modal-header ">
+                <h5 class="modal-title">
+                <span id="employeeName"></span>'s Payment Details
+                </h5>
+                
+
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -55,7 +104,9 @@
                         <option value="12">Dec</option>
                     </select>
                 </div>
-                <p>Salary: <span id="salary"></span></p>
+                <!-- <p>Total Days: <span id="totalDays"></span></p>
+                <p>Days Present: <span id="daysPresent"></span></p> -->
+                <p>base Salary: <span id="salary"></span></p>
                 <div class="form-group">
                     <label for="currency">Select Currency:</label>
                     <select name="currency" id="currency" class="form-control">
@@ -96,13 +147,30 @@
     var staff_id=0;
     var payModal, bonusModal;
 
-    function openPayModal(staffId, staffSalary) {
-        salary = Number(staffSalary);
-        staff_id = Number(staffId);
-        document.getElementById('salary').innerText = salary;
-        payModal = new bootstrap.Modal(document.getElementById('payModal'));
-        payModal.show();
-    }
+    function openPayModal(staffId, staffSalary, staffName, totalDays, daysPresent) {
+    salary = Number(staffSalary);
+    staff_id = Number(staffId);
+    document.getElementById('salary').innerText = salary;
+    document.getElementById('employeeName').innerText = staffName;
+    
+    payModal = new bootstrap.Modal(document.getElementById('payModal'));
+    payModal.show();
+}
+// function openPayModal(staffId, staffSalary, staffName, totalDays, daysPresent) {
+//     staff_id = staffId; // Global staff ID is set here
+//     salary = Number(staffSalary);
+
+//     document.getElementById('salary').innerText = salary;
+//     document.getElementById('employeeName').innerText = staffName;
+//     document.getElementById('totalDays').innerText = totalDays || 'N/A';
+//     document.getElementById('daysPresent').innerText = daysPresent || 'N/A';
+
+//     payModal = new bootstrap.Modal(document.getElementById('payModal'));
+//     payModal.show();
+// }
+
+
+
 
     function calculateTotal() {
         bonus = Number(document.getElementById('bonusInput').value);

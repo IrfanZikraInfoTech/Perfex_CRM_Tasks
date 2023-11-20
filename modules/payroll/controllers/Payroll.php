@@ -13,7 +13,6 @@ class Payroll extends AdminController
         echo 'hello world';
     }
 
-    // Role_salary
     public function Role_salary(){   
         if (!has_permission('payroll', '', 'admin')) {
             access_denied('Access Denied!');
@@ -22,6 +21,28 @@ class Payroll extends AdminController
         $this->load->view('role_salary', $data);
         // $this->load->view('payroll_manage');
     }
+
+
+//  public function Role_salary(){
+//         if (!has_permission('payroll', '', 'admin')) {
+//             access_denied('Access Denied!');
+//         }
+//         $currentYear = date("Y");
+//         $currentMonth = date("m"); // Get the current month
+    
+//         $data['staffs'] = $this->payroll_model->get_employee_details();
+//         foreach ($data['staffs'] as $key => $staff) {
+//             // Fetching only the current month's data
+//             $monthlyPunctuality = $this->payroll_model->kpi_monthly_punctuality_rate($staff['staffid'], $currentYear, $currentMonth);
+//             $data['staffs'][$key]['current_month_punctuality'] = $monthlyPunctuality[$currentMonth];
+//         }
+//     // var_dump($data['monthly_punctuality']);
+//         $this->load->view('role_salary', $data);
+
+//     }
+
+    
+    
     
     public function add_payment() {
         $staff_id = $this->input->post('staffId');

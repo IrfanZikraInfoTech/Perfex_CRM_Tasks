@@ -15,52 +15,50 @@
             <div class="grid grid-cols-3 gap-6 mb-10">
                 <!-- Paid Leaves Details -->
                 <div class="bg-blue-100 rounded-lg p-4 shadow">
-                    <?php 
-                    $paidDifference = (int)get_option('paid_leaves') - (int)$app_paid_no;
-                    $paidDisplayText = $paidDifference >= 0 ? $paidDifference . " left" : abs($paidDifference) . " Exceeded";
-                    ?>
-                    <div class="flex flex-row justify-between">
-                        <h3 class="text-xl font-bold mb-2">Paid Leaves:</h3>
-                        <div><h2 class="px-4 flex items-center justify-center h-5 rounded-full bg-white text-black"><?= $paidDisplayText ?></h2></div>
-                    </div>
-                    <div class="text-lg font-semibold flex xl:flex-row flex-col justify-between">
-                        <div>Pending: <?= $pen_paid_no ?></div>
-                        <div>Approved: <?= $app_paid_no ?></div>
-                        <div>Disapproved: <?= $dis_paid_no ?></div>
-                    </div>
-                </div>
+                <?php 
+    $paidDifference = (int)get_option('paid_leaves') - round($app_paid_no, 1);
+    $paidDisplayText = $paidDifference >= 0 ? $paidDifference . " left" : abs($paidDifference) . " Exceeded";
+    ?>
+    <div class="flex flex-row justify-between">
+        <h3 class="text-xl font-bold mb-2">Paid Leaves:</h3>
+        <div><h2 class="px-4 flex items-center justify-center h-5 rounded-full bg-white text-black"><?= $paidDisplayText ?></h2></div>
+    </div>
+    <div class="text-lg font-semibold flex xl:flex-row flex-col justify-between">
+        <div>Pending: <?= round($pen_paid_no, 1) ?></div>
+        <div>Approved: <?= round($app_paid_no, 1) ?></div>
+        <div>Disapproved: <?= round($dis_paid_no, 1) ?></div>
+    </div>
+</div>
 
-                <!-- Unpaid Leaves Details -->
-                <div class="bg-green-100 rounded-lg p-4 shadow">
-                    <?php 
-                    $unpaidDifference = (int)get_option('unpaid_leaves') - (int)$app_unpaid_no;
-                    $unpaidDisplayText = $unpaidDifference >= 0 ? $unpaidDifference . " left" : abs($unpaidDifference) . " Exceeded";
-                    ?>
-                    <div class="flex flex-row justify-between">
-                        <h3 class="text-xl font-bold mb-2">Loss Of Pay Leaves:</h3>
-                        <div><h2 class="px-4 flex items-center justify-center h-5 rounded-full bg-white text-black"><?= $unpaidDisplayText ?></h2></div>
-                    </div>
-                    <div class="text-lg font-semibold flex xl:flex-row flex-col justify-between">
-                        <div>Pending: <?= $pen_unpaid_no ?></div>
-                        <div>Approved: <?= $app_unpaid_no ?></div>
-                        <div>Disapproved: <?= $dis_unpaid_no ?></div>
-                    </div>
-                </div>
+<!-- Unpaid Leaves Details -->
+<div class="bg-green-100 rounded-lg p-4 shadow">
+<?php 
+    $unpaidDifference = (int)get_option('unpaid_leaves') - round($app_unpaid_no, 1);
+    $unpaidDisplayText = $unpaidDifference >= 0 ? $unpaidDifference . " left" : abs($unpaidDifference) . " Exceeded";
+    ?>
+    <div class="flex flex-row justify-between">
+        <h3 class="text-xl font-bold mb-2">Loss Of Pay Leaves:</h3>
+        <div><h2 class="px-4 flex items-center justify-center h-5 rounded-full bg-white text-black"><?= $unpaidDisplayText ?></h2></div>
+    </div>
+    <div class="text-lg font-semibold flex xl:flex-row flex-col justify-between">
+    <div>Pending: <?= round($pen_unpaid_no, 1) ?></div>
+        <div>Approved: <?= round($app_unpaid_no, 1) ?></div>
+        <div>Disapproved: <?= round($dis_unpaid_no, 1) ?></div>
+    </div>
+</div>
+
 
                 <!-- Gazetted Leaves Details -->
                 <div class="bg-yellow-100 rounded-lg p-4 shadow">
-                    <!-- <?php 
-                    $gazDifference = (int)get_option('gaz_leaves') - (int)$app_gaz_no;
-                    $gazDisplayText = $gazDifference >= 0 ? $gazDifference . " left" : abs($gazDifference) . " Exceeded";
-                    ?> -->
+                  
                     <div class="flex flex-row justify-between">
                         <h3 class="text-xl font-bold mb-2">Gazetted Leaves:</h3>
                         <!-- <div><h2 class="px-4 flex items-center justify-center h-5 rounded-full bg-white text-black"><?= $gazDisplayText ?></h2></div> -->
                     </div>
                     <div class="text-lg font-semibold flex xl:flex-row flex-col justify-between">
-                        <div>Pending: <?= $pen_gaz_no ?></div>
-                        <div>Approved: <?= $app_gaz_no ?></div>
-                        <div>Disapproved: <?= $dis_gaz_no ?></div>
+                    <div>Pending: <?= round($pen_gaz_no, 1) ?></div>
+                        <div>Approved: <?= round($app_gaz_no, 1) ?></div>
+                        <div>Disapproved: <?= round($dis_gaz_no, 1) ?></div>
                     </div>
                 </div>
             </div>

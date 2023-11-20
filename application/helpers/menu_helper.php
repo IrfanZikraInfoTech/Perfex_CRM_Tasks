@@ -273,7 +273,7 @@ function app_init_admin_sidebar_menu_items()
         'position' => 2, // The menu position
         'icon'     => 'fa-solid fa-circle-xmark', // Font awesome icon
     ]);
-
+    if (has_permission('team_management', '', 'admin') || has_staff_under()) {
     $CI->app_menu->add_sidebar_children_item('team_management', [
         'slug'     => 'management_projects', // Required ID/slug UNIQUE for the child menu
         'name'     => 'All Exit Forms', // The name if the item
@@ -281,6 +281,7 @@ function app_init_admin_sidebar_menu_items()
         'position' => 2, // The menu position
         'icon'     => 'fa-brands fa-wpforms', // Font awesome icon
     ]);
+}
     
 
     
