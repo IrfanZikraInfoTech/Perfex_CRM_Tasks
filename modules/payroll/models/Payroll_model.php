@@ -37,7 +37,6 @@ class Payroll_model extends App_Model
         return $query->result_array();
     }
     
-
     public function kpi_monthly_punctuality_rate($staff_id, $year) {
         $monthlyData = [];
     
@@ -92,8 +91,6 @@ class Payroll_model extends App_Model
     
         return $monthlyData;
     }
-    
-    
     
 
     //Setting
@@ -158,7 +155,7 @@ class Payroll_model extends App_Model
         
         return $query->row();
     } 
-    public function savePaymentMode($id, $paymentMode, ){
+    public function savePaymentMode($id, $paymentMode){
         $this->db->set('payment_mode', $paymentMode);
         $this->db->where('id', $id);
         return $this->db->update('tbl_payroll_records');

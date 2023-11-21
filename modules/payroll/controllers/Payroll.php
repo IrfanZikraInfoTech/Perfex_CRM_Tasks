@@ -7,11 +7,11 @@ class Payroll extends AdminController
     public function __construct(){
         parent::__construct();
         $this->load->model('payroll_model');
+        $this->load->library('kpi_system');
+
     }
 
-    public function testing(){
-        echo 'hello world';
-    }
+
 
     public function Role_salary(){   
         if (!has_permission('payroll', '', 'admin')) {
@@ -19,31 +19,41 @@ class Payroll extends AdminController
         }
         $data['staffs'] = $this->payroll_model->get_employee_details();
         $this->load->view('role_salary', $data);
-        // $this->load->view('payroll_manage');
     }
 
+    public function getAttendanceData() {
+        $staffId = $this->input->post('staffId');
+        $fromDate = $this->input->post('fromDate');
+        $toDate = $this->input->post('toDate');
+    
+        $this->load->model('team_management_model');
+        $attendanceData = $this->kpi_system->kpi_punctuality_rate($staffId, $fromDate, $toDate);
+    
+        echo json_encode($attendanceData);
+    }
 
-//  public function Role_salary(){
-//         if (!has_permission('payroll', '', 'admin')) {
-//             access_denied('Access Denied!');
-//         }
-//         $currentYear = date("Y");
-//         $currentMonth = date("m"); // Get the current month
-    
-//         $data['staffs'] = $this->payroll_model->get_employee_details();
-//         foreach ($data['staffs'] as $key => $staff) {
-//             // Fetching only the current month's data
-//             $monthlyPunctuality = $this->payroll_model->kpi_monthly_punctuality_rate($staff['staffid'], $currentYear, $currentMonth);
-//             $data['staffs'][$key]['current_month_punctuality'] = $monthlyPunctuality[$currentMonth];
-//         }
-//     // var_dump($data['monthly_punctuality']);
-//         $this->load->view('role_salary', $data);
+    public function getUnpaidLeavesData() {
+        $staffId = $this->input->post('staffId');
+        $fromDate = $this->input->post('fromDate');
+        $toDate = $this->input->post('toDate');
+        
+        // Call the method with the correct parameters
+        $unpaidLeavesCount = $this->team_management_model->get_approved_unpaid_leave_days($staffId, $fromDate, $toDate);
+        
+        echo json_encode(['unpaidLeaves' => $unpaidLeavesCount]);
+    }
 
-//     }
+    public function getallLeaves() {
+        $staffId = $this->input->post('staffId');
+        $fromDate = $this->input->post('fromDate');
+        $toDate = $this->input->post('toDate');
+        
+        // Call the method with the correct parameters
+        $leaves = $this->team_management_model->get_applications_by_staff_id_range($staffId, $fromDate, $toDate);
+        
+        echo json_encode(['leaves' => $leaves]);
+    }
 
-    
-    
-    
     public function add_payment() {
         $staff_id = $this->input->post('staffId');
         $bonus = $this->input->post('bonus');
@@ -52,18 +62,26 @@ class Payroll extends AdminController
         $status = $this->input->post('status', TRUE);
         $created_date = date('Y-m-d');
         $update_date = null;
-        $month = $this->input->post('month');
-        $currency = $this->input->post('currency');  // Retrieve currency from POST data
-    
+        $currency = $this->input->post('currency');  
+        $allowances = $this->input->post('allowances');  
+        $unpaid_leave_deduction = $this->input->post('unpaid_leave_deduction');  
+        $remarks = $this->input->post('remarks');  
+        $fromDate = $this->input->post('fromDate');  
+        $toDate = $this->input->post('toDate');  
+
+
         $data = array(
             'staff_id' => $staff_id,
+            'allowances' => $allowances,
+            'unpaid_leave_deduction' => $unpaid_leave_deduction,
+            'remarks' => $remarks,
             'bonus' => $bonus,
             'deduction' => $deduction,
             'salary' => $salary,
             'status' => $status,
             'created_date' => $created_date,
-            'update_date' => $update_date,
-            'month' => $month,
+            'fromDate' => $fromDate,
+            'toDate' => $toDate,
             'currency' => $currency  // Add currency to the data array
         );
     

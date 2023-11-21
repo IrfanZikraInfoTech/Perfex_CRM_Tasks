@@ -763,6 +763,37 @@ class Team_management_model extends App_Model
         return $query->result();
     }
 
+    public function get_approved_unpaid_leave_days($staff_id, $fromDate, $toDate) {
+        $this->db->select("SUM(DATEDIFF(end_date, start_date) + 1) as total_unpaid_leave_days");
+        $this->db->from('tbl_applications');
+        $this->db->where('staff_id', $staff_id);
+        $this->db->where('application_type', 'Unpaid Leave');
+        $this->db->where('status', 'Approved');
+        $this->db->where('start_date >=', $fromDate);
+        $this->db->where('end_date <=', $toDate);
+        
+        $query = $this->db->get();
+        
+        if ($query->num_rows() > 0) {
+            $result = $query->row_array();
+            return $result['total_unpaid_leave_days'];
+        } else {
+            return 0; // Return 0 if no unpaid leaves are found
+        }
+    }
+
+    public function get_applications_by_staff_id_range($staff_id, $fromDate, $toDate) {
+        $this->db->select('*');
+        $this->db->from('tbl_applications');
+        $this->db->where('staff_id', $staff_id);
+        $this->db->where('start_date >=', $fromDate); // Filter by start date
+        $this->db->where('end_date <=', $toDate); // Filter by end date
+        $this->db->order_by('id DESC');
+        $query = $this->db->get();
+    
+        return $query->result();
+    }
+
     public function get_all_applications($status, $staff_under) {
         $this->db->select('*');
         $this->db->from('tbl_applications');
@@ -1909,5 +1940,6 @@ $this->db->where('staff_id !=', 1);  // This line excludes staff with ID 1
         $this->db->where('id', $form_id);
         return $this->db->update('tbl_exit');
     }
+    
 
 }
