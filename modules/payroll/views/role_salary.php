@@ -254,6 +254,11 @@
     var currency = document.getElementById('currency').value;
     var fromDate = document.getElementById('fromDate').value;
     var toDate = document.getElementById('toDate').value;
+    var totalDays = document.getElementById('totalDays').innerText; // Use innerText instead of value
+    var daysPresent = document.getElementById('daysPresent').innerText; // Use innerText instead of value
+    var unpaidleaves = document.getElementById('unpaidleaves').innerText; // Use innerText instead of value
+    var leaves = document.getElementById('leaves').innerText; // Use innerText instead of value
+
 
 
     Swal.fire({
@@ -280,6 +285,11 @@
                 remarks: remarks,
                 fromDate: fromDate,
                 toDate: toDate,
+                currency: currency,
+                totalDays: totalDays,
+                daysPresent: daysPresent,
+                leaves: leaves,
+                unpaidleaves: unpaidleaves,
                 currency: currency
             }
         });

@@ -64,7 +64,7 @@
             ?>
                 <tr data-month="<?php echo $rowMonth; ?>">
                     <td><?php echo $staff['firstname']; ?></td>
-                    <td><?php echo $staff['currency'] . ' ' . $staff['salary'] + $staff['bonus'] - $staff['deduction']; ?></td>
+                    <td><?php echo $staff['currency'] . ' ' . $staff['salary'] + $staff['bonus']+$staff['allowances'] - $staff['unpaid_leave_deduction'] - $staff['deduction']; ?></td>
                     <td><?php echo $staff['approver_name']; ?></td>
                     <td>
                         <select class="form-control payment-mode" data-id="<?php echo $staff['id']; ?>" disabled>
@@ -80,8 +80,10 @@
                     <td><button class="btn btn-secondary edit-save-btn" data-id="<?php echo $staff['id']; ?>" data-editing="false">Edit</button></td>
                     <?php } ?>
 
-                    <td><a href="<?php echo admin_url("payroll/view_payslip")."/0/".$staff['id']; ?>" class="btn btn-primary view-slip" data-id="<?php echo $staff['id']; ?>">Download Slip</a></td>
-                    <td><a href="<?php echo admin_url("payroll/view_payslip")."/1/".$staff['id']; ?>" class="btn btn-primary view-slip" data-id="<?php echo $staff['id']; ?>">View </a></td>
+                    <td><a href="<?php echo admin_url("payroll/view_payslip")."/".$staff['id']; ?>" class="btn btn-primary view-slip" data-id="<?php echo $staff['id']; ?>">Download Slip</a></td>
+                    <td><a target="_blank" href="<?php echo admin_url("payroll/view_payslip")."/".$staff['id']; ?>" class="btn btn-primary view-slip" data-id="<?php echo $staff['id']; ?>">View </a></td>
+
+                    
                 </tr>
             <?php 
                     endif;

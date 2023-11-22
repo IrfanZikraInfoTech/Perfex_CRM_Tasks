@@ -146,15 +146,17 @@ class Payroll_model extends App_Model
     
     //payslip
     public function getPaymentDetails($id) {
-        $this->db->select('tblstaff.*, tbl_payroll_records.salary, tbl_payroll_records.staff_id, tbl_payroll_records.bonus, approver.firstname AS approver_name, tbl_payroll_records.deduction, tbl_payroll_records.id, tbl_payroll_records.changedby, tbl_payroll_records.Refrence_number,tbl_payroll_records.payment_mode,tbl_payroll_records.month,tbl_payroll_records.status');
+        $this->db->select('tblstaff.*, tbl_payroll_records.*, tbldepartments.name as department_name');
         $this->db->from('tbl_payroll_records');
         $this->db->join('tblstaff', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'left');
         $this->db->join('tblstaff AS approver', 'tbl_payroll_records.changedby = approver.staffid', 'left');
-        $this->db->where('id', $id);
+        $this->db->join('tblstaff_departments', 'tblstaff_departments.staffid = tblstaff.staffid', 'left');
+        $this->db->join('tbldepartments', 'tbldepartments.departmentid = tblstaff_departments.departmentid', 'left');
+        $this->db->where('tbl_payroll_records.id', $id);
         $query = $this->db->get();
         
         return $query->row();
-    } 
+    }
     public function savePaymentMode($id, $paymentMode){
         $this->db->set('payment_mode', $paymentMode);
         $this->db->where('id', $id);

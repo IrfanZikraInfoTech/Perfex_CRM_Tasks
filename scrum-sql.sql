@@ -109,3 +109,19 @@ CREATE TABLE tbl_exit (
     'additional_comments' TEXT,
     'status' VARCHAR(100);
 );
+
+
+-- payroll
+ALTER TABLE tbl_payroll_records ADD daysPresent INT(11);
+ALTER TABLE tbl_payroll_records ADD unpaidleaves INT(11);
+ALTER TABLE tbl_payroll_records ADD leaves INT(11);
+ALTER TABLE tbl_payroll_records ADD totalDays INT(11);
+ALTER TABLE tbl_payroll_records ADD allowances INT(11);
+ALTER TABLE tbl_payroll_records ADD unpaid_leave_deduction INT(11);
+ALTER TABLE tbl_payroll_records ADD fromDate DATE;
+ALTER TABLE tbl_payroll_records ADD toDate DATE;
+ALTER TABLE tbl_payroll_records ADD daysPresent INT(11);
+ALTER TABLE tbl_payroll_records ADD unpaidleaves INT(11);
+ALTER TABLE tbl_payroll_records ADD leaves INT(11);
+ALTER TABLE tbl_payroll_records ADD totalDays INT(11);
+ALTER TABLE tbl_payroll_records ADD remarks TEXT;

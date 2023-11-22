@@ -68,6 +68,11 @@ class Payroll extends AdminController
         $remarks = $this->input->post('remarks');  
         $fromDate = $this->input->post('fromDate');  
         $toDate = $this->input->post('toDate');  
+        $totalDays = $this->input->post('totalDays');  
+        $daysPresent = $this->input->post('daysPresent');  
+        $leaves = $this->input->post('leaves');  
+        $unpaidleaves = $this->input->post('unpaidleaves');  
+
 
 
         $data = array(
@@ -82,6 +87,10 @@ class Payroll extends AdminController
             'created_date' => $created_date,
             'fromDate' => $fromDate,
             'toDate' => $toDate,
+            'totalDays' => $totalDays,
+            'daysPresent' => $daysPresent,
+            'leaves' => $leaves,
+            'unpaidleaves' => $unpaidleaves,
             'currency' => $currency  // Add currency to the data array
         );
     
@@ -157,47 +166,14 @@ class Payroll extends AdminController
         // Load the view and pass the data
         $this->load->view('pay_slip', $data);
    }
-   public function view_payslip($type, $id) {
-    // Load the employee data
-    $data = $this->payroll_model->getPaymentDetails($id);
-    if (!$data) {
+ public function view_payslip($id) {
+    $data['payslip'] = $this->payroll_model->getPaymentDetails($id);
+    if (!$data['payslip']) {
         show_404();
         return;
     }
-
-    // Create a new mPDF object.
-    $mpdf = new \Mpdf\Mpdf();
-
-    // Add a page
-    $mpdf->AddPage();
-
-    // Set the image that will be used as a background.
-    $img_file = "https://i.ibb.co/qFYCS3K/Letter-haed-empty-01.jpg";
-    $mpdf->Image($img_file, 1, 9.5, 285, 360, '', '', '', false, 300, '', false, false, 0);
-
-    // Define some HTML content with style
-    $salary = $data->salary;
-    $bonus = $data->bonus;
-    $deduction = $data->deduction;
-    $total = $salary + $bonus - $deduction;
-
-    $html = file_get_contents(base_url('modules/payroll/views/pay_salary_slip_model.html'));
-
-    $html = str_replace(
-        ['{firstname}','{lastname}','{email}', '{phonenumber}', '{payment_mode}', '{salary}', '{bonus}', '{deduction}', '{total}','{Refrence_number}','{approver_name}','{remark}'],
-        [$data->firstname, $data->lastname, $data->email, $data->phonenumber, $data->payment_mode, $salary, $bonus, $deduction, $total, $data->Refrence_number, $data->approver_name,],
-        $html
-    );
-
-    // Output the HTML content
-    $mpdf->WriteHTML($html);
-
-    // Close and output PDF document
-    if($type==1){
-        $mpdf->Output('Salaryslip.pdf', 'I');
-    }else{
-        $mpdf->Output('Salaryslip.pdf', 'D');
-    }
+    // var_dump($data);
+    $this->load->view('dynamic_pdf/payslip', $data);
 }
 
    public function save_payment_mode() {
