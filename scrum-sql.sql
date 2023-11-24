@@ -125,3 +125,8 @@ ALTER TABLE tbl_payroll_records ADD unpaidleaves INT(11);
 ALTER TABLE tbl_payroll_records ADD leaves INT(11);
 ALTER TABLE tbl_payroll_records ADD totalDays INT(11);
 ALTER TABLE tbl_payroll_records ADD remarks TEXT;
+
+
+-- country
+
+ALTER TABLE `tblstaff` ADD `country` VARCHAR(255) NOT NULL AFTER `probation_period_time`;

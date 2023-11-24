@@ -252,7 +252,13 @@ if ($member->active == 0) {?>
 
 						</tr>
 
-						
+						<tr class="project-overview">
+
+							<td class="bold"><?php echo _l('country'); ?></td>
+
+							<td><?php echo html_entity_decode($member->country); ?></td>
+
+						</tr>
 
 						<tr class="project-overview">
 

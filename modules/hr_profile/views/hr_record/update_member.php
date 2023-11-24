@@ -275,8 +275,21 @@ echo render_date_input('birthday', 'hr_hr_birthday', _d($birthday));?>
 
 
                         </div>
+                        <div class="row">
 
+                        <div class="col-md-12">
+                           <div class="form-group">
+                              <label for="country" class="control-label"><?php echo _l('Country'); ?></label>
+                              <select name="country" class="selectpicker" id="country" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
+                                    <option value="USA" <?php if (isset($member) && $member->country == 'USA') { echo 'selected'; } ?>><?php echo _l('USA'); ?></option>
 
+                                    <option value="Pakistan" <?php if (isset($member) && $member->country == 'Pakistan') { echo 'selected'; } ?>><?php echo _l('Pakistan'); ?></option>
+                                    <option value="India" <?php if (isset($member) && $member->country == 'India') { echo 'selected'; } ?>><?php echo _l('India'); ?></option>
+                                    <option value="Bangladesh" <?php if (isset($member) && $member->country == 'Bangladesh') { echo 'selected'; } ?>><?php echo _l('Bangladesh'); ?></option>
+                              </select>
+                           </div>
+                        </div>
+                     </div>
 
                         <div class="row">
 
