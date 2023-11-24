@@ -32,7 +32,13 @@ function payroll_init_menu_items()
     ]);
 
     
-    
+    $CI->app_menu->add_sidebar_children_item('payroll', [
+        'slug' => 'Dashboard', // Required ID/slug UNIQUE for the child menu
+        'name' => 'Dashboard', // The name of the item
+        'href' => admin_url('payroll/dashboard'), // URL of the item
+        'position' => 1, // The menu position
+        'icon' => 'fa fa-tachometer-alt', // Font awesome icon
+    ]);
     //Role Salary
     $CI->app_menu->add_sidebar_children_item('payroll', [
         'slug' => 'calculate', // Required ID/slug UNIQUE for the child menu

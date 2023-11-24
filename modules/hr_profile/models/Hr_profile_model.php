@@ -35,7 +35,7 @@ class Hr_profile_model extends App_Model
 
 		$staff_working = $this->db->query('SELECT * FROM '.db_prefix().'staff WHERE status_work = "working"')->result_array();
 
-		$staff_birthday = $this->db->query('SELECT * FROM '.db_prefix().'staff WHERE status_work = "working" AND MONTH(birthday) = '.date('m').' ORDER BY birthday ASC')->result_array();
+		$staff_birthday = $this->db->query('SELECT * FROM '.db_prefix().'staff WHERE status_work = "working" AND active = 1 AND MONTH(birthday) = '.date('m').' ORDER BY birthday ASC ')->result_array();
 
 		$staff_inactivity = $this->db->query('SELECT * FROM '.db_prefix().'staff WHERE status_work = "inactivity" AND staffid in (SELECT staffid FROM '.db_prefix().'hr_list_staff_quitting_work where dateoff >= \''.date('Y-m-01').' 00:00:00'.'\' and dateoff <= \''.date('Y-m-t').' 23:59:59'.'\')')->result_array();
 

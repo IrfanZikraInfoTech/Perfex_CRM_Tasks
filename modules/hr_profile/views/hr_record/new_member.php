@@ -170,8 +170,24 @@
 										</div>
 
 									</div>
+									<div class="row">
 
+										<div class="col-md-12">
+										<div class="form-group">
+											<label for="country" class="control-label"><?php echo _l('hr_country'); ?></label>
+											<select name="country" class="selectpicker" id="country" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
+												<option value="USA" <?php if (isset($member) && $member->country == 'USA') { echo 'selected'; } ?>><?php echo ('USA'); ?></option>
 
+												<option value="Pakistan" <?php if (isset($member) && $member->country == 'Pakistan') { echo 'selected'; } ?>><?php echo ('Pakistan'); ?></option>
+
+												<option value="India" <?php if (isset($member) && $member->country == 'India') { echo 'selected'; } ?>><?php echo ('India'); ?></option>
+
+												<option value="Bangladesh" <?php if (isset($member) && $member->country == 'Bangladesh') { echo 'selected'; } ?>><?php echo ('Bangladesh'); ?></option>
+											</select>
+										</div>
+
+										</div>
+									</div>
 
 									<div class="row">
 
