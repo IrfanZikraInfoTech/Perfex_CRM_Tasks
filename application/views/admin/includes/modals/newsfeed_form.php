@@ -12,7 +12,8 @@
                 <a href="<?php echo admin_url('profile'); ?>">
                     <?php echo staff_profile_image($current_user->staffid, ['staff-profile-image-small']); ?>
                     <?php echo $current_user->firstname . ' ' . $current_user->lastname ; ?></a>
-                    
+
+                    <input type="text" class="form-control my-3" id="heading" name="heading" placeholder="Enter announcement heading here">
                     <div class="mt-4">
                         <?php echo render_textarea('content', '', '', [], [], '', 'tinymce'); ?>
                     </div>

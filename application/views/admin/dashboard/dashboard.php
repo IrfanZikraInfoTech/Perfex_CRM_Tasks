@@ -35,9 +35,10 @@ function displayTasks($tasks) {
 <style>
 .clamp-lines {
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* Number of lines you want to display */
+    -webkit-line-clamp: 6; /* Adjust number of lines you want to display if needed */
     -webkit-box-orient: vertical;
     overflow: hidden;
+    line-height: 1.4; /* Adjust the line-height for comfortable reading */
 }
 
 .myscrollbar::-webkit-scrollbar {
@@ -304,33 +305,17 @@ if ($todayIsBirthday) : ?>
                                         $isLiked = $this->newsfeed_model->user_liked_post($post["postid"]) ? "true" : "false";
                                         $totalLikes = count($this->newsfeed_model->get_post_likes($post["postid"]));
                                         $currentDateTime = new DateTime();
-                                        $postDateTime = new DateTime($post["datecreated"]);
                                         $hasUserSeenPost = in_array($currentUserId, $post['seen_by'] ? (explode(',', $post["seen_by"])) : []); // Check if user ID exists in seen_by column
                                         $postClass = $hasUserSeenPost ? "" : "not-seen"; // Assign the class based on if the user has seen the post or not
-                                        $interval = $currentDateTime->diff($postDateTime);
-                                        
-                                        $timeString = '';
-                                        if ($interval->y > 0) {
-                                            $timeString = $interval->y . ' year' . ($interval->y > 1 ? 's' : '') . ' ago';
-                                        } elseif ($interval->m > 0) {
-                                            $timeString = $interval->m . ' month' . ($interval->m > 1 ? 's' : '') . ' ago';
-                                        } elseif ($interval->d > 0) {
-                                            $timeString = $interval->d . ' day' . ($interval->d > 1 ? 's' : '') . ' ago';
-                                        } elseif ($interval->h > 0) {
-                                            $timeString = $interval->h . ' hour' . ($interval->h > 1 ? 's' : '') . ' ago';
-                                        } elseif ($interval->i > 0) {
-                                            $timeString = $interval->i . ' minute' . ($interval->i > 1 ? 's' : '') . ' ago';
-                                        } else {
-                                            $timeString = 'just now';
-                                        }
-                                    ?>
-                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="custom_border dashboard-posts bg-white rounded-[40px] m-4 p-6 pb-2 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-<?= get_option('management_theme_border')?>  <?= $postClass ?>" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this);">
+                                        ?>
+                                        <div data-postid="<?= $post["postid"] ?>" data-total-likes="<?= $totalLikes ?>"  data-liked-by-user="<?= $isLiked ?>"  class="custom_border dashboard-posts bg-white rounded-[40px] m-4 px-6 py-3 cursor-pointer hover:shadow-md border border-gray-200 border-solid transition-all hover:border-<?= get_option('management_theme_border')?>  <?= $postClass ?>" data-creator="<?= $post["creator_name"] ?>" data-content="<?= htmlentities($post["content"]) ?>" onclick="openPostModal(this);">
                                             <div class="flex justify-between items-center">
-                                                <div class="font-bold text-xl"><?= $post["creator_name"] ?></div>
-                                                <div class="text-gray-500 text-sm italic"><?= $timeString ?></div>
+                                                <div class="font-bold text-xl"><?= $post["heading"] ?></div>
+                                                <div><?= staff_profile_image($post['creator'], ['border-4 border-gradient-to-r from-teal-400 to-blue-500 object-cover w-12 h-12 rounded-full staff-profile-image-thumb mt-3'], 'thumb'); ?></div>
                                             </div>
                                             <div class="text-gray-500 mb-3">Published: <?= $post["datecreated"] ?></div>
-                                            <div class="clamp-lines text-md mb-4"><?= $post["content"] ?></div>
+
+                                            <!-- <div class="clamp-lines text-md mb-4"><?=  $post["content"] ?></div> -->
                                             
                                             <div class="likes-count text-gray-500 mb-1">
                                                 <?= $totalLikes ?> <?= $totalLikes === 1 ? "like" : "likes" ?>
@@ -658,7 +643,6 @@ function openPostModal(postElement) {
 
     var creatorName = postElement.getAttribute('data-creator');
     var content = postElement.getAttribute('data-content');
-    var timeString = postElement.querySelector('.text-sm.italic').innerText;
     var dateCreated = postElement.querySelector('.text-gray-500.mb-3').innerText;
     
     var likeButton = modal.querySelector('.btnlike');
@@ -679,7 +663,6 @@ function openPostModal(postElement) {
     likeCount.innerText = `${totalLikes} ${totalLikes === "1" ? "like" : "likes"}`;
 
     document.getElementById('modalCreatorName').innerText = creatorName;
-    document.getElementById('modalTime').innerText = timeString;
     document.getElementById('modalDate').innerText = dateCreated;
     document.getElementById('modalContent').innerHTML = content;
 

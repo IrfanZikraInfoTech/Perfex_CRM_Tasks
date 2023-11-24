@@ -57,10 +57,14 @@ class Newsfeed extends AdminController
                 $pinned_class = ' pinned';
             }
 
+            
             $response .= '<div class="panel_s newsfeed_post' . $pinned_class . '" data-main-postid="' . $post['postid'] . '">';
             $response .= '<div class="panel-body post-content">';
+
             $response .= '<div class="media">';
+
             $response .= '<div class="media-left">';
+
             $response .= '<a href="' . admin_url('profile/' . $post['creator']) . '">' . staff_profile_image($post['creator'], [
                 'staff-profile-image-small',
                 'no-radius',
@@ -91,6 +95,7 @@ class Newsfeed extends AdminController
                 $visible_departments = substr($visible_departments, 0, -2);
                 $response .= '<i class="fa-regular fa-circle-question" data-toggle="tooltip" data-title="' . _l('newsfeed_newsfeed_post_only_visible_to_departments', $visible_departments) . '"></i> ';
             }
+            $response .= '<h2 class="post-heading mb-3"><b>' . htmlspecialchars($post['heading'], ENT_QUOTES, 'UTF-8') . '</b></h2>';
             $response .= check_for_links($post['content']);
             $response .= '<div class="clearfix mbot10"></div>';
             $image_attachments       = $this->newsfeed_model->get_post_attachments($post['postid'], true);

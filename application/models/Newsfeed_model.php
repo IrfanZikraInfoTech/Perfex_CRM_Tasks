@@ -191,6 +191,7 @@ class Newsfeed_model extends App_Model
     public function add($data)
     {
         unset($data['null']);
+        $data['heading'] = $this->security->xss_clean($data['heading']); 
         $data['datecreated'] = date('Y-m-d H:i:s');
         $data['content']     = nl2br($data['content']);
         $data['creator']     = get_staff_user_id();
