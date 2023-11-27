@@ -55,56 +55,102 @@
 <div class="modal" tabindex="-1" id="payModal">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header ">
-                <h5 class="modal-title">
-                <span id="employeeName"></span>'s Payment Details
-                </h5>
-                
+        <div class="modal-header bg-gray-200 border-b border-gray-100">
+            <h5 class="modal-title text-xl font-bold text-black mx-auto">
+                <span id="employeeName"></span>'s Monthly Attendance and Salary Details
+            </h5>
+        </div>
 
-            </div>
+
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="fromDate">From Date:</label>
-                    <input type="date" id="fromDate" class="form-control" name="fromDate">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                        <label for="fromDate">From:</label>
+                        <input type="date" id="fromDate" class="form-control" name="fromDate">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                        <label for="toDate">To:</label>
+                        <input type="date" id="toDate" class="form-control" name="toDate">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="toDate">To Date:</label>
-                    <input type="date" id="toDate" class="form-control" name="toDate">
+                <div class="flex flex-wrap -mx-3 mb-2">
+                    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                    <p class="text-sm font-semibold">Total Days: <span id="totalDays" class="font-normal"></span></p>
+                    </div>
+                    <div class="w-full md:w-1/2 px-3">
+                    <p class="text-sm font-semibold">Days Present: <span id="daysPresent" class="font-normal"></span></p>
+                    </div>
                 </div>
-                <p>Total Days: <span id="totalDays"></span></p>
-                <p>Days Present: <span id="daysPresent"></span></p>
-                <p>Unpaid Leaves: <span id="unpaidleaves"></span></p>
-                <p>Leaves: <span id="leaves"></span></p>
-                <p>base Salary: <span id="salary"></span></p>
-                <div class="form-group">
-                    <label for="currency">Select Currency:</label>
-                    <select name="currency" id="currency" class="form-control">
-                        <option value="INR">INR</option>
-                        <option value="PKR">PKR</option>
-                    </select>
+                <div class="flex flex-wrap -mx-3 mb-2">
+                    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                    <p class="text-sm font-semibold">Unpaid Leaves: <span id="unpaidleaves" class="font-normal"></span></p>
+                    </div>
+                    <div class="w-full md:w-1/2 px-3">
+                    <p class="text-sm font-semibold">Leaves: <span id="leaves" class="font-normal"></span></p>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="bonusInput">Bonus:</label>
-                    <input id="bonusInput" type="number" placeholder="Enter Bonus" oninput="calculateTotal()" class="form-control">
+                <div class="row">
+                    <div class="mb-4 col-md-12">
+                    <p class="text-sm font-semibold">Base Salary: <span id="salary" class="font-normal"></span></p>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group mb-4">
+                        <label for="currency" class="block text-gray-700 text-sm font-bold mb-2">Select Currency:</label>
+                        <select name="currency" id="currency" class="form-control block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
+                            <option value="INR">INR</option>
+                            <option value="PKR">PKR</option>
+                        </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="allowancesInput">Other Allowances:</label>
-                    <input id="allowancesInput" type="number" placeholder="Enter Allowances" oninput="calculateTotal()" class="form-control">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="bonusInput" class="block text-gray-700 text-sm font-bold mb-2">Bonus:</label>
+                            <input id="bonusInput" type="number" placeholder="Enter Bonus" oninput="calculateTotal()" class="form-control block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="allowancesInput" class="block text-gray-700 text-sm font-bold mb-2">Other Allowances:</label>
+                            <input id="allowancesInput" type="number" placeholder="Enter Allowances" oninput="calculateTotal()" class="form-control block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="deductionInput">Deduction:</label>
-                    <input id="deductionInput" type="number" placeholder="Enter Deduction" oninput="calculateTotal()" class="form-control">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="deductionInput" class="block text-gray-700 text-sm font-bold mb-2">Deduction:</label>
+                            <input id="deductionInput" type="number" placeholder="Enter Deduction" oninput="calculateTotal()" class="form-control block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="unpaid_leave_deduction" class="block text-gray-700 text-sm font-bold mb-2">Unpaid Leave Deduction:</label>
+                            <input id="unpaid_leave_deduction" type="number" placeholder="Enter Unpaid Deduction" oninput="calculateTotal()" class="form-control block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="unpaid_leave_deduction">Unpaid Leave Deduction:</label>
-                    <input id="unpaid_leave_deduction" type="number" placeholder="Enter Unpaid Deduction" oninput="calculateTotal()" class="form-control">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="remarks" class="block text-gray-700 text-sm font-bold mb-2">Remarks</label>
+                            <input id="remarks" type="text" placeholder="Enter Remarks" class="form-control block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mt-4">
+                            <p class="text-lg font-bold">Total: <span id="total" class="font-normal"></span></p>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="remarks">Remarks</label>
-                    <input id="remarks" type="text" placeholder="Enter Remarks"class="form-control">
-                </div>
-                <p>Total: <span id="total"></span></p>
+                
             </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePayModal()">Close</button>
                 <button type="button" class="btn btn-primary" onclick="makePayment()">Update Payment</button>
