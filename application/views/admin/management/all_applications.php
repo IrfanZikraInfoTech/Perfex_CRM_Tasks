@@ -124,8 +124,12 @@ $(document).ready(function() {
                 "data": null,
                 "width" : "10%",
                 "render": function(data, type, row) {
-                    return '<div class="flex flex-row items-center gap-2"><div>'+row.user_pfp+'</div><button data-toggle="modal" data-target="#attachmentModal" onclick="attachmentModal('+row.id+')">'+row.user_name+'</button></div>';
-                }
+    return '<div class="flex flex-col items-center justify-center gap-1">' +
+                '<div class="flex justify-center w-10 h-10">' + row.user_pfp + '</div>' +
+                '<button data-toggle="modal" data-target="#attachmentModal" onclick="attachmentModal(' + row.id + ')" class="text-center w-full">' + row.user_name + '</button>' +
+            '</div>';
+}
+
             },
             { data: 'created_at' },
             { data: 'application_type' },
