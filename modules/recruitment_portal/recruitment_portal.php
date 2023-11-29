@@ -151,7 +151,9 @@ if (!$CI->db->table_exists(db_prefix() . 'requisition_form')) {
         `work_schedule` TEXT NOT NULL,
         `salary` VARCHAR(100) NOT NULL,
         `additional_info`TEXT NOT NULL,
-        `status` VARCHAR(100) NOT NULL DEFAULT 'Pending' 
+        `status` VARCHAR(100) NOT NULL DEFAULT 'Pending' ,
+        ALTER TABLE `tblrequisition_form` ADD `locations` TEXT NOT NULL AFTER `additional_info`;
+
 
     ) ");
 }
@@ -192,6 +194,7 @@ function addCustomRoutes() {
 function recruitment_portal_init_menu_items()
 {
     $CI = &get_instance();
+
     $CI->app_menu->add_sidebar_menu_item('recruitment_portal', [
         'name'     => 'Recruitment', // The name of the item
         'position' => 3, // The menu position, see below for default positions.
@@ -205,21 +208,46 @@ function recruitment_portal_init_menu_items()
         'position' => 1, // The menu position
         'icon'     => 'fa fa-bullhorn', // Font awesome icon
     ]);
+    }
+    // if ($CI->recruitment_portal_model->has_permission(null, $staff_user_id, 'act')) {
+    //     $CI->app_menu->add_sidebar_children_item('recruitment_portal', [
+    //         'slug'     => 'submissions',
+    //         'name'     => 'Submissions',
+    //         'href'     => admin_url('recruitment_portal/submissions'),
+    //         'position' => 2,
+    //         'icon'     => 'fa fa-paper-plane',
+    //     ]);
+    // }
 
-    $CI->app_menu->add_sidebar_children_item('recruitment_portal', [
-        'slug'     => 'submissions', // Required ID/slug UNIQUE for the child menu
-        'name'     => 'Submissions', // The name if the item
-        'href'     => admin_url('recruitment_portal/submissions'), // URL of the item
-        'position' => 2, // The menu position
-        'icon'     => 'fa fa-paper-plane', // Font awesome icon
-    ]);
-}
+    $CI = &get_instance();
+    $staff_user_id = get_staff_user_id();
+
+    $has_global_act_permission = false;
+    $campaigns = $CI->recruitment_portal_model->get_campaigns();
+    foreach ($campaigns as $campaign) {
+        if ($CI->recruitment_portal_model->has_permission($campaign->id, $staff_user_id, 'act')) {
+            $has_global_act_permission = true;
+            break;
+        }
+    }
+
+    if ($has_global_act_permission) {
+        $CI->app_menu->add_sidebar_children_item('recruitment_portal', [
+            'slug'     => 'submissions',
+            'name'     => 'Submissions',
+            'href'     => admin_url('recruitment_portal/submissions'),
+            'position' => 2,
+            'icon'     => 'fa fa-paper-plane',
+        ]);
+    }
+
+    
 if (has_permission('recruitment_portal', '', 'admin') || has_staff_under()) {
     $CI->app_menu->add_sidebar_children_item('recruitment_portal', [
         'slug'     => 'Requisition_Form', // Required ID/slug UNIQUE for the child menu
         'name'     => 'Requisition Form', // The name if the item
         'href'     => admin_url('recruitment_portal/requisition_form'), // URL of the item
-        'position' => 2, // The menu position
+        'position' => 5, // The menu position
         'icon'     => 'fa fa-address-book', // Font awesome icon
     ]);
 }
@@ -228,7 +256,7 @@ if (has_permission('recruitment_portal', '', 'admin')) {
         'slug'     => 'All_Requisition_Form', // Required ID/slug UNIQUE for the child menu
         'name'     => 'Req Submissions', // The name if the item
         'href'     => admin_url('recruitment_portal/all_requisition_form'), // URL of the item
-        'position' => 2, // The menu position
+        'position' => 5, // The menu position
         'icon'     => 'fa fa-address-book', // Font awesome icon
     ]);
 }
