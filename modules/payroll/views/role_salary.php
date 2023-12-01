@@ -77,26 +77,57 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-wrap -mx-3 mb-2">
-                    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                    <p class="text-sm font-semibold">Total Days: <span id="totalDays" class="font-normal"></span></p>
+                <div class="flex flex-wrap  mb-4 mt-3">
+                    <!-- Total Days Card -->
+                    <div class="bg-white rounded-lg border border-gray-200 p-4 w-40 text-center shadow-lg mx-3">
+                    <p class="text-sm font-medium text-gray-600">
+                        Total Days
+                    </p>
+                    <p class="text-lg font-semibold text-gray-700">
+                        <span id="totalDays"></span>
+                    </p>
                     </div>
-                    <div class="w-full md:w-1/2 px-3">
-                    <p class="text-sm font-semibold">Days Present: <span id="daysPresent" class="font-normal"></span></p>
+                    <div class="bg-white rounded-lg border border-gray-200 p-4 w-40 text-center shadow-lg mx-3">
+                    <p class="text-sm font-medium text-gray-600">
+                        Days Present
+                    </p>
+                    <p class="text-lg font-semibold text-gray-700">
+                        <span id="daysPresent"></span>
+                    </p>
+                    </div>
+                    <div class="bg-white rounded-lg border border-gray-200 p-4 w-40 text-center shadow-lg mx-3">
+                    <p class="text-sm font-medium text-gray-600">
+                        Leaves: 
+                    </p>
+                    <p class="text-lg font-semibold text-gray-700">
+                        <span id="leaves"></span>
+                    </p>
                     </div>
                 </div>
-                <div class="flex flex-wrap -mx-3 mb-2">
-                    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                    <p class="text-sm font-semibold">Unpaid Leaves: <span id="unpaidleaves" class="font-normal"></span></p>
+
+                <div class="flex flex-wrap  mb-4 mt-3">
+                    <!-- Total Days Card -->
+                    <div class="bg-white rounded-lg border border-gray-200 p-4 w-40 text-center shadow-lg mx-3">
+                    <p class="text-sm font-medium text-gray-600">
+                        Unpaid Leaves
+                    </p>
+                    <p class="text-lg font-semibold text-gray-700">
+                        <span id="unpaidleaves"></span>
+                    </p>
                     </div>
-                    <div class="w-full md:w-1/2 px-3">
-                    <p class="text-sm font-semibold">Leaves: <span id="leaves" class="font-normal"></span></p>
+                    <div class="bg-white rounded-lg border border-gray-200 p-4 w-40 text-center shadow-lg mx-3">
+                    <p class="text-sm font-medium text-gray-600">
+                        Base Salary
+                    </p>
+                    <p class="text-lg font-semibold text-gray-700">
+                        <span id="salary"></span>
+                    </p>
                     </div>
                 </div>
+
+           
                 <div class="row">
-                    <div class="mb-4 col-md-12">
-                    <p class="text-sm font-semibold">Base Salary: <span id="salary" class="font-normal"></span></p>
-                    </div>
+                    
                     <div class="col-md-12">
                         <div class="form-group mb-4">
                         <label for="currency" class="block text-gray-700 text-sm font-bold mb-2">Select Currency:</label>
@@ -331,7 +362,6 @@
                 remarks: remarks,
                 fromDate: fromDate,
                 toDate: toDate,
-                currency: currency,
                 totalDays: totalDays,
                 daysPresent: daysPresent,
                 leaves: leaves,

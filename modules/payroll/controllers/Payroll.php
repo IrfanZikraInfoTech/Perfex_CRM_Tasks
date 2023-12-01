@@ -167,7 +167,7 @@ public function save_exchange_rate() {
             'daysPresent' => $daysPresent,
             'leaves' => $leaves,
             'unpaidleaves' => $unpaidleaves,
-            'currency' => $currency  // Add currency to the data array
+            'currency' => $currency 
         );
     
         $result = $this->payroll_model->add_payment($data);
@@ -198,11 +198,13 @@ public function save_exchange_rate() {
 
     //monthly payroll
     public function monthly_section() {    
-        // Get the month and year from the GET parameters, set a default if they're not set
-        $month = $this->input->get('month', TRUE) ? $this->input->get('month', TRUE) : date('Y-m-d');
+        // Get the current month and year if they're not set in the GET parameters
+        $month = $this->input->get('month', TRUE) ? $this->input->get('month', TRUE) : date('m');
+        $year = $this->input->get('year', TRUE) ? $this->input->get('year', TRUE) : date('Y');
+        $monthYear = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
     
         // Retrieve the data from the Model
-        $data['staffs'] = $this->payroll_model->get_monthly_payroll($month);
+        $data['staffs'] = $this->payroll_model->get_monthly_payroll($monthYear);
     
         // Load the view and pass the data
         $this->load->view('monthly_section', $data);

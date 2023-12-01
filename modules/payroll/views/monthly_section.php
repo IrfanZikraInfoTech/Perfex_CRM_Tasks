@@ -6,29 +6,36 @@
     <div class="container">
     <h2 class="text-center my-6 text-2xl"><?php echo "Monthly Section Salary"?></h2>
         <form class="form-inline" method="get" action="">
-            <div class="form-group mb-2">
-                <label for="month" class="mr-2">Month:</label>
-                <select class="form-control mr-2" name="month" id="month">
-                    <?php 
-                        $selectedMonth = isset($_GET['month']) ? $_GET['month'] : null;
-                        for ($m=1; $m<=12; ++$m) { 
-                    ?>
-                        <option value="<?php echo $m; ?>" <?php echo $m == $selectedMonth ? 'selected="selected"' : ''; ?>>
-                            <?php echo date('F', mktime(0, 0, 0, $m, 1)); ?>
-                        </option>
-                    <?php } ?>
-                </select>
-            </div>
-            <div class="form-group mb-2">
-                <label for="year" class="mr-2">Year:</label>
-                <select class="form-control mr-2" name="year" id="year">
-                    <?php for($y=date('Y'); $y>=2000; $y--){ ?>
-                        <option value="<?php echo $y; ?>"><?php echo $y; ?></option>
-                    <?php } ?>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Filter</button>
-        </form>
+        <div class="form-group mb-2">
+            <label for="month" class="mr-2">Month:</label>
+            <select class="form-control mr-2" name="month" id="month">
+                <?php 
+                    // Set the selected month to current month if none is set
+                    $selectedMonth = isset($_GET['month']) ? $_GET['month'] : date('n');
+                    for ($m=1; $m<=12; ++$m) { 
+                ?>
+                <option value="<?php echo $m; ?>" <?php echo $m == $selectedMonth ? 'selected="selected"' : ''; ?>>
+                    <?php echo date('F', mktime(0, 0, 0, $m, 1)); ?>
+                </option>
+                <?php } ?>
+            </select>
+        </div>
+        <div class="form-group mb-2">
+            <label for="year" class="mr-2">Year:</label>
+            <select class="form-control mr-2" name="year" id="year">
+                <?php 
+                    // Set the selected year to current year if none is set
+                    $selectedYear = isset($_GET['year']) ? $_GET['year'] : date('Y');
+                    for($y=date('Y'); $y>=2000; $y--){
+                ?>
+                <option value="<?php echo $y; ?>" <?php echo $y == $selectedYear ? 'selected="selected"' : ''; ?>>
+                    <?php echo $y; ?>
+                </option>
+                <?php } ?>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
     </div>
 
     
@@ -60,42 +67,41 @@
                     <td class="px-2 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' . $staff['salary']; ?></td>
                     <td class="px-2 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' .$staff['bonus']; ?></td>
                     <td class="px-2 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' . $staff['deduction']; ?></td>
-                    <?php
-                        // Calculate total as base salary + bonus - deduction
-                        $totalAmount = $staff['salary'] + $staff['bonus'] - $staff['deduction'];
-                        ?>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' . $totalAmount; ?></td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-500" style="display: flex; align-items: center;">
-                        <select name="approval_status" class="form-control approval-status" data-id="<?php echo $staff['id']; ?>" style="width: auto; margin-right: 10px;" disabled>
-                            <option value="2"<?php if($staff['status'] == '2') echo 'selected'; ?>>Approved</option>
-                            <option value="1"<?php if($staff['status'] == '1') echo 'selected'; ?>>Pending</option>
-                            <option value="0"<?php if($staff['status'] == '0') echo 'selected'; ?>>Rejected</option>
-                        </select>
-                        <button type="button" class="btn btn-primary edit-save-btn" data-id="<?php echo $staff['id']; ?>"><i class="fas fa-edit"></i></button>
-                    </td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['approver_name']; ?></td>
-                            <!-- Add the delete button to each row -->
-                    <!-- Inside your table body loop -->
-                    <td class="flex px-4 py-2 whitespace-nowrap text-center text-sm text-gray-500">
-                        <!-- Pay Button to Open Modal -->
                         <?php
-                            // Show Pay button if the approver name is either "Ansar" or "Anwar"
-                            $canShowPayButton = ($staff['approver_name'] === 'Ansar' || $staff['approver_name'] === 'Anwaar');
-                        ?>
-                        <button type="button" onclick="showAlertAndModal('<?php echo $staff["id"]; ?>');" 
-                            class="btn btn-success pay-button" 
-                            data-staffId="<?php echo $staff['id']; ?>" 
-                            data-totalAmount="<?php echo $totalAmount; ?>" 
-                            data-approver="<?php echo $staff['approver_name']; ?>"
-                            <?php echo $canShowPayButton ? '' : 'disabled'; ?>>
-                            Pay
-                        </button>
-                        <form action="<?php echo admin_url('payroll/delete_record'); ?>" method="post">
-                            <input type="hidden" name="<?=$this->security->get_csrf_token_name();?>" value="<?=$this->security->get_csrf_hash();?>">
-                            <input type="hidden" name="id_to_delete" value="<?php echo $staff['id']; ?>">
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
-                    </td>
+                            // Calculate total as base salary + bonus - deduction
+                            $totalAmount = $staff['salary'] + $staff['bonus'] - $staff['deduction'];
+                            ?>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' . $totalAmount; ?></td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-500" style="display: flex; align-items: center;">
+                            <select name="approval_status" class="form-control approval-status" data-id="<?php echo $staff['id']; ?>" style="width: auto; margin-right: 10px;" disabled>
+                                <option value="2"<?php if($staff['status'] == '2') echo 'selected'; ?>>Approved</option>
+                                <option value="0"<?php if($staff['status'] == '0') echo 'selected'; ?>>Rejected</option>
+                            </select>
+                            <button type="button" class="btn btn-primary edit-save-btn" data-id="<?php echo $staff['id']; ?>"><i class="fas fa-edit"></i></button>
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['approver_name']; ?></td>
+                                <!-- Add the delete button to each row -->
+                        <!-- Inside your table body loop -->
+                        <td class="flex px-4 py-2 whitespace-nowrap text-center text-sm text-gray-500">
+                            <!-- Pay Button to Open Modal -->
+                            <?php
+                                // Show Pay button if the approver name is either "Ansar" or "Anwar"
+                                $canShowPayButton = ($staff['approver_name'] === 'Ansar' || $staff['approver_name'] === 'Anwaar');
+                            ?>
+                            <button type="button" onclick="showAlertAndModal('<?php echo $staff['id']; ?>');" 
+                                class="btn btn-success pay-button" 
+                                data-staffId="<?php echo $staff['id']; ?>" 
+                                data-totalAmount="<?php echo $totalAmount; ?>" 
+                                data-approver="<?php echo $staff['approver_name']; ?>"
+                                <?php echo $canShowPayButton ? '' : 'disabled'; ?> style="color:white; background-color:green">
+                                Pay
+                            </button>
+                            <form action="<?php echo admin_url('payroll/delete_record'); ?>" method="post">
+                                <input type="hidden" name="<?=$this->security->get_csrf_token_name();?>" value="<?=$this->security->get_csrf_hash();?>">
+                                <input type="hidden" name="id_to_delete" value="<?php echo $staff['id']; ?>">
+                                <button type="submit" class="btn btn-danger" style="background-color:#DC2626">Delete</button>
+                            </form>
+                        </td>
                 </tr>
             <?php 
                     endif;

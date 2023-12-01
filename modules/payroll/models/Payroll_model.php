@@ -14,7 +14,7 @@ class Payroll_model extends App_Model
     public function get_employee_details() {
         $this->db->select('tblstaff.*, tbl_payroll_salary.*, tbl_payroll_records.currency, tbldepartments.name as department_name');
         $this->db->from('tblstaff');
-        $this->db->where('tblstaff.active', 1); // Only select active staff
+        // $this->db->where('tblstaff.active', 1); // Only select active staff
         $this->db->where('tblstaff.report_to IS NOT NULL'); // Exclude staff with 'report_to' as NULL
 
         $this->db->join('tbl_payroll_salary', 'tbl_payroll_salary.employee_id = tblstaff.staffid', 'left');

@@ -16,10 +16,15 @@
                     </div>
                     <select name="selectedMonth" id="monthSelect" class="w-full py-2 pr-4 pl-2 rounded-full focus:outline-none focus:border-blue-300">
                         <!-- Populate options for each month -->
-                        <?php for ($i = 1; $i <= 12; $i++): ?>
-                            <option value="<?php echo $i; ?>" <?php echo (isset($selectedMonth) && $selectedMonth == $i) ? 'selected' : ''; ?>>
-                                <?php echo date('F', mktime(0, 0, 0, $i, 10)); ?>
-                            </option>
+                        <?php 
+                            // Use the current month as the default if $selectedMonth is not set
+                            $currentMonth = date('n');
+                            for ($i = 1; $i <= 12; $i++):
+                                $isSelected = (isset($selectedMonth) ? $selectedMonth : $currentMonth) == $i;
+                        ?>
+                        <option value="<?php echo $i; ?>" <?= $isSelected ? 'selected' : ''; ?>>
+                            <?php echo date('F', mktime(0, 0, 0, $i, 10)); ?>
+                        </option>
                         <?php endfor; ?>
                     </select>
                     <button type="submit" class="btn btn-primary text-white py-2 px-4 rounded-full" style="background-color: <?= $bg_color ?>;">
