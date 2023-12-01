@@ -17,11 +17,15 @@ public function dashboard(){
     $data = [];
     $allMonthsSalaries = $this->payroll_model->get_total_salaries_by_month();
     $data['all_months_salaries'] = $allMonthsSalaries;
-// var_dump($data['all_months_salaries']);
-    // ... existing code ...
+    //  var_dump($data['all_months_salaries']);
     if ($this->input->post('selectedMonth')) {
         $selectedMonth = $this->input->post('selectedMonth');
-        
+        $currentYear = date('Y'); // Assuming you want the current year.
+
+        // Fetch saved exchange rates for the selected month and year.
+        $savedRates = $this->payroll_model->get_exchange_rates($selectedMonth, $currentYear);
+        $data['saved_rates'] = $savedRates;
+    
         // Pakistan Salaries
         $pakSalariesData = $this->payroll_model->get_total_pak_salaries($selectedMonth);
         $data['total_salaries_pak'] = $pakSalariesData['total_salary'];
@@ -40,26 +44,7 @@ public function dashboard(){
         $totalStaff = $this->payroll_model->get_total_staff_for_month($selectedMonth);
         $departmentSalaries = $this->payroll_model->get_department_wise_salaries($selectedMonth);
         $data['department_salaries'] = $departmentSalaries;
-        $totalSalariesForMonth = $pakSalariesData['total_salary'] + $indSalariesData['total_salary'] + $bangSalariesData['total_salary'];
-        $data['total_salaries_for_month'] = $totalSalariesForMonth;
-
-        $apiKey = "a7328bcd671f72ecf1580dbbca309d5a";
-        $apiEndpoint = "https://api.apilayer.com/exchangerates_data/latest?symbols=PKR,BDT,INR&base=USD&apikey={$apiKey}";
-        $ch = curl_init($apiEndpoint);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
-        curl_close($ch);
-        $response = curl_exec($ch);
-        if ($response === false) {
-            // echo 'cURL Error: ' . curl_error($ch);
-        }        if ($response) {
-            $rates = json_decode($response, true)['rates'];
-
-            // Convert salaries to USD
-            $data['total_salaries_pak_usd'] = $data['total_salaries_pak'] * $rates['PKR'];
-            $data['total_salaries_bang_usd'] = $data['total_salaries_bang'] * $rates['BDT'];
-            $data['total_salaries_ind_usd'] = $data['total_salaries_ind'] * $rates['INR'];
-        }
+      
 
 
     } else {
@@ -71,16 +56,36 @@ public function dashboard(){
         $data['currency_ind'] = '';
         $data['total_salaries_bang'] = 0;
         $data['currency_bang'] = '';
-        $data['total_salaries_pak_usd'] = 0;
-        $data['total_salaries_bang_usd'] = 0;
-        $data['total_salaries_ind_usd'] = 0;
-
+       
 
     }
     $data['selectedMonth'] = $selectedMonth;
     $data['total_staff'] = $totalStaff ?? 0;
 // var_dump($data['total_salaries_ind_usd']);
     $this->load->view('dashboard', $data);
+}
+
+
+public function save_exchange_rate() {
+    // Validate the request
+    if (!$this->input->is_ajax_request()) {
+       exit('No direct script access allowed');
+    }
+
+    $month = $this->input->post('month');
+    $year = $this->input->post('year');
+    $rate = $this->input->post('rate');
+    $currency = $this->input->post('currency');
+
+    $data = [
+        'month' => $month,
+        'year' => $year,
+        'rate_' . strtolower($currency) => $rate
+    ];
+
+    $this->payroll_model->save_exchange_rate($data);
+
+    echo json_encode(['status' => 'success']);
 }
 
 

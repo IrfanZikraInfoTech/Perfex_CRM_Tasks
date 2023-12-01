@@ -280,45 +280,88 @@ class Payroll_model extends App_Model
     
     
     public function get_total_salaries_by_month() {
-        $this->db->select('MONTH(tbl_payroll_records.fromDate) as month, SUM(tbl_payroll_salary.employee_salary) as total_salary');
-        $this->db->from('tblstaff');
-        $this->db->join('tbl_payroll_salary', 'tbl_payroll_salary.employee_id = tblstaff.staffid', 'inner');
-        $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'inner');
-        $this->db->where('tblstaff.active', 1);
-        $this->db->where('tbl_payroll_records.fromDate IS NOT NULL', null, false);
-        $this->db->group_by('MONTH(tbl_payroll_records.fromDate)');
-        $this->db->order_by('month', 'asc');
-        
-        $query = $this->db->get();
-        return $query->result_array();
+        $currentYear = date('Y'); // Get the current year
+        $convertedSalaries = [];
+    
+        // Define the currencies you are dealing with
+        $currencies = ['pkr', 'ind', 'bang'];
+    
+        foreach ($currencies as $currency) {
+            $this->db->select([
+                'MONTH(tbl_payroll_records.fromDate) as month',
+                'SUM(tbl_payroll_salary.employee_salary) as total_salary'
+            ]);
+            $this->db->from('tblstaff');
+            $this->db->join('tbl_payroll_salary', 'tbl_payroll_salary.employee_id = tblstaff.staffid', 'inner');
+            $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'inner');
+            $this->db->where('tblstaff.active', 1);
+            $this->db->where('tbl_payroll_records.currency', strtoupper($currency)); // Make sure the currency matches the database value
+            $this->db->where('tbl_payroll_records.fromDate IS NOT NULL', null, false);
+            $this->db->group_by('MONTH(tbl_payroll_records.fromDate)');
+            $this->db->order_by('month', 'asc');
+    
+            $query = $this->db->get();
+            $monthlySalaries = $query->result_array();
+    
+            // Convert each month's salary to USD
+            foreach ($monthlySalaries as $salary) {
+                $exchangeRates = $this->get_exchange_rates($salary['month'], $currentYear);
+                $rateKey = 'rate_' . strtolower($currency);
+    
+                if (isset($exchangeRates[$rateKey]) && $exchangeRates[$rateKey] > 0) {
+                    $convertedSalary = $salary['total_salary'] / $exchangeRates[$rateKey];
+                } else {
+                    $convertedSalary = $salary['total_salary']; // Default to original if no rate
+                }
+    
+                // Aggregate converted salaries per month
+                if (isset($convertedSalaries[$salary['month']])) {
+                    $convertedSalaries[$salary['month']] += $convertedSalary;
+                } else {
+                    $convertedSalaries[$salary['month']] = $convertedSalary;
+                }
+            }
+        }
+    
+        return $convertedSalaries;
     }
     
+    
+
+
+
+    public function save_exchange_rate($data) {
+        // Check if an entry for the selected month and year already exists
+        $this->db->where('month', $data['month']);
+        $this->db->where('year', $data['year']);
+        $query = $this->db->get('tbl_exchange_rates');
+    
+        if ($query->num_rows() > 0) {
+            // Update the existing entry
+            $this->db->where('month', $data['month']);
+            $this->db->where('year', $data['year']);
+            $this->db->update('tbl_exchange_rates', $data);
+        } else {
+            // Insert a new entry
+            $this->db->insert('tbl_exchange_rates', $data);
+        }
+    }
+    public function get_exchange_rates($month, $year) {
+        // Retrieve the rates for the specified month and year
+        $this->db->where('month', $month);
+        $this->db->where('year', $year);
+        $query = $this->db->get('tbl_exchange_rates');
+
+        if ($query->num_rows() > 0) {
+            return $query->row_array();
+        } else {
+            // Return null or an array with default values if no rates are found
+            return null;
+        }
+    }
+    
+    
 }
-    // public function get_payroll_records(){
-    //     $this->db->select('tblstaff.firstname,tblstaff.staffid,tbl_payroll_records.*',);
-    //     $this->db->from('tblstaff');
-    //     $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'left');
-    //     $query = $this->db->get();
-    //     return $query->result_array();
-    // }
-    // public function add_salary_bonus($employee_id,$bonus){
-    //     $existing_record = $this->db->get_where('tbl_payroll_records', array('staff_id' => $employee_id))->row();
-
-    //     if ($existing_record) {
-    //         $data = array(
-    //             'bonus' => $bonus,
-    //             // add other fields here as necessary
-    //         );
-    //         $this->db->where('staff_id', $employee_id);
-    //         return $this->db->update('tbl_payroll_records', $data);
-    //     } else {
-    //         $data = array(
-    //             'staff_id' => $employee_id,
-    //             // add other fields here as necessary
-    //         );
-
-    //         return $this->db->insert('tbl_payroll_records', $data);
-    //     }
-    // }
+   
 
     
