@@ -235,24 +235,27 @@ public function save_exchange_rate() {
 
     //payslip
     public function pay_slip(){
-        // Get the month and year from the GET parameters, set a default if they're not set
-        $month = $this->input->get('month', TRUE) ? $this->input->get('month', TRUE) : date('Y-m-d');
-   
+        
+        $month = $this->input->get('month', TRUE) ? $this->input->get('month', TRUE) : date('m');
+        $year = $this->input->get('year', TRUE) ? $this->input->get('year', TRUE) : date('Y');
+        $monthYear = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    
         // Retrieve the data from the Model
         $data['staffs'] = $this->payroll_model->get_monthly_payroll($month);
     
         // Load the view and pass the data
         $this->load->view('pay_slip', $data);
-   }
- public function view_payslip($id) {
-    $data['payslip'] = $this->payroll_model->getPaymentDetails($id);
-    if (!$data['payslip']) {
-        show_404();
-        return;
     }
-    // var_dump($data);
-    $this->load->view('dynamic_pdf/payslip', $data);
-}
+    
+    public function view_payslip($id) {
+        $data['payslip'] = $this->payroll_model->getPaymentDetails($id);
+        if (!$data['payslip']) {
+            show_404();
+            return;
+        }
+        // var_dump($data);
+        $this->load->view('dynamic_pdf/payslip', $data);
+    }
 
    public function save_payment_mode() {
     $id = $this->input->post('id');

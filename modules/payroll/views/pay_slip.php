@@ -9,16 +9,17 @@
         <form method="get" action="" class="form-inline">
             <div class="form-group mb-2">
                 <label for="month" class="mr-2">Month:</label>
-                <select name="month" id="month" class="form-control">
-                    <?php 
-                        $selectedMonth = isset($_GET['month']) ? $_GET['month'] : null;
-                        for ($m=1; $m<=12; ++$m) { 
-                    ?>
-                        <option value="<?php echo $m; ?>" <?php echo $m == $selectedMonth ? 'selected="selected"' : ''; ?>>
-                            <?php echo date('F', mktime(0, 0, 0, $m, 1)); ?>
-                        </option>
-                    <?php } ?>
-                </select>
+                <select class="form-control mr-2" name="month" id="month">
+                <?php 
+                    // Set the selected month to current month if none is set
+                    $selectedMonth = isset($_GET['month']) ? $_GET['month'] : date('n');
+                    for ($m=1; $m<=12; ++$m) { 
+                ?>
+                <option value="<?php echo $m; ?>" <?php echo $m == $selectedMonth ? 'selected="selected"' : ''; ?>>
+                    <?php echo date('F', mktime(0, 0, 0, $m, 1)); ?>
+                </option>
+                <?php } ?>
+            </select>
             </div>
             <div class="form-group mx-sm-3 mb-2">
                 <label for="year" class="mr-2">Year:</label>
