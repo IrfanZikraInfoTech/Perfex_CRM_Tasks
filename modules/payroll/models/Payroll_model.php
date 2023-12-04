@@ -267,56 +267,21 @@ class Payroll_model extends App_Model
     }
     
     public function get_department_wise_salaries($selectedMonth) {
-        $currentYear = date('Y'); // Get the current year
-    
-        // First, get the department salaries with their currencies
-        $this->db->select([
-            'tbldepartments.name as department_name',
-            'tbl_payroll_records.total as individual_salary', // Get individual salary
-            'tbl_payroll_records.currency' // Get the currency for each salary
-        ]);
+        $this->db->select('tbldepartments.name as department_name, SUM(tbl_payroll_salary.employee_salary) as total_salary');
         $this->db->from('tblstaff');
         $this->db->join('tblstaff_departments', 'tblstaff.staffid = tblstaff_departments.staffid', 'inner');
         $this->db->join('tbldepartments', 'tbldepartments.departmentid = tblstaff_departments.departmentid', 'inner');
+        $this->db->join('tbl_payroll_salary', 'tbl_payroll_salary.employee_id = tblstaff.staffid', 'inner');
         $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'inner');
         $this->db->where('tblstaff.active', 1);
-        $this->db->where("MONTH(tbl_payroll_records.fromDate) =", $selectedMonth);
-    
+        $this->db->where("MONTH(tbl_payroll_records.fromDate) = ", $selectedMonth);
+        $this->db->group_by('tbldepartments.departmentid'); // Group by department to get total per department
+        $this->db->order_by('total_salary', 'desc'); // Optional: Order by total salary, descending
+        
         $query = $this->db->get();
-        $salariesWithCurrency = $query->result_array();
-    
-        // Now, convert each individual salary to USD and sum up per department
-        $departmentSalariesUSD = [];
-        foreach ($salariesWithCurrency as $salary) {
-            $exchangeRates = $this->get_exchange_rates($selectedMonth, $currentYear);
-            $currencyLower = strtolower($salary['currency']);
-            $rateKey = 'rate_' . $currencyLower;
-    
-            if (isset($exchangeRates[$rateKey]) && $exchangeRates[$rateKey] > 0) {
-                $convertedSalary = $salary['individual_salary'] / $exchangeRates[$rateKey];
-            } else {
-                $convertedSalary = $salary['individual_salary']; // If no exchange rate, use the original salary
-            }
-    
-            // Aggregate the converted salaries per department
-            if (isset($departmentSalariesUSD[$salary['department_name']])) {
-                $departmentSalariesUSD[$salary['department_name']] += $convertedSalary;
-            } else {
-                $departmentSalariesUSD[$salary['department_name']] = $convertedSalary;
-            }
-        }
-    
-        // Format the result for charting
-        $formattedResults = [];
-        foreach ($departmentSalariesUSD as $department => $totalSalary) {
-            $formattedResults[] = [
-                'department_name' => $department,
-                'total_salary_usd' => $totalSalary
-            ];
-        }
-    
-        return $formattedResults;
+        return $query->result_array();
     }
+    
     
     public function get_total_salaries_by_month() {
         $currentYear = date('Y'); // Get the current year
