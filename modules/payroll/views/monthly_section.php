@@ -40,13 +40,15 @@
 
     
     <div class="container mt-4">
-        <table class="min-w-full divide-y divide-gray-200 shadow-lg mt-4">
+        <table class="table table-responsive">
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                     <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Base Salary</th>
                     <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Bonus</th>
                     <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Deduction</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Other Allowances</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Leave Deduction</th>         
                     <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approval</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approver Name</th>
@@ -67,9 +69,12 @@
                     <td class="px-2 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' . $staff['salary']; ?></td>
                     <td class="px-2 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' .$staff['bonus']; ?></td>
                     <td class="px-2 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' . $staff['deduction']; ?></td>
+                    <td class="px-2 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' . $staff['allowances']; ?></td>
+                    <td class="px-2 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' . $staff['unpaid_leave_deduction']; ?></td>
+
                         <?php
                             // Calculate total as base salary + bonus - deduction
-                            $totalAmount = $staff['salary'] + $staff['bonus'] - $staff['deduction'];
+                            $totalAmount = $staff['total'] ;
                             ?>
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' . $totalAmount; ?></td>
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-500" style="display: flex; align-items: center;">
@@ -81,8 +86,8 @@
                         </td>
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['approver_name']; ?></td>
                                 <!-- Add the delete button to each row -->
-                        <!-- Inside your table body loop -->
-                        <td class="flex px-4 py-2 whitespace-nowrap text-center text-sm text-gray-500">
+                                <!-- Inside your table body loop -->
+                                <td class="flex px-4 py-2 whitespace-nowrap text-center text-sm text-gray-500">
                             <!-- Pay Button to Open Modal -->
                             <?php
                                 // Show Pay button if the approver name is either "Ansar" or "Anwar"

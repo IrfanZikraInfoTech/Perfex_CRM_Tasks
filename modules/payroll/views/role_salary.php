@@ -366,7 +366,7 @@
                 daysPresent: daysPresent,
                 leaves: leaves,
                 unpaidleaves: unpaidleaves,
-                currency: currency
+                currency: currency,
             }
         });
 

@@ -148,7 +148,7 @@ public function save_exchange_rate() {
         $daysPresent = $this->input->post('daysPresent');  
         $leaves = $this->input->post('leaves');  
         $unpaidleaves = $this->input->post('unpaidleaves');  
-
+        $total = $this->input->post('total');  
 
 
         $data = array(
@@ -167,7 +167,8 @@ public function save_exchange_rate() {
             'daysPresent' => $daysPresent,
             'leaves' => $leaves,
             'unpaidleaves' => $unpaidleaves,
-            'currency' => $currency 
+            'currency' => $currency,
+            'total' => $total 
         );
     
         $result = $this->payroll_model->add_payment($data);

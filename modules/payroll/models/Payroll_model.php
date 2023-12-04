@@ -177,41 +177,45 @@ class Payroll_model extends App_Model
   
 
     public function get_total_pak_salaries($selectedMonth) {
-        $this->db->select_sum('tbl_payroll_salary.employee_salary');
-        $this->db->select('tbl_payroll_records.currency'); // Currency bhi select karna
+
+        $this->db->select_sum('tbl_payroll_records.total');
+        $this->db->select('tbl_payroll_records.currency'); // Selecting the currency from 'tbl_payroll_records'
+        
         $this->db->from('tblstaff');
-        $this->db->join('tbl_payroll_salary', 'tbl_payroll_salary.employee_id = tblstaff.staffid', 'left');
+        
         $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'left');
+        
         $this->db->where('tblstaff.active', 1);
         $this->db->where('tblstaff.country', 'Pakistan');
         
-        // toDate aur fromDate ke month condition
-        $this->db->where("MONTH(tbl_payroll_records.fromDate) <= $selectedMonth AND MONTH(tbl_payroll_records.toDate) >= $selectedMonth");
-    
+        $this->db->where("MONTH(tbl_payroll_records.created_date) =", $selectedMonth);
+        
         $query = $this->db->get();
+        
         $result = $query->row_array();
-    
+        
         if (!empty($result)) {
             return [
-                'total_salary' => $result['employee_salary'] ?? 0, // Agar null hai to 0 return kare
-                'currency' => $result['currency'] ?? 'N/A' // Agar currency null hai to 'N/A' return kare
+                'total_salary' => $result['total'] ?? 0, // If 'total' is null, return 0
+                'currency' => $result['currency'] ?? 'N/A' // If 'currency' is null, return 'N/A'
             ];
         } else {
-            return ['total_salary' => 0, 'currency' => 'N/A'];
+            return ['total_salary' => 0, 'currency' => 'N/A']; // Return default values if result is empty
         }
     }
     
+    
 
     public function get_total_ind_salaries($selectedMonth) {
-        $this->db->select_sum('tbl_payroll_salary.employee_salary');
-        $this->db->select('tbl_payroll_records.currency'); // Currency bhi select karna
+
+        $this->db->select_sum('tbl_payroll_records.total');
+        $this->db->select('tbl_payroll_records.currency'); // Selecting the currency from 'tbl_payroll_records'
         $this->db->from('tblstaff');
-        $this->db->join('tbl_payroll_salary', 'tbl_payroll_salary.employee_id = tblstaff.staffid', 'left');
+        
         $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'left');
-        $this->db->where('tblstaff.active', 1);
+
         $this->db->where('tblstaff.country', 'India');
         
-        // toDate aur fromDate ke month condition
         $this->db->where("MONTH(tbl_payroll_records.fromDate) <= $selectedMonth AND MONTH(tbl_payroll_records.toDate) >= $selectedMonth");
     
         $query = $this->db->get();
@@ -219,7 +223,7 @@ class Payroll_model extends App_Model
     
         if (!empty($result)) {
             return [
-                'total_salary' => $result['employee_salary'] ?? 0, // Agar null hai to 0 return kare
+                'total_salary' => $result['total'] ?? 0, // Agar null hai to 0 return kare
                 'currency' => $result['currency'] ?? 'N/A' // Agar currency null hai to 'N/A' return kare
             ];
         } else {
@@ -228,12 +232,12 @@ class Payroll_model extends App_Model
     }
 
     public function get_total_bang_salaries($selectedMonth) {
-        $this->db->select_sum('tbl_payroll_salary.employee_salary');
-        $this->db->select('tbl_payroll_records.currency'); // Currency bhi select karna
+        $this->db->select_sum('tbl_payroll_records.total');
+        $this->db->select('tbl_payroll_records.currency'); // Selecting the currency from 'tbl_payroll_records'
         $this->db->from('tblstaff');
-        $this->db->join('tbl_payroll_salary', 'tbl_payroll_salary.employee_id = tblstaff.staffid', 'left');
+        
         $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'left');
-        $this->db->where('tblstaff.active', 1);
+
         $this->db->where('tblstaff.country', 'Bangladesh');
         
         // toDate aur fromDate ke month condition
@@ -244,7 +248,7 @@ class Payroll_model extends App_Model
     
         if (!empty($result)) {
             return [
-                'total_salary' => $result['employee_salary'] ?? 0, // Agar null hai to 0 return kare
+                'total_salary' => $result['total'] ?? 0, // Agar null hai to 0 return kare
                 'currency' => $result['currency'] ?? 'N/A' // Agar currency null hai to 'N/A' return kare
             ];
         } else {
@@ -263,21 +267,56 @@ class Payroll_model extends App_Model
     }
     
     public function get_department_wise_salaries($selectedMonth) {
-        $this->db->select('tbldepartments.name as department_name, SUM(tbl_payroll_salary.employee_salary) as total_salary');
+        $currentYear = date('Y'); // Get the current year
+    
+        // First, get the department salaries with their currencies
+        $this->db->select([
+            'tbldepartments.name as department_name',
+            'tbl_payroll_records.total as individual_salary', // Get individual salary
+            'tbl_payroll_records.currency' // Get the currency for each salary
+        ]);
         $this->db->from('tblstaff');
         $this->db->join('tblstaff_departments', 'tblstaff.staffid = tblstaff_departments.staffid', 'inner');
         $this->db->join('tbldepartments', 'tbldepartments.departmentid = tblstaff_departments.departmentid', 'inner');
-        $this->db->join('tbl_payroll_salary', 'tbl_payroll_salary.employee_id = tblstaff.staffid', 'inner');
         $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'inner');
         $this->db->where('tblstaff.active', 1);
-        $this->db->where("MONTH(tbl_payroll_records.fromDate) = ", $selectedMonth);
-        $this->db->group_by('tbldepartments.departmentid'); // Group by department to get total per department
-        $this->db->order_by('total_salary', 'desc'); // Optional: Order by total salary, descending
-        
-        $query = $this->db->get();
-        return $query->result_array();
-    }
+        $this->db->where("MONTH(tbl_payroll_records.fromDate) =", $selectedMonth);
     
+        $query = $this->db->get();
+        $salariesWithCurrency = $query->result_array();
+    
+        // Now, convert each individual salary to USD and sum up per department
+        $departmentSalariesUSD = [];
+        foreach ($salariesWithCurrency as $salary) {
+            $exchangeRates = $this->get_exchange_rates($selectedMonth, $currentYear);
+            $currencyLower = strtolower($salary['currency']);
+            $rateKey = 'rate_' . $currencyLower;
+    
+            if (isset($exchangeRates[$rateKey]) && $exchangeRates[$rateKey] > 0) {
+                $convertedSalary = $salary['individual_salary'] / $exchangeRates[$rateKey];
+            } else {
+                $convertedSalary = $salary['individual_salary']; // If no exchange rate, use the original salary
+            }
+    
+            // Aggregate the converted salaries per department
+            if (isset($departmentSalariesUSD[$salary['department_name']])) {
+                $departmentSalariesUSD[$salary['department_name']] += $convertedSalary;
+            } else {
+                $departmentSalariesUSD[$salary['department_name']] = $convertedSalary;
+            }
+        }
+    
+        // Format the result for charting
+        $formattedResults = [];
+        foreach ($departmentSalariesUSD as $department => $totalSalary) {
+            $formattedResults[] = [
+                'department_name' => $department,
+                'total_salary_usd' => $totalSalary
+            ];
+        }
+    
+        return $formattedResults;
+    }
     
     public function get_total_salaries_by_month() {
         $currentYear = date('Y'); // Get the current year
@@ -289,13 +328,12 @@ class Payroll_model extends App_Model
         foreach ($currencies as $currency) {
             $this->db->select([
                 'MONTH(tbl_payroll_records.fromDate) as month',
-                'SUM(tbl_payroll_salary.employee_salary) as total_salary'
+                'SUM(tbl_payroll_records.total) as total_salary', // Sum the 'total' column
+                'tbl_payroll_records.currency' // Select the currency from 'tbl_payroll_records'
             ]);
             $this->db->from('tblstaff');
-            $this->db->join('tbl_payroll_salary', 'tbl_payroll_salary.employee_id = tblstaff.staffid', 'inner');
             $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'inner');
-            $this->db->where('tblstaff.active', 1);
-            $this->db->where('tbl_payroll_records.currency', strtoupper($currency)); // Make sure the currency matches the database value
+            $this->db->where('tbl_payroll_records.currency', strtoupper($currency)); // Match the currency
             $this->db->where('tbl_payroll_records.fromDate IS NOT NULL', null, false);
             $this->db->group_by('MONTH(tbl_payroll_records.fromDate)');
             $this->db->order_by('month', 'asc');
@@ -325,7 +363,6 @@ class Payroll_model extends App_Model
     
         return $convertedSalaries;
     }
-    
     
 
 
