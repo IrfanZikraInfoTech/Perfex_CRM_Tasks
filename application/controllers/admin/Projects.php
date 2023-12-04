@@ -1373,6 +1373,7 @@ class Projects extends AdminController
     }
 
 
+
     public function create_new_sprint() {
         $project_id = $this->input->post('project_id');
         $sprint_name = $this->input->post('name');
@@ -1419,13 +1420,14 @@ class Projects extends AdminController
             $this->email->to($member['email']);
             $this->email->subject($subject);
             $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
-            $this->email->send();
+            // $this->email->send();
         }
     
         echo json_encode(['new_sprint_id' => $new_sprint_id, 'success' => $success]);
     }
     
 
+    
     public function update_sprint_name() {
         $sprint_id = $this->input->post('sprint_id');
         $new_name = $this->input->post('new_name');
@@ -1459,6 +1461,8 @@ class Projects extends AdminController
         // Return a JSON response
         echo json_encode(array('success' => $success));
     }
+
+
 
     public function update_sprint_status() {
         $sprint_id = $this->input->post('sprint_id');
@@ -1511,7 +1515,7 @@ class Projects extends AdminController
                 $this->email->to($member['email']);
                 $this->email->subject($subject);
                 $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
-                $this->email->send();
+                // $this->email->send();
             }
         }
     
@@ -1559,13 +1563,15 @@ class Projects extends AdminController
                 $this->email->to($member['email']);
                 $this->email->subject($subject);
                 $this->email->message(get_option('email_header') . $template . get_option('email_footer'));
-                $this->email->send();
+                // $this->email->send();
             }
         }
     
         echo json_encode(array('success' => $success));
     }
     
+
+
 
     public function get_sprint() {
         $sprint_id = $this->input->post('sprint_id');
