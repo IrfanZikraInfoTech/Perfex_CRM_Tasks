@@ -1,6 +1,35 @@
 <?php 
     $this->load->view('header');
 ?>
+
+<style>
+    /* Custom CSS to hide scrollbars */
+/* Style for thin, grey scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 2px; /* Width of the scrollbar */
+    height: 2px; /* Height of the scrollbar for horizontal scroll */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Track color */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #ced4da; /* Handle color */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #ced4da; /* Handle color on hover */
+}
+
+/* For Firefox */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #ced4da #f1f1f1;
+}
+
+
+</style>
 <div id="wrapper">
     <!-- Monthly Dropdown -->
     <div class="container">
@@ -39,8 +68,8 @@
     </div>
 
     
-    <div class="container mt-4">
-        <table class="table table-responsive">
+    <div class="container mt-4 table-responsive custom-scrollbar" >
+        <table class="table table-striped">
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
@@ -90,11 +119,18 @@
                                 <td class="flex px-4 py-2 whitespace-nowrap text-center text-sm text-gray-500">
                             <!-- Pay Button to Open Modal -->
                             <?php
-                                // Show Pay button if the approver name is either "Ansar" or "Anwar"
-                                $canShowPayButton = ($staff['approver_name'] === 'Ansar' || $staff['approver_name'] === 'Anwaar');
+                                // Get the ID of the currently logged-in staff member
+                                $currentUserId = get_staff_user_id();
+
+                                // Check if the current user has admin permissions in the payroll module
+                                $isAdmin = has_permission('payroll', '', 'admin');
+
+                                // Show Pay button if the approver name is "Ansar" or "Anwaar", the current user is the approver, or if the user is an admin
+                                $canShowPayButton = ($staff['approver_name'] === 'Ansar' || $staff['approver_name'] === 'Anwaar' || $staff['approver_name'] == $currentUserId || $isAdmin);
                             ?>
+
                             <button type="button" onclick="showAlertAndModal('<?php echo $staff['id']; ?>');" 
-                                class="btn btn-success pay-button" 
+                                class="btn btn-success pay-button mr-1" 
                                 data-staffId="<?php echo $staff['id']; ?>" 
                                 data-totalAmount="<?php echo $totalAmount; ?>" 
                                 data-approver="<?php echo $staff['approver_name']; ?>"
@@ -140,13 +176,15 @@
 </div>
 <script>
    function showAlertAndModal(staffId) {
+    alert('helo');
+    console.log('hi');
         // Get the corresponding Pay button
         var payButton = document.querySelector(`.pay-button[data-staffId="${staffId}"]`);
 
         // Check if the button is disabled
-        if(payButton.disabled) {
-            return;
-        }
+        // if(payButton.disabled) {
+        //     return;
+        // }
 
         var modalId = '#payModal';
         $(modalId).modal('show');
