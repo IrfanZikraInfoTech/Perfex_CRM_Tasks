@@ -54,23 +54,23 @@
                 </tr>
             </thead>
             <tbody>
-                <?php 
-                    $selectedMonth = isset($_GET['month']) ? str_pad($_GET['month'], 2, '0', STR_PAD_LEFT) : null;
-                    $selectedYear = isset($_GET['year']) ? $_GET['year'] : date('Y');
-                    if(is_array($staffs)){
-                        foreach ($staffs as $staff) :
-                            if($staff['staff_id'] == $this->session->userdata('staff_user_id') || is_admin()) :
-                                // Convert fromDate and toDate to DateTime objects
-                                $fromDate = new DateTime($staff['fromDate']);
-                                $toDate = new DateTime($staff['toDate']);
+             <tbody>
+    <?php 
+    $selectedMonth = isset($_GET['month']) ? str_pad($_GET['month'], 2, '0', STR_PAD_LEFT) : null;
+    $selectedYear = isset($_GET['year']) ? $_GET['year'] : date('Y');
+    if(is_array($staffs)){
+        foreach ($staffs as $staff) :
+            // Convert fromDate and toDate to DateTime objects
+            $fromDate = new DateTime($staff['fromDate']);
+            $toDate = new DateTime($staff['toDate']);
 
-                                // Extract month and year from fromDate
-                                $rowMonth = $fromDate->format('m');
-                                $rowYear = $fromDate->format('Y');
+            // Extract month and year from fromDate
+            $rowMonth = $fromDate->format('m');
+            $rowYear = $fromDate->format('Y');
 
-                                // Check if the row's month and year match the selected month and year
-                                if (($selectedMonth === null || $selectedMonth == $rowMonth) && $selectedYear == $rowYear) :
-                ?>
+            // Check if the row's month and year match the selected month and year
+            if (($selectedMonth === null || $selectedMonth == $rowMonth) && $selectedYear == $rowYear) :
+    ?>
        
                 <tr data-month="<?php echo $rowMonth; ?>">
                     <td><?php echo $staff['firstname']; ?></td>
@@ -97,7 +97,7 @@
                 </tr>
             <?php 
                     endif;
-                    endif;
+                    
                     endforeach;
                 }
             ?>

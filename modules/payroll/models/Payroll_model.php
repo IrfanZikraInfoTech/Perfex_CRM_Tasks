@@ -275,7 +275,6 @@ class Payroll_model extends App_Model
     public function get_total_staff_for_month($selectedMonth) {
         $this->db->from('tblstaff');
         $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'left');
-        $this->db->where('tblstaff.active', 1);
         $this->db->where("MONTH(tbl_payroll_records.fromDate) <= $selectedMonth AND MONTH(tbl_payroll_records.toDate) >= $selectedMonth");
         $this->db->group_by('tblstaff.staffid'); // Ensure unique staff count
     
@@ -289,7 +288,6 @@ class Payroll_model extends App_Model
         $this->db->join('tbldepartments', 'tbldepartments.departmentid = tblstaff_departments.departmentid', 'inner');
         $this->db->join('tbl_payroll_salary', 'tbl_payroll_salary.employee_id = tblstaff.staffid', 'inner');
         $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'inner');
-        $this->db->where('tblstaff.active', 1);
         $this->db->where("MONTH(tbl_payroll_records.fromDate) <= $selectedMonth AND MONTH(tbl_payroll_records.toDate) >= $selectedMonth");
         $this->db->group_by('tbldepartments.departmentid'); // Group by department to get total per department
         $this->db->order_by('total_salary', 'desc'); // Optional: Order by total salary, descending

@@ -135,14 +135,16 @@
                                 $canShowPayButton = ($staff['approver_name'] === 'Ansar' || $staff['approver_name'] === 'Anwaar' || $staff['approver_name'] == $currentUserId || $isAdmin);
                             ?>
 
-                            <button type="button" onclick="showAlertAndModal('<?php echo $staff['id']; ?>');" 
-                                class="btn btn-success pay-button mr-1" 
-                                data-staffId="<?php echo $staff['id']; ?>" 
-                                data-totalAmount="<?php echo $totalAmount; ?>" 
-                                data-approver="<?php echo $staff['approver_name']; ?>"
-                                <?php echo $canShowPayButton ? '' : 'disabled'; ?> style="color:white; background-color:green">
-                                Pay
-                            </button>
+<button type="button" onclick="showAlertAndModal(this);" 
+        class="btn btn-success pay-button mr-1" 
+        data-staffId="<?php echo $staff['id']; ?>" 
+        data-totalAmount="<?php echo $totalAmount; ?>" 
+        data-staffName="<?php echo $staff['firstname']; ?>" // Added this attribute
+        data-approver="<?php echo $staff['approver_name']; ?>"
+        <?php echo $canShowPayButton ? '' : 'disabled'; ?> style="color:white; background-color:green">
+        Pay
+</button>
+
                             <form action="<?php echo admin_url('payroll/delete_record'); ?>" method="post">
                                 <input type="hidden" name="<?=$this->security->get_csrf_token_name();?>" value="<?=$this->security->get_csrf_hash();?>">
                                 <input type="hidden" name="id_to_delete" value="<?php echo $staff['id']; ?>">
@@ -181,20 +183,26 @@
     </div>
 </div>
 <script>
-   function showAlertAndModal(staffId) {
-    // alert('helo');
-    // console.log('hi');
-        // Get the corresponding Pay button
-        var payButton = document.querySelector(`.pay-button[data-staffId="${staffId}"]`);
+   function showAlertAndModal(buttonElement) {
+    // Extract data attributes from the button element
+    var staffId = buttonElement.getAttribute('data-staffId');
+    var staffName = buttonElement.getAttribute('data-staffName'); // Now getting staffName
+    var totalAmount = buttonElement.getAttribute('data-totalAmount');
+    var approver = buttonElement.getAttribute('data-approver');
 
-        // Check if the button is disabled
-        // if(payButton.disabled) {
-        //     return;
-        // }
+    // Update modal content with the extracted data
+    var modalBody = document.querySelector('#payModal .modal-body');
+    modalBody.textContent = `Confirm payment for ${staffName}?`;
 
-        var modalId = '#payModal';
-        $(modalId).modal('show');
-    }
+    // You might also want to set the data-id attribute of the "Success" button in the modal
+    var confirmButton = document.querySelector('#payModal .confirm-pay');
+    confirmButton.setAttribute('data-id', staffId);
+
+    // Show the modal
+    var modalId = '#payModal';
+    $(modalId).modal('show');
+}
+
     function hidemodel() {
         var modalId = '#payModal';
         $(modalId).modal('hide');
