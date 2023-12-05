@@ -134,6 +134,7 @@
                         <select name="currency" id="currency" class="form-control block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
                             <option value="INR">INR</option>
                             <option value="PKR">PKR</option>
+                            <option value="BDT">BDT</option>
                         </select>
                         </div>
                     </div>
@@ -313,6 +314,7 @@
         document.getElementById('unpaid_leave_deduction').value = "";
         document.getElementById('allowancesInput').value = "";
         document.getElementById('remarks').value = "";
+        document.getElementById('total').innerText = '0';
 
     }
 

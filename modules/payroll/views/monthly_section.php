@@ -86,13 +86,19 @@
             </thead>
             <tbody>
             <?php 
-                $selectedMonth = isset($_GET['month']) ? $_GET['month'] : null;
-                if(is_array($staffs)){
-                foreach ($staffs as $staff) : 
-                    $rowMonth = ($staff['month']);
-                    // Only display the row if the selected month matches the row's month
-                    if ($selectedMonth === null || $selectedMonth == $rowMonth) :
-            ?>                    
+                // Retrieve the selected month and year from the query parameters or set to null if not present
+                $selectedMonth = isset($_GET['month']) ? str_pad($_GET['month'], 2, '0', STR_PAD_LEFT) : null;
+                $selectedYear = isset($_GET['year']) ? $_GET['year'] : null;
+
+                if (is_array($staffs)) {
+                    foreach ($staffs as $staff) : 
+                        // Assuming fromDate is in 'Y-m-d' format, extract the month and year from it
+                        $fromDateMonth = date('m', strtotime($staff['fromDate']));
+                        $fromDateYear = date('Y', strtotime($staff['fromDate']));
+
+                        // Display the row only if there is no selected month/year (show all) or if the fromDate's month/year matches the selected ones
+                        if (($selectedMonth === null || $selectedMonth == $fromDateMonth) && ($selectedYear === null || $selectedYear == $fromDateYear)) :
+            ?>                  
                 <tr>
                     <td class="px-2 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['firstname']; ?></td>
                     <td class="px-2 py-2 whitespace-nowrap text-sm text-center text-gray-500"><?php echo $staff['currency'] . ' ' . $staff['salary']; ?></td>
@@ -176,8 +182,8 @@
 </div>
 <script>
    function showAlertAndModal(staffId) {
-    alert('helo');
-    console.log('hi');
+    // alert('helo');
+    // console.log('hi');
         // Get the corresponding Pay button
         var payButton = document.querySelector(`.pay-button[data-staffId="${staffId}"]`);
 

@@ -392,6 +392,7 @@ $month_names = array_map(function($month_num) {
 ?>
 
 document.addEventListener("DOMContentLoaded", function() {
+    console.log(<?php echo json_encode(array_values($all_months_salaries)); ?>);
     var ctx = document.getElementById('monthSalariesChart').getContext('2d');
     var monthSalariesChart = new Chart(ctx, {
         type: 'horizontalBar',

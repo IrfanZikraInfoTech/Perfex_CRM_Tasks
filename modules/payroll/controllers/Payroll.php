@@ -199,17 +199,21 @@ public function save_exchange_rate() {
 
     //monthly payroll
     public function monthly_section() {    
-        // Get the current month and year if they're not set in the GET parameters
-        $month = $this->input->get('month', TRUE) ? $this->input->get('month', TRUE) : date('m');
+        // Get the selected month and year from the GET parameters or default to the current month and year
+        $month = $this->input->get('month', TRUE) ? str_pad($this->input->get('month', TRUE), 2, '0', STR_PAD_LEFT) : date('m');
         $year = $this->input->get('year', TRUE) ? $this->input->get('year', TRUE) : date('Y');
-        $monthYear = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    
+        // Create the start and end date strings for the month
+        $startDate = $year . '-' . $month . '-01';
+        $endDate = date('Y-m-t', strtotime($startDate)); // Last day of the month
     
         // Retrieve the data from the Model
-        $data['staffs'] = $this->payroll_model->get_monthly_payroll($monthYear);
+        $data['staffs'] = $this->payroll_model->get_monthly_payroll($startDate, $endDate);
     
         // Load the view and pass the data
         $this->load->view('monthly_section', $data);
     }
+    
     public function update_approval_status() {
     
         // Fetch the POST data
@@ -234,19 +238,36 @@ public function save_exchange_rate() {
     
     //finished monthly 
 
-    //payslip
-    public function pay_slip(){
+    // //payslip
+    // public function pay_slip(){
         
-        $month = $this->input->get('month', TRUE) ? $this->input->get('month', TRUE) : date('m');
-        $year = $this->input->get('year', TRUE) ? $this->input->get('year', TRUE) : date('Y');
-        $monthYear = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    //     $month = $this->input->get('month', TRUE) ? $this->input->get('month', TRUE) : date('m');
+    //     $year = $this->input->get('year', TRUE) ? $this->input->get('year', TRUE) : date('Y');
+    //     $monthYear = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT);
+    
+    //     // Retrieve the data from the Model
+    //     $data['staffs'] = $this->payroll_model->get_monthly_payroll($month);
+    
+    //     // Load the view and pass the data
+    //     $this->load->view('pay_slip', $data);
+    // }
+    
+    public function pay_slip() {
+        // Get the selected month and year from the GET parameters or default to the current month and year
+        $selectedMonth = $this->input->get('month') ? $this->input->get('month') : date('m');
+        $selectedYear = $this->input->get('year') ? $this->input->get('year') : date('Y');
+    
+        // Create the start and end date strings for the month
+        $startDate = $selectedYear . '-' . str_pad($selectedMonth, 2, '0', STR_PAD_LEFT) . '-01';
+        $endDate = date('Y-m-t', strtotime($startDate)); // Last day of the month
     
         // Retrieve the data from the Model
-        $data['staffs'] = $this->payroll_model->get_monthly_payroll($month);
+        $data['staffs'] = $this->payroll_model->get_monthly_payroll($startDate, $endDate);
     
         // Load the view and pass the data
         $this->load->view('pay_slip', $data);
     }
+    
     
     public function view_payslip($id) {
         $data['payslip'] = $this->payroll_model->getPaymentDetails($id);

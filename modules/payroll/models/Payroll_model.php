@@ -12,7 +12,7 @@ class Payroll_model extends App_Model
     }
     //Role_salary
     public function get_employee_details() {
-        $this->db->select('tblstaff.*, tbl_payroll_salary.*, tbl_payroll_records.currency, tbldepartments.name as department_name');
+        $this->db->select('tblstaff.*, tbl_payroll_salary.*, tbl_payroll_records.*, tbldepartments.name as department_name');
         $this->db->from('tblstaff');
         // $this->db->where('tblstaff.active', 1); // Only select active staff
         $this->db->where('tblstaff.report_to IS NOT NULL'); // Exclude staff with 'report_to' as NULL
@@ -117,20 +117,36 @@ class Payroll_model extends App_Model
     }   
 
     //monthly payroll
-    public function get_monthly_payroll($month) {
-        $this->db->select('tblstaff.firstname, tbl_payroll_records.*,approver.firstname AS approver_name,');
+    // public function get_monthly_payroll($month) {
+    //     $this->db->select('tblstaff.firstname, tbl_payroll_records.*,approver.firstname AS approver_name,');
+    //     $this->db->from('tbl_payroll_records');
+    //     $this->db->join('tblstaff', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'left');
+    //     $this->db->join('tblstaff AS approver', 'tbl_payroll_records.changedby = approver.staffid', 'left');
+    //     // $this->db->where('month', $month);
+    //     $query = $this->db->get();
+    
+    //     if ($query->num_rows() > 0) {
+    //         return $query->result_array();
+    //     } else {
+    //         return false;
+    //     }
+    // } 
+
+    public function get_monthly_payroll($startDate, $endDate) {
+        $this->db->select('tblstaff.firstname, tbl_payroll_records.*, approver.firstname AS approver_name');
         $this->db->from('tbl_payroll_records');
         $this->db->join('tblstaff', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'left');
         $this->db->join('tblstaff AS approver', 'tbl_payroll_records.changedby = approver.staffid', 'left');
-        // $this->db->where('month', $month);
-        $query = $this->db->get();
     
-        if ($query->num_rows() > 0) {
-            return $query->result_array();
-        } else {
-            return false;
-        }
-    } 
+        // Filter records between the start and end dates
+        $this->db->where('tbl_payroll_records.fromDate >=', $startDate);
+        $this->db->where('tbl_payroll_records.toDate <=', $endDate);
+    
+        $query = $this->db->get();
+        
+        return $query->num_rows() > 0 ? $query->result_array() : false;
+    }
+    
     public function update_approval_status($id, $status, $changedby) {
         $this->db->set('status', $status);
         $this->db->set('changedby', $changedby);
@@ -188,7 +204,7 @@ class Payroll_model extends App_Model
         $this->db->where('tblstaff.active', 1);
         $this->db->where('tblstaff.country', 'Pakistan');
         
-        $this->db->where("MONTH(tbl_payroll_records.created_date) =", $selectedMonth);
+        $this->db->where("MONTH(tbl_payroll_records.fromDate) <= $selectedMonth AND MONTH(tbl_payroll_records.toDate) >= $selectedMonth");
         
         $query = $this->db->get();
         
@@ -274,7 +290,7 @@ class Payroll_model extends App_Model
         $this->db->join('tbl_payroll_salary', 'tbl_payroll_salary.employee_id = tblstaff.staffid', 'inner');
         $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'inner');
         $this->db->where('tblstaff.active', 1);
-        $this->db->where("MONTH(tbl_payroll_records.fromDate) = ", $selectedMonth);
+        $this->db->where("MONTH(tbl_payroll_records.fromDate) <= $selectedMonth AND MONTH(tbl_payroll_records.toDate) >= $selectedMonth");
         $this->db->group_by('tbldepartments.departmentid'); // Group by department to get total per department
         $this->db->order_by('total_salary', 'desc'); // Optional: Order by total salary, descending
         
@@ -283,54 +299,131 @@ class Payroll_model extends App_Model
     }
     
     
+    // public function get_total_salaries_by_month() {
+    //     $currentYear = date('Y'); // Get the current year
+    //     $convertedSalaries = [];
+    
+    //     // Define the currencies you are dealing with
+    //     $currencies = ['pkr', 'ind', 'bang'];
+    
+    //     foreach ($currencies as $currency) {
+    //         $this->db->select([
+    //             'MONTH(tbl_payroll_records.fromDate) as month',
+    //             'SUM(tbl_payroll_records.total) as total_salary', // Sum the 'total' column
+    //             'tbl_payroll_records.currency' // Select the currency from 'tbl_payroll_records'
+    //         ]);
+    //         $this->db->from('tblstaff');
+    //         $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'inner');
+    //         $this->db->where('tbl_payroll_records.currency', strtoupper($currency)); // Match the currency
+    //         $this->db->where('tbl_payroll_records.fromDate IS NOT NULL', null, false);
+    //         $this->db->group_by('MONTH(tbl_payroll_records.fromDate)');
+    //         $this->db->order_by('month', 'asc');
+    
+    //         $query = $this->db->get();
+    //         $monthlySalaries = $query->result_array();
+    
+    //         // Convert each month's salary to USD
+    //         foreach ($monthlySalaries as $salary) {
+    //             $exchangeRates = $this->get_exchange_rates($salary['month'], $currentYear);
+    //             $rateKey = 'rate_' . strtolower($currency);
+    
+    //             if (isset($exchangeRates[$rateKey]) && $exchangeRates[$rateKey] > 0) {
+    //                 $convertedSalary = $salary['total_salary'] / $exchangeRates[$rateKey];
+    //             } else {
+    //                 $convertedSalary = $salary['total_salary']; // Default to original if no rate
+    //             }
+    
+    //             // Aggregate converted salaries per month
+    //             if (isset($convertedSalaries[$salary['month']])) {
+    //                 $convertedSalaries[$salary['month']] += $convertedSalary;
+    //             } else {
+    //                 $convertedSalaries[$salary['month']] = $convertedSalary;
+    //             }
+    //         }
+    //     }
+    
+    //     return $convertedSalaries;
+    // }
+    
+
+    // public function get_total_salaries_by_month() {
+    //     $currentYear = date('Y'); // Get the current year
+    //     $monthlyTotalsUSD = [];
+    
+    //     // Define the currencies you are dealing with
+    //     $currencies = ['pkr', 'ind', 'bang'];
+    
+    //     for ($month = 1; $month <= 12; $month++) {
+    //         $monthlyTotalsUSD[$month] = 0; // Initialize the total for each month
+    
+    //         foreach ($currencies as $currency) {
+    //             $this->db->select([
+    //                 'SUM(tbl_payroll_records.total) as total_salary', // Sum the 'total' column
+    //                 'tbl_payroll_records.currency' // Select the currency from 'tbl_payroll_records'
+    //             ]);
+    //             $this->db->from('tblstaff');
+    //             $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'inner');
+    //             $this->db->where('tbl_payroll_records.currency', strtoupper($currency)); // Match the currency
+    //             $this->db->where('YEAR(tbl_payroll_records.fromDate)', $currentYear); // Filter by current year
+    //             $this->db->where('MONTH(tbl_payroll_records.fromDate)', $month); // Filter by the specific month
+    
+    //             $query = $this->db->get();
+    //             $result = $query->row_array();
+    
+    //             // If there's a total salary for the currency
+    //             if ($result && $result['total_salary'] > 0) {
+    //                 $exchangeRates = $this->get_exchange_rates($month, $currentYear); // Get exchange rates for the current month
+    //                 $rateKey = 'rate_' . strtolower($currency);
+    
+    //                 if (isset($exchangeRates[$rateKey]) && $exchangeRates[$rateKey] > 0) {
+    //                     // Convert the total salary to USD and add it to the monthly total
+    //                     $monthlyTotalsUSD[$month] += $result['total_salary'] / $exchangeRates[$rateKey];
+    //                 }
+    //             }
+    //         }
+    //     }
+    
+    //     return $monthlyTotalsUSD;
+    // }
+
+
     public function get_total_salaries_by_month() {
-        $currentYear = date('Y'); // Get the current year
-        $convertedSalaries = [];
-    
-        // Define the currencies you are dealing with
-        $currencies = ['pkr', 'ind', 'bang'];
-    
-        foreach ($currencies as $currency) {
+    $currentYear = date('Y'); // Get the current year
+    $monthlyTotalsUSD = array_fill(1, 12, 0); // Initialize all months with 0
+
+    // Define the currencies you are dealing with
+    $currencies = ['pkr', 'ind', 'bang'];
+
+    foreach ($currencies as $currency) {
+        for ($month = 1; $month <= 12; $month++) {
             $this->db->select([
-                'MONTH(tbl_payroll_records.fromDate) as month',
                 'SUM(tbl_payroll_records.total) as total_salary', // Sum the 'total' column
-                'tbl_payroll_records.currency' // Select the currency from 'tbl_payroll_records'
             ]);
             $this->db->from('tblstaff');
             $this->db->join('tbl_payroll_records', 'tbl_payroll_records.staff_id = tblstaff.staffid', 'inner');
             $this->db->where('tbl_payroll_records.currency', strtoupper($currency)); // Match the currency
-            $this->db->where('tbl_payroll_records.fromDate IS NOT NULL', null, false);
-            $this->db->group_by('MONTH(tbl_payroll_records.fromDate)');
-            $this->db->order_by('month', 'asc');
-    
+            $this->db->where('YEAR(tbl_payroll_records.fromDate)', $currentYear); // Filter by current year
+            $this->db->where('MONTH(tbl_payroll_records.fromDate)', $month); // Filter by the specific month
+
             $query = $this->db->get();
-            $monthlySalaries = $query->result_array();
-    
-            // Convert each month's salary to USD
-            foreach ($monthlySalaries as $salary) {
-                $exchangeRates = $this->get_exchange_rates($salary['month'], $currentYear);
+            $result = $query->row_array();
+
+            if ($result && $result['total_salary'] > 0) {
+                $exchangeRates = $this->get_exchange_rates($month, $currentYear); // Get exchange rates for the specific month
                 $rateKey = 'rate_' . strtolower($currency);
-    
+
                 if (isset($exchangeRates[$rateKey]) && $exchangeRates[$rateKey] > 0) {
-                    $convertedSalary = $salary['total_salary'] / $exchangeRates[$rateKey];
-                } else {
-                    $convertedSalary = $salary['total_salary']; // Default to original if no rate
-                }
-    
-                // Aggregate converted salaries per month
-                if (isset($convertedSalaries[$salary['month']])) {
-                    $convertedSalaries[$salary['month']] += $convertedSalary;
-                } else {
-                    $convertedSalaries[$salary['month']] = $convertedSalary;
+                    // Convert the total salary to USD and add it to the respective month
+                    $monthlyTotalsUSD[$month] += $result['total_salary'] / $exchangeRates[$rateKey];
                 }
             }
         }
-    
-        return $convertedSalaries;
     }
+
+    return $monthlyTotalsUSD; // Return the array with totals for each month
+}
+
     
-
-
 
     public function save_exchange_rate($data) {
         // Check if an entry for the selected month and year already exists
