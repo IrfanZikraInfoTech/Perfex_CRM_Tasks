@@ -754,6 +754,10 @@
                                 <?php
                            $task_single_mark_as_statuses = hooks()->apply_filters('task_single_mark_as_statuses', $task_statuses);
                            foreach ($task_single_mark_as_statuses as $status) { ?>
+                           <?php if ($status['id'] == 5) {
+                                    continue; // Skip rendering this status
+                                }
+                            ?>
                                 <?php if ($task->status != $status['id']) { ?>
                                 <li>
                                     <a href="#"
