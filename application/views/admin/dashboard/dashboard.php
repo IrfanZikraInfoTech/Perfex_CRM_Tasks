@@ -145,26 +145,32 @@ function displayTasks($tasks) {
     }
 
     
-    <?php
+     <?php
 
 $todayIsBirthday = false;
-$birthdayStaffId = null;
-$isMyBirthday = false;
-foreach($upcoming_birthdays as $staff) {
+$birthdaysToday = [];
+$isMyBirthday= false;
+
+$birthdayNames = [];
+$birthdaysToday = [];
+$imageElements = '';
+
+foreach ($upcoming_birthdays as $staff) {
     $dob = DateTime::createFromFormat('Y-m-d', $staff['date_of_birth']);
-    $birthdayThisYear = new DateTime(date('Y') . '-' . date('m', strtotime($staff['date_of_birth'])) . '-' . date('d', strtotime($staff['date_of_birth'])));
-    
+    $birthdayThisYear = new DateTime(date('Y') . '-' . $dob->format('m') . '-' . $dob->format('d'));
+
     $currentDate = new DateTime(date('Y-m-d'));
     if ($currentDate == $birthdayThisYear) {
         $todayIsBirthday = true;
-        $birthdayStaffId = $staff['staffid'];
-
-        $birthdayStaffName = $staff['firstname'] . ' ' . $staff['lastname'];
-        break;
+        $birthdayNames[] = $staff['firstname'] . ' ' . $staff['lastname'];
+        $birthdaysToday[] = [
+            'image' => staff_profile_image_url($staff['staffid'], 'thumb'),
+        ];
     }
 }
 
-$isMyBirthday = (get_staff_user_id() == $birthdayStaffId);
+
+$isMyBirthday = in_array(get_staff_user_id(), array_column($birthdaysToday, 'staffid'));
 
 if($todayIsBirthday){
   ?>
@@ -836,26 +842,48 @@ function showFollowedTasks() {
 
 
 <?php
-
-if ($todayIsBirthday && !isset($_SESSION['shown_birthday_popup'][$birthdayStaffId])) {
+if ($todayIsBirthday && !isset($_SESSION['shown_birthday_popup'][$birthdayStaffId])){
     // Mark this staff member's birthday popup as shown in this session
     $_SESSION['shown_birthday_popup'][$birthdayStaffId] = true;
 
 
     // Prepare the birthday message
-    $birthdayMessage = $isMyBirthday ? "Happy Birthday to You!" : "Its {$birthdayStaffName}'s birthday!!";
+    // $birthdayMessage = $isMyBirthday ? "Happy Birthday to You!" : "Its {$birthdayStaffName}'s birthday!!";
+    $birthdayMessage = '';
+    if ($todayIsBirthday) {
+        if (count($birthdayNames) > 1) {
+            // Message for multiple birthdays
+            $lastStaff = array_pop($birthdayNames); // Take the last name out
+            $birthdayMessage = 'Celebrating the birthdays of ' . implode(', ', $birthdayNames) . ' & ' . $lastStaff . ' <br>Cheers to all!';
+        } else {
+            // Message for a single birthday
+            $birthdayMessage = "Celebrating the birthday of  " . $birthdayNames[0] .".<br>Happy Birthday to you!" ;
 
+        }
+    }
+    
 ?>
 
 Swal.fire({
     title: '🎉 Birthday Alert!',
-    text: '<?= addslashes($birthdayMessage) ?>',
-    imageUrl: '<?= staff_profile_image_url($birthdayStaffId,'thumb') ?>', // You can use a birthday image path here
-    imageAlt: 'Birthday',
-    confirmButtonText: 'Celebrate!'
+    html: `
+        <div class="flex justify-center items-center flex-wrap gap-4 mb-6 p-4 ">
+            <?php foreach ($birthdaysToday as $birthday): ?>
+                <div class="p-1">
+                    <img src="<?= $birthday['image'] ?>" alt="Birthday" class="w-32 h-32 rounded-full">
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <p class="text-lg text-center font-semibold mb-4"><?= $birthdayMessage ?></p>
+    `,
+    confirmButtonText: 'Celebrate!',
+    customClass: {
+        popup: 'rounded-lg',
+    },
 });
 
 <?php }?>
+
 
 </script>
 
