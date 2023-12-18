@@ -8,10 +8,15 @@ function displayTasks($tasks) {
     if (count($tasks) > 0) {
         echo '<div id="taskList" class="p-4 flex flex-col mt-4 gap-2">';
         foreach ($tasks as $task) {
+            $completion_date = date('Y-m-d', strtotime($task->datefinished)); // use 'datefinished' field
+
             $current_time = time();
             $start_time = strtotime($task->startdate);
             $due_time = strtotime($task->duedate ? $task->duedate : $task->startdate);
-            if ($task->status == 5 && $due_time < $current_time) {
+            // if ($task->status == 5 && $due_time < $current_time) {
+            //     continue;
+            // }
+            if ($task->status == 5 && $completion_date != $current_date) {
                 continue;
             }
             ?>

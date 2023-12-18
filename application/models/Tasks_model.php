@@ -26,19 +26,38 @@ class Tasks_model extends App_Model
 
 
     // Not used?
-    public function get_user_tasks_assigned($staff_id)
-    {
-        $this->db->select('tbltasks.*, GROUP_CONCAT(tbltask_assigned.staffid) as assignees');
-        $this->db->from('tbltasks');
-        $this->db->join('tbltask_assigned', 'tbltasks.id = tbltask_assigned.taskid');
-        $this->db->where('tbltask_assigned.staffid', $staff_id);
-        $this->db->where('tbltasks.sprint_id IS NOT NULL');
-        $this->db->group_by('tbltasks.id');
-        $this->db->order_by('tbltasks.startdate');
-        $query = $this->db->get();
+    // public function get_user_tasks_assigned($staff_id)
+    // {
+    //     $this->db->select('tbltasks.*, GROUP_CONCAT(tbltask_assigned.staffid) as assignees');
+    //     $this->db->from('tbltasks');
+    //     $this->db->join('tbltask_assigned', 'tbltasks.id = tbltask_assigned.taskid');
+    //     $this->db->where('tbltask_assigned.staffid', $staff_id);
+    //     $this->db->where('tbltasks.sprint_id IS NOT NULL');
+    //     $this->db->group_by('tbltasks.id');
+    //     $this->db->order_by('tbltasks.startdate');
+    //     $query = $this->db->get();
 
-        return $query->result();
-    }
+    //     return $query->result();
+    // }
+
+public function get_user_tasks_assigned($staff_id)
+{
+    $current_date = date('Y-m-d');
+    
+    $this->db->select('tbltasks.*, GROUP_CONCAT(tbltask_assigned.staffid) as assignees');
+    $this->db->from('tbltasks');
+    $this->db->join('tbltask_assigned', 'tbltasks.id = tbltask_assigned.taskid');
+    $this->db->where('tbltask_assigned.staffid', $staff_id);
+    $this->db->where('tbltasks.sprint_id IS NOT NULL');
+    // Include tasks that are completed today
+    $this->db->where("(tbltasks.status != 5 OR (tbltasks.status = 5 AND DATE(tbltasks.datefinished) = '$current_date'))", NULL, FALSE);
+    $this->db->group_by('tbltasks.id');
+    $this->db->order_by('tbltasks.startdate');
+    $query = $this->db->get();
+// var_dump($query);
+    return $query->result();
+}
+
     
     public function get_statuses()
     {
