@@ -178,9 +178,8 @@ class Payroll_model extends App_Model
         $this->db->where('id', $id);
         return $this->db->update('tbl_payroll_records');
     }
-    public function saveReferenceNumber($id, $referenceNumber,$paymentMode,$remark) {
+    public function saveReferenceNumber($id, $referenceNumber,$paymentMode) {
         $this->db->set('Refrence_number', $referenceNumber);
-        $this->db->set('remark', $remark);
         $this->db->set('payment_mode', $paymentMode);
         $this->db->where('id', $id);
         return $this->db->update('tbl_payroll_records');
@@ -409,6 +408,7 @@ class Payroll_model extends App_Model
             if ($result && $result['total_salary'] > 0) {
                 $exchangeRates = $this->get_exchange_rates($month, $currentYear); // Get exchange rates for the specific month
                 $rateKey = 'rate_' . strtolower($currency);
+
 
                 if (isset($exchangeRates[$rateKey]) && $exchangeRates[$rateKey] > 0) {
                     // Convert the total salary to USD and add it to the respective month

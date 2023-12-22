@@ -19,7 +19,7 @@
                     <label
                         for="notify_project_members_status_change"><?php echo _l('notify_project_members_status_change'); ?></label>
                 </div>
-                <div class="checkbox checkbox-primary">
+                <div class="checkbox checkbox-primary hidden">
                     <input type="checkbox" name="mark_all_tasks_as_completed" id="mark_all_tasks_as_completed">
                     <label
                         for="mark_all_tasks_as_completed"><?php echo _l('project_mark_all_tasks_as_completed'); ?></label>

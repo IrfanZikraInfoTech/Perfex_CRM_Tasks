@@ -617,19 +617,39 @@ function is_task_created_by_staff($taskId, $staffId = null)
 function get_tasks_in_date_range($staff_id, $from, $to, $forKPI = false){
     $CI = &get_instance();
 
+    // Get all tasks assigned to the user
     $tasks = $CI->tasks_model->get_user_tasks_assigned($staff_id);
-    $filteredTasks = [];
 
     // Convert dates to DateTime objects for comparison
     $startDate = new DateTime($from);
     $endDate = new DateTime($to);
 
-    // Filter tasks based on date range
+    // Get task timers within the date range
+    $CI->db->select('task_id');
+    $CI->db->from(db_prefix() . 'taskstimers');
+    $CI->db->where('staff_id', $staff_id);
+    $CI->db->where('DATE(FROM_UNIXTIME(start_time)) >=', $startDate->format('Y-m-d'));
+    $CI->db->where('DATE(FROM_UNIXTIME(start_time)) <=', $endDate->format('Y-m-d'));
+    $taskTimersQuery = $CI->db->get();
+    $taskTimers = $taskTimersQuery->result_array();
+    $taskIdsWithTimers = array_column($taskTimers, 'task_id');
+
+    $filteredTasks = [];
+
+    // Filter tasks based on date range or task timer existence
     foreach($tasks as $task){
+        $taskInDateRange = false;
         $startConsideration = ($task->startdate) ? new DateTime($task->startdate) : new DateTime(date("Y-m-d", strtotime($task->dateadded)));
         $dueConsideration = ($task->duedate) ? new DateTime($task->duedate) : $startConsideration;
 
         if($startConsideration <= $endDate && $dueConsideration >= $startDate){
+            $taskInDateRange = true;
+        }
+
+        // Check if task timer exists for the task within the date range
+        $taskHasTimerInRange = in_array($task->id, $taskIdsWithTimers);
+
+        if($taskInDateRange || $taskHasTimerInRange){
             if($forKPI) {
                 // Return only the selected properties when forKPI is true
                 $filteredTask = new stdClass();

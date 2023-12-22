@@ -241,7 +241,7 @@ class kpi_system
         $totalLoggedTime = 0;
     
         // Grace period is 30 minutes in seconds for each day
-        $gracePeriodPerDay = 30 * 60;
+        $gracePeriodPerDay = 90 * 60;
     
         // Convert dates to DateTime objects for iteration
         $startDate = new DateTime($from);

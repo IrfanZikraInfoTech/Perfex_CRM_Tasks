@@ -17,7 +17,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 * environments.
 *
 */
-define('APP_BASE_URL', 'http://localhost:8080/perfex_crm');
+define('APP_BASE_URL', 'http://localhost/sync-crm');
 
 /*
 * --------------------------------------------------------------------------

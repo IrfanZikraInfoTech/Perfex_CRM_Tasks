@@ -152,7 +152,7 @@
                                 <?php } ?>
                                 <?php if (isset($project)) { ?>
                                 <div class="form-group mark_all_tasks_as_completed hide">
-                                    <div class="checkbox checkbox-primary">
+                                    <div class="checkbox checkbox-primary hidden">
                                         <input type="checkbox" name="mark_all_tasks_as_completed"
                                             id="mark_all_tasks_as_completed">
                                         <label

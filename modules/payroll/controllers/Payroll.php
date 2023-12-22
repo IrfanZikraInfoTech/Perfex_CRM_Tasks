@@ -295,10 +295,10 @@ public function save_exchange_rate() {
     public function save_reference_number() {
     $id = $this->input->post('id');
     $referenceNumber = $this->input->post('reference_number');
-    $remark = $this->input->post('remark');
+    // $remark = $this->input->post('remark');
     $paymentMode = $this->input->post('payment_mode');
 
-    echo $this->payroll_model->saveReferenceNumber($id, $referenceNumber,$paymentMode,$remark);
+    echo $this->payroll_model->saveReferenceNumber($id, $referenceNumber,$paymentMode);
     }
 }
     // public function make_payment() {

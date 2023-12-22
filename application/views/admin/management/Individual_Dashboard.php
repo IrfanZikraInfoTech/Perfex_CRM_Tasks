@@ -197,8 +197,10 @@ function interpolateColor($from, $to, $percent) {
                             </thead>
                             <tbody>
                                 <tr class="hover:bg-gray-50 transition">
-                                    <td class="font-semibold">Attendance Rate</td>
-                                    <td class="text-right"><?= round($punctuality_rate['present_percentage'],2) ?>%</td>
+                                    
+                                        <td class="font-semibold">Attendance Rate</td>
+                                        <td class="text-right"><?= round($punctuality_rate['present_percentage'],2) ?>%</td>
+                                    
                                 </tr>
                                 <tr class="hover:bg-gray-50 transition">
                                     <td class="font-semibold">Punctuality Rate</td>
@@ -331,7 +333,7 @@ function interpolateColor($from, $to, $percent) {
                         <span class="text-xl mt-2"><?= hoursToHoursMinutes($task_rates['esimate_hours']) ?></span>
                     </div>
                     <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
-                        <span class="text-sm font-medium">Total Time spent on Stories</span>
+                        <span class="text-sm font-medium"><a onclick="showKpiInformationModal('Total time spent on stories falling within date range irrespective of the fact whether it\'s task timer activity lies within the date range or not!')" class="cursor-pointer">Total Time spent on Stories <i class="fa fa-info-circle pl-2"></i></a></span>
                         <span class="text-xl mt-2"><?= hoursToHoursMinutes($task_rates['spent_hours']) ?></span>
                     </div>
                 </div>
@@ -351,7 +353,7 @@ function interpolateColor($from, $to, $percent) {
                         <span class="text-xl mt-2"><?= hoursToHoursMinutes($shift_productivity_rate['total_logged_time']) ?></span>
                     </div>
                     <div class="flex flex-col items-center bg-white p-5 shadow-sm hover:shadow-lg rounded-[40px] transition  border border-gray-200 border-solid hover:border-<?= get_option('management_theme_border')?>">
-                        <span class="text-sm font-medium">Total Hours on Tasks</span>
+                        <span class="text-sm font-medium"><a onclick="showKpiInformationModal('Total task timer activity by staff member for all assigned tasks for the selected date range!')" class="cursor-pointer">Total Hours on Tasks <i class="fa fa-info-circle pl-2"></i></a></span>
                         <span class="text-xl mt-2"><?= hoursToHoursMinutes($shift_productivity_rate['total_task_time']) ?></span>
                     </div>
                 </div>
@@ -642,7 +644,14 @@ var chart = new Chart(ctx, {
          },
     }
 });
-
+function showKpiInformationModal(text) {
+    Swal.fire({
+        title: 'Metric Information',
+        text: text,
+        icon: 'info',
+        confirmButtonText: 'Got it'
+    });
+}
 </script>
 <?php 
 if($from == $to){
